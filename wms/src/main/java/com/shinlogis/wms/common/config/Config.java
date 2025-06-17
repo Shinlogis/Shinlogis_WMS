@@ -1,0 +1,37 @@
+package com.shinlogis.wms.common.config;
+
+public class Config {
+	
+    public static final String url = "jdbc:mysql://localhost:3306/shop";
+    public static final String id = "shop";
+    public static final String password = "1234";
+    
+    public static final String PRODUCT_IMAGE_PATH = "C:\\public";
+    
+	/*-------------------------------------
+	 각 페이지 정의
+	 --------------------------------------*/
+	public static final int MAIN_PAGE = 0; 
+	public static final int INBOUND_PLAN_PAGE = 1; 
+	public static final int INBOUND_ITEM_PAGE = 2; 
+	public static final int INBOUND_PROCESS_PAGE = 3; 
+	public static final int OUTBOUND_PLAN_PAGE = 4; 
+	public static final int OUTBOUNT_PROCESS_PAGE = 5;
+	public static final int STOCK_PAGE = 6; 
+	public static final int PRODUCT_PAGE = 7; 
+	public static final int LOCATION_PAGE = 8;
+	public static final int SUPPLIER_PAGE = 9;
+	public static final int CHATTING_PAGE = 10;
+	public static final int MY_PAGE = 11;
+	
+	/*-------------------------------------
+	 관리자 앱 메인 설정
+	 --------------------------------------*/
+	public static final int ADMINMAIN_WIDTH = 1440;
+	public static final int ADMINMAIN_HEIGHT = 1024;
+	public static final int SIDE_WIDTH = 200;
+	public static final int SIDE_HEIGHT = ADMINMAIN_HEIGHT;
+	public static final int HEADER_WIDTH = ADMINMAIN_WIDTH - SIDE_WIDTH;
+	public static final int HEADER_HEIGHT = 50;
+
+}
