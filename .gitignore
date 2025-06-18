@@ -1,0 +1,37 @@
+# === IDE 관련 ===
+.metadata/
+.settings/
+.loadpath
+.classpath
+.project
+.sts4-cache/
+.recommenders/
+.externalToolBuilders/
+*.launch
+
+# === 빌드 산출물 ===
+bin/
+target/
+out/
+build/
+*.class
+*.jar
+*.war
+*.zip
+
+# === 임시 / 백업 / 로그 ===
+*.log
+*.tmp
+*.bak
+*.swp
+*~.nib
+hs_err_pid*
+replay_pid*
+
+# === 시스템 파일 ===
+.DS_Store
+Thumbs.db
+
+# === 기타 ===
+.apt_generated/
+.apt_generated_test/
