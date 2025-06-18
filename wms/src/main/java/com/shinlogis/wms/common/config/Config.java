@@ -33,5 +33,14 @@ public class Config {
 	public static final int SIDE_HEIGHT = ADMINMAIN_HEIGHT;
 	public static final int HEADER_WIDTH = ADMINMAIN_WIDTH - SIDE_WIDTH;
 	public static final int HEADER_HEIGHT = 50;
-
+	
+	/*-------------------------------------
+	 관리 페이지 설정
+	 --------------------------------------*/
+	public static final int CONTENT_WIDTH = ADMINMAIN_WIDTH - SIDE_WIDTH - 140; // 컨텐츠 영역 너비
+	
+	public static final int PAGE_NAME_HEIGHT = 30; // 페이지명 높이
+	public static final int SEARCH_BAR_HEIGHT = 100;
+	public static final int TABLE_HEIGHT = 785;
+	public static final int TABLE_NORTH_HEIGHT = 40;
 }

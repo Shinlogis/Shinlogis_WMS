@@ -1,23 +1,37 @@
 package com.shinlogis.wms;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.util.DBManager;
+import com.shinlogis.wms.inbound.view.InboundPlanPage;
 import com.shinlogis.wms.main.view.MainPage;
-import com.shinlogis.wms.security.model.Admin;
 import com.shinlogis.wms.view.Page;
 
 public class AppMain extends JFrame {
-    JPanel p_west, p_center, p_north, p_container;
+    JPanel p_west, p_center, p_north, p_content;
     JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
     JLabel la_outboundPlan, la_outboundDetail;
     JLabel la_inventory, la_container, la_branch, la_supplier, la_chat;
+	Page[] pages;
 
     DBManager dbManager = DBManager.getInstance();
     public Connection conn;
@@ -26,6 +40,7 @@ public class AppMain extends JFrame {
     public AppMain() {
         initUI();
         connect();
+        createPage();
         setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
         setVisible(true);
         addWindowListener(new WindowAdapter() {
@@ -41,7 +56,7 @@ public class AppMain extends JFrame {
         p_center = new JPanel(new BorderLayout());
         p_west = new JPanel();
         p_north = new JPanel();
-        p_container = new JPanel();
+        p_content = new JPanel();
 
         // 상단 바 설정
         p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));
@@ -53,12 +68,15 @@ public class AppMain extends JFrame {
         // 조립
         p_center.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.ADMINMAIN_HEIGHT));
         p_center.setBackground(Color.BLUE);
-        p_container.setPreferredSize(p_center.getPreferredSize());
-        p_container.setBackground(Color.WHITE);
+        
+        p_content.setPreferredSize(p_center.getPreferredSize());
+        p_content.setBackground(Color.WHITE);
 
         p_center.add(p_north, BorderLayout.NORTH);
+        p_center.add(p_content, BorderLayout.CENTER);
         add(p_west, BorderLayout.WEST);
-        add(p_center, BorderLayout.CENTER);
+        add(p_center, BorderLayout.CENTER);       
+      
     }
 
     private void createSidebar() {
@@ -80,6 +98,15 @@ public class AppMain extends JFrame {
         la_branch = createMenuItem("지점 관리", Config.INBOUND_PROCESS_PAGE);
         la_supplier = createMenuItem("공급사 관리", Config.OUTBOUNT_PROCESS_PAGE);
         la_chat = createMenuItem("지점과 채팅하기", Config.OUTBOUND_PLAN_PAGE);
+
+        // 이벤트 연결
+        la_inboundPlan.addMouseListener(new MouseAdapter() {
+      		@Override
+      		public void mouseClicked(MouseEvent e) {
+      			showPage(Config.INBOUND_PLAN_PAGE);
+      			System.out.println("click");
+      		}
+      	});
 
         // 메뉴 그룹 추가
         addMenuGroups();
@@ -154,6 +181,31 @@ public class AppMain extends JFrame {
     private void connect() {
         conn = dbManager.getConnection();
     }
+    
+	/**
+	 * 쇼핑몰에 사용할 모든 페이지 생성 및 부착
+	 */
+	public void createPage() {
+		pages = new Page[2];
+
+		pages[0] = new MainPage(this);
+		pages[1] = new InboundPlanPage(this);
+		
+
+		for (int i = 0; i < pages.length; i++) {
+			p_content.add(pages[i]);
+		}
+	}
+
+	/**
+	 * 부착된 페이지들을 대상으로, 어떤 페이지들을 보여줄지 결정하는 메서드
+	 */
+	public void showPage(int target) {
+
+		for (int i = 0; i < pages.length; i++) {
+			pages[i].setVisible((i == target) ? true : false);
+		}
+	}
 
     public static void main(String[] args) {
         new AppMain();
