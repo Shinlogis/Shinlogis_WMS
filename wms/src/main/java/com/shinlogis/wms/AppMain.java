@@ -25,6 +25,7 @@ import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
+import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
 import com.shinlogis.wms.inOutBound.view.InboundPlanPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.main.view.MainPage;
@@ -118,6 +119,15 @@ public class AppMain extends JFrame {
       			System.out.println("click");
       		}
       	});
+        
+        // 입고상세 이벤트 연결 추가 @author 김예진
+        la_inboundDetail.addMouseListener(new MouseAdapter() {
+      		@Override
+      		public void mouseClicked(MouseEvent e) {
+      			showPage(Config.INBOUND_ITEM_PAGE);
+      			System.out.println("click");
+      		}
+      	});
 
         // 메뉴 그룹 추가
         addMenuGroups();
@@ -197,10 +207,11 @@ public class AppMain extends JFrame {
 	 * 쇼핑몰에 사용할 모든 페이지 생성 및 부착
 	 */
 	public void createPage() {
-		pages = new Page[2];
+		pages = new Page[3];
 
 		pages[0] = new MainPage(this);
 		pages[1] = new InboundPlanPage(this);
+		pages[2] = new InboundPlanItemPage(this);
 		
 
 		for (int i = 0; i < pages.length; i++) {

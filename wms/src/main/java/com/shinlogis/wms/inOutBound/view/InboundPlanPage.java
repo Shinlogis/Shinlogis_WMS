@@ -167,6 +167,5 @@ public class InboundPlanPage extends Page{
 		setBackground(Color.LIGHT_GRAY);
 				
 		
-		
 	}
 }
