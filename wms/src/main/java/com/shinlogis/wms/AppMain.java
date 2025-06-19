@@ -20,10 +20,13 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import com.shinlogis.wms.Member.view.MemberJoin;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
+import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inOutBound.view.InboundPlanPage;
+import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.main.view.MainPage;
 
 public class AppMain extends JFrame {
@@ -32,10 +35,15 @@ public class AppMain extends JFrame {
     JLabel la_outboundPlan, la_outboundDetail;
     JLabel la_inventory, la_container, la_branch, la_supplier, la_chat;
 	Page[] pages;
+	
+	MemberJoin memberJoin;
+	boolean login = false;
+
 
     DBManager dbManager = DBManager.getInstance();
     public Connection conn;
-    //public Admin admin = new Admin();
+    public HeadquartersUser headquartersUser;
+    public LocationUser locationUser;
 
     public AppMain() {
         initUI();
@@ -52,11 +60,13 @@ public class AppMain extends JFrame {
     }
 
     private void initUI() {
+    	
         // 메인 패널 초기화
         p_center = new JPanel(new BorderLayout());
         p_west = new JPanel();
         p_north = new JPanel();
         p_content = new JPanel();
+        memberJoin = new MemberJoin();
 
         // 상단 바 설정
         p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));
@@ -75,7 +85,8 @@ public class AppMain extends JFrame {
         p_center.add(p_north, BorderLayout.NORTH);
         p_center.add(p_content, BorderLayout.CENTER);
         add(p_west, BorderLayout.WEST);
-        add(p_center, BorderLayout.CENTER);       
+        add(p_center, BorderLayout.CENTER);    
+        
       
     }
 
@@ -206,8 +217,11 @@ public class AppMain extends JFrame {
 			pages[i].setVisible((i == target) ? true : false);
 		}
 	}
+	
+	
+	
 
-    public static void main(String[] args) {
-        new AppMain();
-    }
+//    public static void main(String[] args) {
+//        new AppMain();
+//    }
 }

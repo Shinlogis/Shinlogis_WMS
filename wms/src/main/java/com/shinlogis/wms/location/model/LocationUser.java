@@ -1,6 +1,6 @@
 package com.shinlogis.wms.location.model;
 
-public class LocationUsers {
+public class LocationUser {
 	private int headquartersUserId;
     private String id;
     private String pw;
