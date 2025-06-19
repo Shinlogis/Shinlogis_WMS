@@ -1,4 +1,4 @@
-package com.shinlogis.wms.view;
+package com.shinlogis.wms.common.config;
 
 import java.awt.Dimension;
 
