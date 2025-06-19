@@ -21,10 +21,10 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import com.shinlogis.wms.common.config.Config;
+import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
-import com.shinlogis.wms.inbound.view.InboundPlanPage;
+import com.shinlogis.wms.inOutBound.view.InboundPlanPage;
 import com.shinlogis.wms.main.view.MainPage;
-import com.shinlogis.wms.view.Page;
 
 public class AppMain extends JFrame {
     JPanel p_west, p_center, p_north, p_content;

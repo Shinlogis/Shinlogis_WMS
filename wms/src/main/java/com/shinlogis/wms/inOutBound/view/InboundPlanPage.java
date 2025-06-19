@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view;
+package com.shinlogis.wms.inOutBound.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,7 +18,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
-import com.shinlogis.wms.view.Page;
+import com.shinlogis.wms.common.config.Page;
 import com.toedter.calendar.JDateChooser;
 
 public class InboundPlanPage extends Page{
