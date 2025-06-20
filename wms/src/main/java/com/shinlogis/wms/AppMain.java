@@ -28,7 +28,9 @@ import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inOutBound.view.InboundPlanPage;
+import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
+import com.shinlogis.wms.inOutBound.view.InboundReceiptPage;
+import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.main.view.MainPage;
 
@@ -36,7 +38,7 @@ public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
 	JLabel la_outboundPlan, la_outboundDetail;
-	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList,la_product;
+	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product;
 	Page[] pages;
 
 	MemberJoin memberJoin;
@@ -58,7 +60,7 @@ public class AppMain extends JFrame {
 	}
 
 	public void initUI() {
-		//로그인한 사용자가 누구인지 판단하기 
+		// 로그인한 사용자가 누구인지 판단하기
 		if (headquartersUser != null) {
 			role = "headquartersUser";
 		} else if (locationUser != null) {
@@ -67,7 +69,7 @@ public class AppMain extends JFrame {
 			JOptionPane.showMessageDialog(this, "사용자 정보가 없습니다.");
 			return;
 		}
-				
+
 		// 메인 패널 초기화
 		p_center = new JPanel(new BorderLayout());
 		p_west = new JPanel();
@@ -92,12 +94,11 @@ public class AppMain extends JFrame {
 		p_center.add(p_content, BorderLayout.CENTER);
 		add(p_west, BorderLayout.WEST);
 		add(p_center, BorderLayout.CENTER);
-		
+
 		connect();
 		createPage();
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
 		setVisible(true);
-
 	}
 
 	private void createSidebar() {
@@ -115,7 +116,7 @@ public class AppMain extends JFrame {
 			la_inboundProcess = createMenuItem("입고 처리", Config.INBOUND_PLAN_PAGE);
 			la_outboundPlan = createMenuItem("출고 예정", Config.INBOUND_ITEM_PAGE);
 			la_outboundDetail = createMenuItem("출고 상세", Config.INBOUND_ITEM_PAGE);
-			la_product= createMenuItem("상품 관리", Config.PRODUCT_PAGE);
+			la_product = createMenuItem("상품 관리", Config.PRODUCT_PAGE);
 			la_inventory = createMenuItem("재고 관리", Config.INVENTORY_PAGE);
 			la_stock = createMenuItem("창고 관리", Config.STOCK_PAGE);
 			la_branch = createMenuItem("지점 관리", Config.LOCATION_PAGE);
@@ -127,6 +128,24 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.INBOUND_PLAN_PAGE);
+					System.out.println("click");
+				}
+			});
+			
+	        // 입고상세 이벤트 연결 추가 @author 김예진
+	        la_inboundDetail.addMouseListener(new MouseAdapter() {
+	      		@Override
+	      		public void mouseClicked(MouseEvent e) {
+	      			showPage(Config.INBOUND_ITEM_PAGE);
+	      			System.out.println("click");
+	      		}
+	      	});
+
+			// 이벤트 연결
+			la_inventory.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.INVENTORY_PAGE);
 					System.out.println("click");
 				}
 			});
@@ -161,7 +180,7 @@ public class AppMain extends JFrame {
 		if ("headquartersUser".equals(role)) {
 			p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
 			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail));
-			p_west.add(createMenuGroup("재고관리", false, la_product,la_inventory, la_stock));
+			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_stock));
 			p_west.add(createMenuGroup("지점관리", false, la_branch));
 			p_west.add(createMenuGroup("공급사관리", false, la_supplier));
 			p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거
@@ -235,10 +254,16 @@ public class AppMain extends JFrame {
 	public void createPage() {
 
 		if ("headquartersUser".equals(role)) {
-			pages = new Page[2];
+			pages = new Page[8];
 
 			pages[0] = new MainPage(this);
-			pages[1] = new InboundPlanPage(this);
+			pages[1] = new InboundReceiptPage(this);
+			pages[2] = new InboundPlanItemPage(this);
+			pages[3] = null;
+			pages[4] = null;
+			pages[5] = null;
+			pages[6] = null;
+			pages[7] = new InventoryPage(this);
 
 		} else if ("locationUser".equals(role)) {
 			pages = new Page[2];
@@ -248,7 +273,9 @@ public class AppMain extends JFrame {
 		}
 
 		for (int i = 0; i < pages.length; i++) {
-			p_content.add(pages[i]);
+			if (pages[i] != null) {
+				p_content.add(pages[i]);
+			}
 		}
 	}
 
@@ -258,11 +285,12 @@ public class AppMain extends JFrame {
 	public void showPage(int target) {
 
 		for (int i = 0; i < pages.length; i++) {
-			pages[i].setVisible((i == target) ? true : false);
+			if (pages[i] != null) {
+				pages[i].setVisible(i == target);
+			}
 		}
 	}
-
+}
 //    public static void main(String[] args) {
 //        new AppMain();
 //    }
-}

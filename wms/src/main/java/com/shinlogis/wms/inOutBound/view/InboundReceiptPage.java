@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,7 +23,11 @@ import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.toedter.calendar.JDateChooser;
 
-public class InboundPlanPage extends Page{
+/**
+ * 입고예정 전표 페이지입니다.
+ * @author 김예진
+ */
+public class InboundReceiptPage extends Page{
 	/* ────────── 페이지명 영역 구성 요소 ────────── */    
 	private JPanel pPageName; // 페이지명 패널
 	private JLabel laPageName; // 페이지명
@@ -42,12 +48,13 @@ public class InboundPlanPage extends Page{
     private JLabel laPlanCount;
     private JTable tblPlan; // 입고예정 목록 테이블
     private JScrollPane scTable;
+    private InboundReceiptModel iModel;
     private DefaultTableModel model;     
 
     private JPanel pTableNorth;
     private JButton btnRegister;  // 입고예정등록
     
-	public InboundPlanPage(AppMain appMain) {
+	public InboundReceiptPage(AppMain appMain) {
 		super(appMain);
 		
 		/* ==== 검색 영역 ==== */
@@ -89,7 +96,7 @@ public class InboundPlanPage extends Page{
         // 상태
         gbc.gridx =6;
         pSearch.add(new JLabel("상태"), gbc);
-        cbStatus = new JComboBox<>(new String[] { "전체", "예정", "처리 중", "완료" });
+        cbStatus = new JComboBox<>(new String[] { "전체", "예정", "진행 중", "완료", "보류" });
         gbc.gridx = 7;
         pSearch.add(cbStatus, gbc);
 
@@ -102,6 +109,10 @@ public class InboundPlanPage extends Page{
 
         // 검색 버튼
         btnSearch = new JButton("검색");
+        // 버튼 클릭 시 입력한 검색어를 조건으로 select
+        btnSearch.addActionListener(e ->{
+        	
+        });
         gbc.gridx = 10;
         pSearch.add(btnSearch, gbc);
         
@@ -125,14 +136,28 @@ public class InboundPlanPage extends Page{
         /* ==== 테이블 영역 ==== */
         pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
 
-//		tblPlan = new JTable(productModel = new ProductModel());
-//		scTable = new JScrollPane(tblPlan);
-//		scTable.setPreferredSize(new Dimension());
-//		
-//		pTable.add(laPlanCount);
-//		pTable.add(scTable);
+		tblPlan = new JTable(iModel = new InboundReceiptModel());
+		tblPlan.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        int row = tblPlan.rowAtPoint(e.getPoint());
+		        int col = tblPlan.columnAtPoint(e.getPoint());
+
+		        // 8번 열(=상세보기)을 클릭했을 때만 출력
+		        if (col == 8 && row != -1) {
+		            System.out.println("click. row: " + row + ", io_receipt_id: " + tblPlan.getValueAt(row, 0));
+		        }
+		    }
+		});
+
+		scTable = new JScrollPane(tblPlan);
+		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, Config.TABLE_HEIGHT - 60));
+				
+		pTable.add(laPlanCount);
+		pTable.add(scTable);
         
         pTable.add(pTableNorth);
+        pTable.add(scTable);
         
 		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
 		pTable.setBackground(Color.WHITE);
@@ -145,5 +170,6 @@ public class InboundPlanPage extends Page{
 		
 		setBackground(Color.LIGHT_GRAY);
 				
+		
 	}
 }

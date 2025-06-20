@@ -1,28 +1,48 @@
 package com.shinlogis.wms.inOutBound.model;
 
+import java.sql.Date;
+
+import com.shinlogis.wms.damagedCode.model.DamagedCode;
+import com.shinlogis.wms.snapshot.model.Snapshot;
+
+/**
+ * 입출고예정 상세 품목 model입니다.
+ * 
+ * @author 김예진
+ * @since 2025-06-20
+ */
 public class IOPlanItem {
 	private int ioItemId;
-	private int ioReceiptId;
+	private IOReceipt ioReceipt;
 	private int plannedQuantity;
-	private int productSnapshot;
-	private int damageCodeId;
+	private Snapshot productSnapshot;
+	private DamagedCode damagedCode;
 	private int damageQuantity;
 	private int actualQuantity;
+	private Date proccessedDate;
 
-	public int getIoItemId() {
-		return ioItemId;
+	public Date getProccessedDate() {
+		return proccessedDate;
 	}
 
-	public void setIoItemId(int ioItemId) {
-		this.ioItemId = ioItemId;
+	public void setProccessedDate(Date proccessedDate) {
+		this.proccessedDate = proccessedDate;
 	}
 
-	public int getIoReceiptId() {
-		return ioReceiptId;
+	public Snapshot getProductSnapshot() {
+		return productSnapshot;
 	}
 
-	public void setIoReceiptId(int ioReceiptId) {
-		this.ioReceiptId = ioReceiptId;
+	public void setProductSnapshot(Snapshot productSnapshot) {
+		this.productSnapshot = productSnapshot;
+	}
+
+	public DamagedCode getDamagedCode() {
+		return damagedCode;
+	}
+
+	public void setDamagedCode(DamagedCode damagedCode) {
+		this.damagedCode = damagedCode;
 	}
 
 	public int getPlannedQuantity() {
@@ -33,21 +53,31 @@ public class IOPlanItem {
 		this.plannedQuantity = plannedQuantity;
 	}
 
-	public int getProductSnapshot() {
-		return productSnapshot;
+	public int getIoItemId() {
+		return ioItemId;
 	}
 
-	public void setProductSnapshot(int productSnapshot) {
-		this.productSnapshot = productSnapshot;
+	public void setIoItemId(int ioItemId) {
+		this.ioItemId = ioItemId;
 	}
 
-	public int getDamageCodeId() {
-		return damageCodeId;
+	public IOReceipt getIoReceipt() {
+		return ioReceipt;
 	}
 
-	public void setDamageCodeId(int damageCodeId) {
-		this.damageCodeId = damageCodeId;
+	public void setIoReceipt(IOReceipt ioReceipt) {
+		this.ioReceipt = ioReceipt;
 	}
+
+	public DamagedCode getDamageCode() {
+		return damagedCode;
+	}
+
+	public void setDamageCode(DamagedCode damageCode) {
+		this.damagedCode = damageCode;
+	}
+
+
 
 	public int getDamageQuantity() {
 		return damageQuantity;

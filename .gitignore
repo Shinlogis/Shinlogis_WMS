@@ -117,6 +117,11 @@ $RECYCLE.BIN/
 *.lnk
 # 추가: Maven target 디렉토리 무시
 /wms/target/
+target/
+
+# 추가 :  이클립스 프로젝트 파일들 무시
+.classpath
+.project
 
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,eclipse,java,macos
