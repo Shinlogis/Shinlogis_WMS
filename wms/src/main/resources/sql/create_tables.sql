@@ -75,7 +75,7 @@ CREATE TABLE inventory (
 -- [상품 스냅샷 테이블]
 CREATE TABLE snapshot (
     snapshot_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_code VARCHAR(100) NOT NULL UNIQUE,
+    product_code VARCHAR(100) NOT NULL,
     product_name VARCHAR(100) NOT NULL,
     storage_type_code VARCHAR(100) NOT NULL,
     supplier_name VARCHAR(100) NOT NULL,
@@ -100,30 +100,30 @@ CREATE TABLE io_receipt (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     scheduled_date DATETIME NOT NULL,
     proccessed_date DATETIME,
-    status VARCHAR(100) NOT NULL,
     location_id INT NOT NULL,
     CHECK (io_type IN ('IN', 'OUT')),
-    CHECK (status IN ('예정', '진행 중', '완료', '보류')),
     FOREIGN KEY (user_id) REFERENCES headquarters_user(headquarters_user_id),
     FOREIGN KEY (location_id) REFERENCES location(location_id)
 );
 
 -- [입출고 상세 항목 테이블]
-CREATE TABLE io_plan_item (
-    io_item_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE io_detail (
+    io_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     io_receipt_id INT NOT NULL,
     planned_quantity INT NOT NULL DEFAULT 0,
-    product_snapshot INT NOT NULL,
+    snapshot_id INT NOT NULL,
     damage_code_id INT NOT NULL,
     damage_quantity INT NOT NULL,
     actual_quantity INT NOT NULL,
     headquarters_user_id INT NOT NULL,
     proccessed_date DATETIME,
+    status VARCHAR(100) NOT NULL,
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
     CHECK (actual_quantity >= 0),
+    CHECK (status IN ('예정', '진행 중', '완료', '보류')),
     FOREIGN KEY (io_receipt_id) REFERENCES io_receipt(io_receipt_id),
-    FOREIGN KEY (product_snapshot) REFERENCES snapshot(snapshot_id),
+    FOREIGN KEY (snapshot_id) REFERENCES snapshot(snapshot_id),
     FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id),
     foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id)
 );
