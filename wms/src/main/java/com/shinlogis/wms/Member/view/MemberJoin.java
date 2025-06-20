@@ -94,10 +94,19 @@ public class MemberJoin extends JFrame{
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
 		p_center.add(createCenterLine(bt_join));
 		
+		
 		//이벤트
+		bt_idCheck.addActionListener(e -> {
+			idCheck();
+		});
+		
+		
+		
 		bt_join.addActionListener(e -> {
-			validate();
-			new MemberLogin();
+			if(checkValid()) {
+				checkValid();
+				new MemberLogin();
+			}
 		});
 		
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
@@ -198,16 +207,32 @@ public class MemberJoin extends JFrame{
 		
 	}
 	
+	//아이디 중복 검사
+	public void idCheck() {
+		HeadquartersUser headquartersUser = new HeadquartersUser();
+		if(t_id.getText() == headquartersUser.getId()) {
+			JOptionPane.showMessageDialog(this, "이미 존재하는 아이디 입니다.");
+			
+		}
+	}
+	
 	//유효성 검사
-	public void validate(){
-		if(t_id.getText().length() < 0) {
+	public boolean checkValid(){
+		if(t_id.getText().length() == 0) {
 			JOptionPane.showMessageDialog(this,"아이디를 입력하세요");
-		}else if(t_pwd.getPassword().length<0) {
+			return false;
+		}else if(t_pwd.getPassword().length==0) {
 			JOptionPane.showMessageDialog(this, "비밀번호를 입력하세요");
-		}else if(t_email.getText().length() <0) {
+			return false;
+		} else if(t_pwdCheck.getPassword().length ==0) {
 			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");
+			return false;
+		}else if(t_email.getText().length() ==0) {
+			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");
+			return false;
 		}else {
 			regist();
+			return true;
 		}
 	}
 	
