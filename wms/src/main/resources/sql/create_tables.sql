@@ -84,12 +84,13 @@ CREATE TABLE snapshot (
     CHECK (price >= 0)
 );
 
--- [파손 코드 테이블]
+-- [파손코드 테이블]
 CREATE TABLE damaged_code (
-    damage_code_id AUTO_INCREMENT PRIMARY KEY,
+    damage_code_id INT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(100) NOT NULL,
     name VARCHAR(100) NOT NULL
 );
+
 
 -- [입출고 전표 테이블]
 CREATE TABLE io_receipt (
