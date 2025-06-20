@@ -28,7 +28,8 @@ import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inOutBound.view.InboundPlanPage;
+import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
+import com.shinlogis.wms.inOutBound.view.InboundReceiptPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.main.view.MainPage;
@@ -98,7 +99,6 @@ public class AppMain extends JFrame {
 		createPage();
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
 		setVisible(true);
-
 	}
 
 	private void createSidebar() {
@@ -131,6 +131,15 @@ public class AppMain extends JFrame {
 					System.out.println("click");
 				}
 			});
+			
+	        // 입고상세 이벤트 연결 추가 @author 김예진
+	        la_inboundDetail.addMouseListener(new MouseAdapter() {
+	      		@Override
+	      		public void mouseClicked(MouseEvent e) {
+	      			showPage(Config.INBOUND_ITEM_PAGE);
+	      			System.out.println("click");
+	      		}
+	      	});
 
 			// 이벤트 연결
 			la_inventory.addMouseListener(new MouseAdapter() {
@@ -248,8 +257,8 @@ public class AppMain extends JFrame {
 			pages = new Page[8];
 
 			pages[0] = new MainPage(this);
-			pages[1] = new InboundPlanPage(this);
-			pages[2] = null;
+			pages[1] = new InboundReceiptPage(this);
+			pages[2] = new InboundPlanItemPage(this);
 			pages[3] = null;
 			pages[4] = null;
 			pages[5] = null;
