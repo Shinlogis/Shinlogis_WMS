@@ -1,8 +1,16 @@
 package com.shinlogis.wms.inOutBound.model;
 
+import java.sql.Date;
+
 import com.shinlogis.wms.damagedCode.model.DamagedCode;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
+/**
+ * 입출고예정 상세 품목 model입니다.
+ * 
+ * @author 김예진
+ * @since 2025-06-20
+ */
 public class IOPlanItem {
 	private int ioItemId;
 	private IOReceipt ioReceipt;
@@ -11,6 +19,15 @@ public class IOPlanItem {
 	private DamagedCode damagedCode;
 	private int damageQuantity;
 	private int actualQuantity;
+	private Date proccessedDate;
+
+	public Date getProccessedDate() {
+		return proccessedDate;
+	}
+
+	public void setProccessedDate(Date proccessedDate) {
+		this.proccessedDate = proccessedDate;
+	}
 
 	public Snapshot getProductSnapshot() {
 		return productSnapshot;

@@ -26,7 +26,7 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
-import com.shinlogis.wms.inOutBound.view.InboundPlanPage;
+import com.shinlogis.wms.inOutBound.view.InboundReceiptPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.main.view.MainPage;
 
@@ -210,7 +210,7 @@ public class AppMain extends JFrame {
 		pages = new Page[3];
 
 		pages[0] = new MainPage(this);
-		pages[1] = new InboundPlanPage(this);
+		pages[1] = new InboundReceiptPage(this);
 		pages[2] = new InboundPlanItemPage(this);
 		
 

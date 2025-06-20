@@ -13,7 +13,10 @@ import com.shinlogis.wms.inOutBound.model.IOPlanItem;
 import com.shinlogis.wms.inOutBound.model.IOReceipt;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
-
+/**
+ * 입출고예정 상세 DAO입니다
+ * @author 김예진
+ */
 public class IOPlanItemDAO {
 	DBManager dbManager = DBManager.getInstance();
 
@@ -32,7 +35,7 @@ public class IOPlanItemDAO {
         PreparedStatement pstmt = null;
 
         try {
-            connection = dbManager.getInstance().getConnection();
+            connection = dbManager.getConnection();
             try {
 				pstmt = connection.prepareStatement(sql);
 				pstmt.setInt(1, item.getIoItemId());
@@ -60,21 +63,26 @@ public class IOPlanItemDAO {
      * @author 김예진
      * @since 2025-06-29
      */
-    public List<IOPlanItem> selectIOPlanItem() {
+    public List<IOPlanItem> selectIOPlanItems() {
         List<IOPlanItem> list = new ArrayList<>();
-        String sql = "SELECT "
-                + "ip.io_item_id, ip.io_receipt_id, ip.planned_quantity, ip.product_snapshot, "
-                + "ip.damage_code_id, ip.damage_quantity, ip.actual_quantity, "
-                + "s.snapshot_id, s.product_code, s.product_name, s.price, s.expiry_date "
-                + "FROM io_plan_item ip "
-                + "JOIN snapshot s ON ip.product_snapshot = s.snapshot_id";
+        String sql = "select * "
+        		+ "FROM io_plan_item ip "
+        		+ "join io_receipt ir  "
+        		+ "on IP.io_receipt_id = IR.io_receipt_id "
+        		+ "JOIN snapshot s  "
+        		+ "ON ip.product_snapshot = s.snapshot_id "
+        		+ "join damaged_code dc "
+        		+ "on IP.damage_code_id = DC.damage_code_id "
+        		+ "join headquarters_user hu "
+        		+ "on HU.headquarters_user_id = IP.headquarters_user_id "
+        		+ "where ir.io_type = 'IN'";
 
         Connection connection = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
         try {
-            connection = dbManager.getInstance().getConnection();
+            connection = dbManager.getConnection();
             try {
                 pstmt = connection.prepareStatement(sql);
                 rs = pstmt.executeQuery();
@@ -97,8 +105,11 @@ public class IOPlanItemDAO {
                     snapshot.setSnapshotId(rs.getInt("product_snapshot"));
                     snapshot.setProductCode(rs.getString("product_code"));
                     snapshot.setProductName(rs.getString("product_name"));
+                    snapshot.setStorageTypeCode(rs.getString("storage_type_code"));
+                    snapshot.setSupplierName(rs.getString("supplier_name"));
                     snapshot.setPrice(rs.getInt("price"));
                     snapshot.setExpiryDate(rs.getDate("expiry_date"));
+                    
                     item.setProductSnapshot(snapshot);
                     
                     DamagedCode code = new DamagedCode();
@@ -107,7 +118,8 @@ public class IOPlanItemDAO {
 
                     item.setDamageQuantity(rs.getInt("damage_quantity"));
                     item.setActualQuantity(rs.getInt("actual_quantity"));
-
+                    item.setProccessedDate(rs.getDate("proccessed_date"));
+                    
                     list.add(item);
                 }
             } catch (SQLException e) {

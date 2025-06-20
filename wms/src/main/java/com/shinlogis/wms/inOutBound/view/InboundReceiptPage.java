@@ -23,7 +23,11 @@ import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.toedter.calendar.JDateChooser;
 
-public class InboundPlanPage extends Page{
+/**
+ * 입고예정 전표 페이지입니다.
+ * @author 김예진
+ */
+public class InboundReceiptPage extends Page{
 	/* ────────── 페이지명 영역 구성 요소 ────────── */    
 	private JPanel pPageName; // 페이지명 패널
 	private JLabel laPageName; // 페이지명
@@ -50,7 +54,7 @@ public class InboundPlanPage extends Page{
     private JPanel pTableNorth;
     private JButton btnRegister;  // 입고예정등록
     
-	public InboundPlanPage(AppMain appMain) {
+	public InboundReceiptPage(AppMain appMain) {
 		super(appMain);
 		
 		/* ==== 검색 영역 ==== */

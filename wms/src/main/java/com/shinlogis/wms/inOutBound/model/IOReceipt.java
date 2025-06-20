@@ -5,6 +5,10 @@ import java.util.Date;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.location.model.Location;
 
+/**
+ * 입출고예정 모델입니다.
+ * @author 김예진
+ */
 public class IOReceipt {
 	private int ioReceiptId;
 	private String ioType;
@@ -14,6 +18,15 @@ public class IOReceipt {
 	private Date processedDate;
 	private String status;
 	private Location location;
+	private String supplierName;
+
+	public String getSupplierName() {
+		return supplierName;
+	}
+
+	public void setSupplierName(String supplierName) {
+		this.supplierName = supplierName;
+	}
 
 	public HeadquartersUser getUser() {
 		return user;
