@@ -198,24 +198,45 @@ INSERT INTO io_receipt (io_type, user_id, created_at, scheduled_date, processed_
 ('IN', 7, '2025-06-19 00:36:48', '2025-06-24 00:36:48', NULL, '예정', 2);
 INSERT INTO io_receipt (io_type, user_id, created_at, scheduled_date, processed_date, status, location_id) VALUES
 ('IN', 6, '2025-06-19 00:36:48', '2025-06-24 00:36:48', NULL, '완료', 4);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(9, 48, 1, 2, 1, 83);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(3, 48, 2, 3, 5, 91);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(3, 66, 3, 5, 2, 25);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(1, 100, 4, 6, 5, 96);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(4, 58, 5, 4, 5, 95);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(8, 30, 6, 1, 0, 30);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(7, 29, 7, 3, 5, 87);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(1, 84, 8, 2, 3, 22);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(8, 83, 9, 1, 0, 83);
-INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity) VALUES
-(1, 82, 10, 7, 4, 93);
 
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (1, 'P001', '상품1', 'ROOM', '공급사1', 7225, '2025-11-30 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (2, 'P002', '상품2', 'ROOM', '공급사2', 4790, '2025-10-07 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (3, 'P003', '상품3', 'COLD', '공급사3', 3696, '2025-07-25 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (4, 'P004', '상품4', 'COLD', '공급사4', 9356, '2025-11-23 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (5, 'P005', '상품5', 'COLD', '공급사5', 2565, '2025-11-24 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (6, 'P006', '상품6', 'FROZEN', '공급사6', 8896, '2025-08-12 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (7, 'P007', '상품7', 'COLD', '공급사7', 1734, '2025-10-26 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (8, 'P008', '상품8', 'COLD', '공급사8', 7250, '2025-09-22 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (9, 'P009', '상품9', 'COLD', '공급사9', 4975, '2025-11-21 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date)
+VALUES (10, 'P010', '상품10', 'ROOM', '공급사10', 7355, '2025-11-16 00:00:00');
+
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (3, 71, 1, 4, 3, 20);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (3, 20, 2, 3, 0, 54);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (4, 82, 3, 4, 4, 60);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (6, 59, 4, 2, 2, 47);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (9, 58, 5, 2, 0, 77);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (10, 69, 6, 3, 1, 82);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (7, 26, 7, 3, 1, 53);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (1, 82, 8, 4, 0, 84);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (8, 28, 9, 3, 0, 79);
+INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity)
+VALUES (4, 47, 10, 5, 0, 41);

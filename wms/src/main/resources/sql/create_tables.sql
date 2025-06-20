@@ -84,12 +84,13 @@ CREATE TABLE snapshot (
     CHECK (price >= 0)
 );
 
--- [파손 코드 테이블]
+-- [파손코드 테이블]
 CREATE TABLE damaged_code (
-    damage_code_id AUTO_INCREMENT PRIMARY KEY,
+    damage_code_id INT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(100) NOT NULL,
     name VARCHAR(100) NOT NULL
 );
+
 
 -- [입출고 전표 테이블]
 CREATE TABLE io_receipt (
@@ -98,7 +99,7 @@ CREATE TABLE io_receipt (
     user_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     scheduled_date DATETIME NOT NULL,
-    processed_date DATETIME,
+    proccessed_date DATETIME,
     status VARCHAR(100) NOT NULL,
     location_id INT NOT NULL,
     CHECK (io_type IN ('IN', 'OUT')),
@@ -116,10 +117,13 @@ CREATE TABLE io_plan_item (
     damage_code_id INT NOT NULL,
     damage_quantity INT NOT NULL,
     actual_quantity INT NOT NULL,
+    headquarters_user_id INT NOT NULL,
+    proccessed_date DATETIME,
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
     CHECK (actual_quantity >= 0),
     FOREIGN KEY (io_receipt_id) REFERENCES io_receipt(io_receipt_id),
     FOREIGN KEY (product_snapshot) REFERENCES snapshot(snapshot_id),
-    FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id)
+    FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id),
+    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id)
 );

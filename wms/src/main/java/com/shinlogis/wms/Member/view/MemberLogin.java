@@ -107,35 +107,12 @@ public class MemberLogin extends JFrame{
 		
 
 		//이벤트 
-		//관리자로 로그인
-		bt_admin.addActionListener(e -> {
-			AppMain appMain=new AppMain();
-			appMain.headquartersUser=user;
-			appMain.initUI();
-		});
-		
-		
-		//지점으로 로그인
-		bt_location.addActionListener(e -> {
+		bt_admin.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
 				AppMain appMain=new AppMain();
-				appMain.locationUser=locationUser;
+				appMain.headquartersUser=user;
 				appMain.initUI();
-		});
-		
-		//아이디 찾기
-		find_id.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				new FindId();
-			}
-		});
-		
-		
-		//비밀번호 찾기
-		find_pwd.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				new FindPwd();
 			}
 		});
 		

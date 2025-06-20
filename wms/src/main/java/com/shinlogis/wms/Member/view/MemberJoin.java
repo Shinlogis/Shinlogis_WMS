@@ -213,6 +213,8 @@ public class MemberJoin extends JFrame{
 		if(t_id.getText() == headquartersUser.getId()) {
 			JOptionPane.showMessageDialog(this, "이미 존재하는 아이디 입니다.");
 			
+		}else {
+			JOptionPane.showMessageDialog(this, "사용 가능한 아이디 입니다.");
 		}
 	}
 	
