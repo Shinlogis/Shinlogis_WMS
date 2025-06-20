@@ -79,6 +79,7 @@ public class MemberLogin extends JFrame{
 			public void mouseClicked(MouseEvent e) {
 				AppMain appMain=new AppMain();
 				appMain.headquartersUser=user;
+				appMain.initUI();
 			}
 		});
 		
@@ -88,6 +89,7 @@ public class MemberLogin extends JFrame{
 			public void mouseClicked(MouseEvent e) {
 				AppMain appMain=new AppMain();
 				appMain.locationUser=locationUser;
+				appMain.initUI();
 			}
 		});
 		add(p_center);
