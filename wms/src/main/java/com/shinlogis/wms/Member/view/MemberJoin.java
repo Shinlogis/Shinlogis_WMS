@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -48,9 +49,10 @@ public class MemberJoin extends JFrame{
 	
 	DBManager dbManager = DBManager.getInstance();
 	HeadquartersDAO headquartersDAO;
-	
+	String role;
 	public MemberJoin(String role) {
-		
+		System.out.println(role);
+		this.role=role;
 		p_center = new JPanel();
 		
 		getContentPane().setBackground(Color.WHITE);
@@ -60,7 +62,7 @@ public class MemberJoin extends JFrame{
 		p_center.setBackground(Color.WHITE);
 		p_center.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2)); 
 		
-		la_join = new JLabel("회원가입");
+		la_join = new JLabel(role + "회원가입");
 		la_id = new JLabel("아이디");
 		bt_idCheck = new JButton("확인");
 		la_pwd = new JLabel("비밀번호");
@@ -96,17 +98,16 @@ public class MemberJoin extends JFrame{
 		
 		
 		//이벤트
+		//아이디 체크
 		bt_idCheck.addActionListener(e -> {
 			idCheck();
 		});
 		
 		
-		
+		//회원가입 버튼
 		bt_join.addActionListener(e -> {
-			if(checkValid()) {
-				checkValid();
-				new MemberLogin();
-			}
+			checkValid();
+			
 		});
 		
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
@@ -160,7 +161,7 @@ public class MemberJoin extends JFrame{
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 1));
 		panel.setPreferredSize(new Dimension(400, 40)); // 높이 약간 더 확보
 		panel.setOpaque(false);
-		comp.setPreferredSize(new Dimension(100, 30));  // 중앙에 적절한 너비 설정
+		comp.setPreferredSize(new Dimension(150, 30));  // 중앙에 적절한 너비 설정
 		
 		panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); //위쪽 여백 
 		
@@ -170,73 +171,63 @@ public class MemberJoin extends JFrame{
 	
 	
 	//회원가입
-	public void regist() {
-		
-		Connection con = dbManager.getConnection();
-		
+	public void regist() throws HeadquartersException{
 		HeadquartersUser headquartersUser = new HeadquartersUser();
 		headquartersUser.setId(t_id.getText());
 		headquartersUser.setPw(new String(t_pwd.getPassword()));
 		headquartersUser.setEmail(t_email.getText(), (String)cb_email.getSelectedItem());
 		
-		try {
-			con.setAutoCommit(false);
-			
+		if(role.equals("본사")) {
 			headquartersDAO.insert(headquartersUser);
+		}else if(role.equals("지점")){
 			
-			con.commit();
-		} catch (HeadquartersException e) {
-			try {
-				con.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-				JOptionPane.showMessageDialog(this, e1.getMessage());
-			}
-			e.printStackTrace();
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				con.setAutoCommit(true);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-		
-		
 	}
 	
 	//아이디 중복 검사
 	public void idCheck() {
-		HeadquartersUser headquartersUser = new HeadquartersUser();
-		if(t_id.getText() == headquartersUser.getId()) {
-			JOptionPane.showMessageDialog(this, "이미 존재하는 아이디 입니다.");
-			
-		}else {
-			JOptionPane.showMessageDialog(this, "사용 가능한 아이디 입니다.");
+		if(headquartersDAO.checkId(t_id.getText())) {
+			// if문의 값이 true이면 사용 가능한 아이디 
+			JOptionPane.showMessageDialog(this, "사용 가능한 아이디입니다.");
+		}else{
+			// false면 중복 아이디 
+			JOptionPane.showMessageDialog(this,"중복된 아이디입니다.");
 		}
 	}
 	
+	
+	
 	//유효성 검사
-	public boolean checkValid(){
+	public void checkValid(){
 		if(t_id.getText().length() == 0) {
 			JOptionPane.showMessageDialog(this,"아이디를 입력하세요");
-			return false;
 		}else if(t_pwd.getPassword().length==0) {
 			JOptionPane.showMessageDialog(this, "비밀번호를 입력하세요");
-			return false;
 		} else if(t_pwdCheck.getPassword().length ==0) {
 			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");
-			return false;
 		}else if(t_email.getText().length() ==0) {
 			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");
-			return false;
-		}else {
-			regist();
-			return true;
+		}else if(!headquartersDAO.checkId(t_id.getText())){
+			JOptionPane.showMessageDialog(this, "중복된 아이디입니다. 다른 아이디를 입력하세요");
+			return;
+		}else if(!Arrays.equals(t_pwd.getPassword(), t_pwdCheck.getPassword())) {
+			JOptionPane.showMessageDialog(this, "비밀번호를 다시 확인해 주세요");
+			return;
+		}
+		else {
+		
+			try {
+				regist();
+				JOptionPane.showMessageDialog(this, "회원가입이 완료되었습니다.");
+				new MemberLogin();
+			} catch (HeadquartersException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, e.getMessage());
+			}
+			
 		}
 	}
+	
 	
 
 }

@@ -121,7 +121,7 @@ public class MemberLogin extends JFrame{
 		headquarters_join.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new MemberJoin("headquarters");
+				new MemberJoin(headquarters_join.getText().substring(0,2));
 			}
 		});
 		
@@ -129,7 +129,23 @@ public class MemberLogin extends JFrame{
 		location_join.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new MemberJoin("location");
+				new MemberJoin(location_join.getText().substring(0,2));
+			}
+		});
+		
+		//아이디 찾기
+		find_id.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				new FindId();
+			}
+		});
+		
+		//비밀번호 찾기
+		find_pwd.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				new FindPwd();
 			}
 		});
 		

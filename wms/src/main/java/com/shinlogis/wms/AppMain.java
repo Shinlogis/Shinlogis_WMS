@@ -36,7 +36,7 @@ public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
 	JLabel la_outboundPlan, la_outboundDetail;
-	JLabel la_inventory, la_container, la_branch, la_supplier, la_chat, la_order, la_orderList;
+	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList,la_product;
 	Page[] pages;
 
 	MemberJoin memberJoin;
@@ -115,11 +115,12 @@ public class AppMain extends JFrame {
 			la_inboundProcess = createMenuItem("입고 처리", Config.INBOUND_PLAN_PAGE);
 			la_outboundPlan = createMenuItem("출고 예정", Config.INBOUND_ITEM_PAGE);
 			la_outboundDetail = createMenuItem("출고 상세", Config.INBOUND_ITEM_PAGE);
-			la_inventory = createMenuItem("재고 관리", Config.INBOUND_PROCESS_PAGE);
-			la_container = createMenuItem("창고 관리", Config.INBOUND_PROCESS_PAGE);
-			la_branch = createMenuItem("지점 관리", Config.INBOUND_PROCESS_PAGE);
-			la_supplier = createMenuItem("공급사 관리", Config.OUTBOUNT_PROCESS_PAGE);
-			la_chat = createMenuItem("지점과 채팅하기", Config.OUTBOUND_PLAN_PAGE);
+			la_product= createMenuItem("상품 관리", Config.PRODUCT_PAGE);
+			la_inventory = createMenuItem("재고 관리", Config.INVENTORY_PAGE);
+			la_stock = createMenuItem("창고 관리", Config.STOCK_PAGE);
+			la_branch = createMenuItem("지점 관리", Config.LOCATION_PAGE);
+			la_supplier = createMenuItem("공급사 관리", Config.SUPPLIER_PAGE);
+			la_chat = createMenuItem("지점과 채팅하기", Config.CHATTING_PAGE);
 
 			// 이벤트 연결
 			la_inboundPlan.addMouseListener(new MouseAdapter() {
@@ -160,7 +161,7 @@ public class AppMain extends JFrame {
 		if ("headquartersUser".equals(role)) {
 			p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
 			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail));
-			p_west.add(createMenuGroup("재고관리", false, la_inventory, la_container));
+			p_west.add(createMenuGroup("재고관리", false, la_product,la_inventory, la_stock));
 			p_west.add(createMenuGroup("지점관리", false, la_branch));
 			p_west.add(createMenuGroup("공급사관리", false, la_supplier));
 			p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거

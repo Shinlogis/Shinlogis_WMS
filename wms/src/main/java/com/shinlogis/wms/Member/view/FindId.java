@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.shinlogis.wms.common.config.Config;
+import com.shinlogis.wms.headquarters.model.HeadquartersUser;
+import com.shinlogis.wms.headquarters.repository.HeadquartersDAO;
 
 public class FindId extends JFrame{
 	
@@ -25,9 +27,11 @@ public class FindId extends JFrame{
 	JLabel la_email;
 	JLabel la_at;
 	JTextField t_email;
-	JComboBox box;
+	JComboBox cb_email;
 	
 	JButton bt;
+	
+	HeadquartersDAO headquartersDAO;
 	
 	 public FindId() {
 		 p_center = new JPanel();
@@ -35,7 +39,7 @@ public class FindId extends JFrame{
 		 la_email = new JLabel("이메일");
 		 la_at = new JLabel("@");
 		 t_email = new JTextField();
-		 box = new JComboBox();
+		 cb_email = new JComboBox();
 		 
 		getContentPane().setBackground(Color.WHITE);
 		this.setLayout(new java.awt.GridBagLayout());
@@ -49,16 +53,20 @@ public class FindId extends JFrame{
 		la_findID.setFont(new Font("맑은고딕", Font.BOLD, 24));
 		la_findID.setHorizontalAlignment(JLabel.CENTER);
 		
-		box.addItem("naver.com");
-		box.addItem("daum.com");
-		box.addItem("gmail.com");
+		cb_email.addItem("naver.com");
+		cb_email.addItem("daum.com");
+		cb_email.addItem("gmail.com");
 			
 		
 		//조립
 		p_center.add(createCenterLine(la_findID));
-		p_center.add(createEmailLine(la_email, t_email, la_at, box));
+		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
 		add(p_center);
 		 
+		//이벤트
+		bt.addActionListener(e->{
+			findIdByEmailText();
+		});
 		 
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
 		setVisible(true);
@@ -94,6 +102,11 @@ public class FindId extends JFrame{
 		}
 		
 		
+		//이메일 통해 아이디 찾기
+		public void findIdByEmailText() {
+			
+			headquartersDAO.findIdByEmail(t_email.getText(), (String)cb_email.getSelectedItem());
+		}
 
 	
 }
