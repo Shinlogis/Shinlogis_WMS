@@ -59,14 +59,14 @@ public class AppMain extends JFrame {
         });
     }
 
-    private void initUI() {
+    public void initUI() {
     	
         // 메인 패널 초기화
         p_center = new JPanel(new BorderLayout());
         p_west = new JPanel();
         p_north = new JPanel();
         p_content = new JPanel();
-        memberJoin = new MemberJoin();
+
 
         // 상단 바 설정
         p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));

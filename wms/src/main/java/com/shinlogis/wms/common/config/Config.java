@@ -2,8 +2,8 @@ package com.shinlogis.wms.common.config;
 
 public class Config {
 	
-    public static final String url = "jdbc:mysql://localhost:3306/shop";
-    public static final String id = "shop";
+    public static final String url = "jdbc:mysql://localhost:3306/wms";
+    public static final String id = "wms";
     public static final String password = "Sinse@1234";
     
     public static final String PRODUCT_IMAGE_PATH = "C:\\public";
