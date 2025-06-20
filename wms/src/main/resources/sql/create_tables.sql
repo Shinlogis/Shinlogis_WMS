@@ -99,7 +99,7 @@ CREATE TABLE io_receipt (
     user_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     scheduled_date DATETIME NOT NULL,
-    processed_date DATETIME,
+    proccessed_date DATETIME,
     status VARCHAR(100) NOT NULL,
     location_id INT NOT NULL,
     CHECK (io_type IN ('IN', 'OUT')),
