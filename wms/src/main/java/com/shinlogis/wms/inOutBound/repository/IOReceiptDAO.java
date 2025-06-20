@@ -61,7 +61,7 @@ public class IOReceiptDAO {
 				HeadquartersUser user = new HeadquartersUser();
 				user.setHeadquartersUserId(resultSet.getInt("user_id"));
 				user.setId(resultSet.getString("id"));
-				user.setEmail(resultSet.getString("email"));
+				//user.setEmail(resultSet.getString("email"));
 				ioReceipt.setUser(user);
 
 				ioReceipt.setCreatedAt(resultSet.getDate("created_at"));
