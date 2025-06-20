@@ -16,10 +16,13 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import com.shinlogis.locationuser.order.view.OrderPage;
+import com.shinlogis.locationuser.orderList.view.OrderListPage;
 import com.shinlogis.wms.Member.view.MemberJoin;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
@@ -27,195 +30,252 @@ import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
 import com.shinlogis.wms.inOutBound.view.InboundReceiptPage;
+import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.main.view.MainPage;
 
 public class AppMain extends JFrame {
-    JPanel p_west, p_center, p_north, p_content;
-    JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
-    JLabel la_outboundPlan, la_outboundDetail;
-    JLabel la_inventory, la_container, la_branch, la_supplier, la_chat;
+	JPanel p_west, p_center, p_north, p_content;
+	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
+	JLabel la_outboundPlan, la_outboundDetail;
+	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product;
 	Page[] pages;
-	
+
 	MemberJoin memberJoin;
 	boolean login = false;
 
+	DBManager dbManager = DBManager.getInstance();
+	public Connection conn;
+	public HeadquartersUser headquartersUser;
+	public LocationUser locationUser;
+	private String role; // 내부적으로 사용할 역할(관리자,지점)
 
-    DBManager dbManager = DBManager.getInstance();
-    public Connection conn;
-    public HeadquartersUser headquartersUser;
-    public LocationUser locationUser;
+	public AppMain() {
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				dbManager.release(conn);
+				System.exit(0);
+			}
+		});
+	}
 
-    public AppMain() {
-        initUI();
-        connect();
-        createPage();
-        setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
-        setVisible(true);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                dbManager.release(conn);
-                System.exit(0);
-            }
-        });
-    }
+	public void initUI() {
+		// 로그인한 사용자가 누구인지 판단하기
+		if (headquartersUser != null) {
+			role = "headquartersUser";
+		} else if (locationUser != null) {
+			role = "locationUser";
+		} else {
+			JOptionPane.showMessageDialog(this, "사용자 정보가 없습니다.");
+			return;
+		}
 
-    private void initUI() {
-    	
-        // 메인 패널 초기화
-        p_center = new JPanel(new BorderLayout());
-        p_west = new JPanel();
-        p_north = new JPanel();
-        p_content = new JPanel();
-        memberJoin = new MemberJoin();
+		// 메인 패널 초기화
+		p_center = new JPanel(new BorderLayout());
+		p_west = new JPanel();
+		p_north = new JPanel();
+		p_content = new JPanel();
 
-        // 상단 바 설정
-        p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));
-        p_north.setBackground(Color.YELLOW);
+		// 상단 바 설정
+		p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));
+		p_north.setBackground(Color.YELLOW);
 
-        // 사이드 바 설정
-        createSidebar();
+		// 사이드 바 설정
+		createSidebar();
 
-        // 조립
-        p_center.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.ADMINMAIN_HEIGHT));
-        p_center.setBackground(Color.BLUE);
-        
-        p_content.setPreferredSize(p_center.getPreferredSize());
-        p_content.setBackground(Color.WHITE);
+		// 조립
+		p_center.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.ADMINMAIN_HEIGHT));
+		p_center.setBackground(Color.BLUE);
 
-        p_center.add(p_north, BorderLayout.NORTH);
-        p_center.add(p_content, BorderLayout.CENTER);
-        add(p_west, BorderLayout.WEST);
-        add(p_center, BorderLayout.CENTER);    
-        
-      
-    }
+		p_content.setPreferredSize(p_center.getPreferredSize());
+		p_content.setBackground(Color.WHITE);
 
-    private void createSidebar() {
-        p_west.setPreferredSize(new Dimension(Config.SIDE_WIDTH, Config.SIDE_HEIGHT));
-        p_west.setBackground(new Color(0xFF7F50));
-        p_west.setLayout(new BoxLayout(p_west, BoxLayout.Y_AXIS));
-        p_west.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+		p_center.add(p_north, BorderLayout.NORTH);
+		p_center.add(p_content, BorderLayout.CENTER);
+		add(p_west, BorderLayout.WEST);
+		add(p_center, BorderLayout.CENTER);
 
-        p_west.add(Box.createVerticalStrut(40)); // 40픽셀 아래로 내림
-        
-        // 메뉴 항목 생성
-        la_inboundPlan = createMenuItem("입고 예정", Config.INBOUND_PLAN_PAGE);
-        la_inboundDetail = createMenuItem("입고 상세", Config.PRODUCT_PAGE);
-        la_inboundProcess = createMenuItem("입고 처리", Config.INBOUND_PLAN_PAGE);
-        la_outboundPlan = createMenuItem("출고 예정", Config.INBOUND_ITEM_PAGE);
-        la_outboundDetail = createMenuItem("출고 상세", Config.INBOUND_ITEM_PAGE);
-        la_inventory = createMenuItem("재고 관리", Config.INBOUND_PROCESS_PAGE);
-        la_container = createMenuItem("창고 관리", Config.INBOUND_PROCESS_PAGE);
-        la_branch = createMenuItem("지점 관리", Config.INBOUND_PROCESS_PAGE);
-        la_supplier = createMenuItem("공급사 관리", Config.OUTBOUNT_PROCESS_PAGE);
-        la_chat = createMenuItem("지점과 채팅하기", Config.OUTBOUND_PLAN_PAGE);
+		connect();
+		createPage();
+		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
+		setVisible(true);
+	}
 
-        // 이벤트 연결
-        la_inboundPlan.addMouseListener(new MouseAdapter() {
-      		@Override
-      		public void mouseClicked(MouseEvent e) {
-      			showPage(Config.INBOUND_PLAN_PAGE);
-      			System.out.println("click");
-      		}
-      	});
-        
-        // 입고상세 이벤트 연결 추가 @author 김예진
-        la_inboundDetail.addMouseListener(new MouseAdapter() {
-      		@Override
-      		public void mouseClicked(MouseEvent e) {
-      			showPage(Config.INBOUND_ITEM_PAGE);
-      			System.out.println("click");
-      		}
-      	});
+	private void createSidebar() {
+		p_west.setPreferredSize(new Dimension(Config.SIDE_WIDTH, Config.SIDE_HEIGHT));
+		p_west.setBackground(new Color(0xFF7F50));
+		p_west.setLayout(new BoxLayout(p_west, BoxLayout.Y_AXIS));
+		p_west.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-        // 메뉴 그룹 추가
-        addMenuGroups();
-    }
+		p_west.add(Box.createVerticalStrut(40)); // 40픽셀 아래로 내림
 
-    private void addMenuGroups() {
-        p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
-        p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail));
-        p_west.add(createMenuGroup("재고관리", false, la_inventory, la_container));
-        p_west.add(createMenuGroup("지점관리", false, la_branch));
-        p_west.add(createMenuGroup("공급사관리", false, la_supplier));
-        p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거
-    }
+		if ("headquartersUser".equals(role)) {
+			// 메뉴 항목 생성
+			la_inboundPlan = createMenuItem("입고 예정", Config.INBOUND_PLAN_PAGE);
+			la_inboundDetail = createMenuItem("입고 상세", Config.PRODUCT_PAGE);
+			la_inboundProcess = createMenuItem("입고 처리", Config.INBOUND_PLAN_PAGE);
+			la_outboundPlan = createMenuItem("출고 예정", Config.INBOUND_ITEM_PAGE);
+			la_outboundDetail = createMenuItem("출고 상세", Config.INBOUND_ITEM_PAGE);
+			la_product = createMenuItem("상품 관리", Config.PRODUCT_PAGE);
+			la_inventory = createMenuItem("재고 관리", Config.INVENTORY_PAGE);
+			la_stock = createMenuItem("창고 관리", Config.STOCK_PAGE);
+			la_branch = createMenuItem("지점 관리", Config.LOCATION_PAGE);
+			la_supplier = createMenuItem("공급사 관리", Config.SUPPLIER_PAGE);
+			la_chat = createMenuItem("지점과 채팅하기", Config.CHATTING_PAGE);
 
-    private JLabel createMenuItem(String text, int pageIndex) {
-        JLabel label = new JLabel(text);
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
-        label.setBorder(new EmptyBorder(5, 30, 5, 0));
-        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        label.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                // 페이지 이동 구현 예정
-            }
+			// 이벤트 연결
+			la_inboundPlan.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.INBOUND_PLAN_PAGE);
+					System.out.println("click");
+				}
+			});
+			
+	        // 입고상세 이벤트 연결 추가 @author 김예진
+	        la_inboundDetail.addMouseListener(new MouseAdapter() {
+	      		@Override
+	      		public void mouseClicked(MouseEvent e) {
+	      			showPage(Config.INBOUND_ITEM_PAGE);
+	      			System.out.println("click");
+	      		}
+	      	});
 
-            public void mouseEntered(MouseEvent e) {
-                label.setForeground(Color.YELLOW);
-            }
+			// 이벤트 연결
+			la_inventory.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.INVENTORY_PAGE);
+					System.out.println("click");
+				}
+			});
 
-            public void mouseExited(MouseEvent e) {
-                label.setForeground(Color.WHITE);
-            }
-        });
-        return label;
-    }
+		} else if ("locationUser".equals(role)) {
+			la_order = createMenuItem("물품 신청", Config.OUTBOUNT_PROCESS_PAGE);
+			la_orderList = createMenuItem("발주내역 조회", Config.OUTBOUND_PLAN_PAGE);
 
-    /**
-     * @param title       그룹 이름
-     * @param noBottomBar true면 마지막 그룹이라 하단 선 제거
-     * @param items       메뉴 항목들
-     */
-    private JPanel createMenuGroup(String title, boolean noBottomBar, JLabel... items) {
-        JPanel group = new JPanel();
-        group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
-        group.setOpaque(false);
+			// 이벤트 연결
+			la_order.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(0);
+					System.out.println("click");
+				}
+			});
+			// 이벤트 연결
+			la_orderList.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(1);
+					System.out.println("click");
+				}
+			});
+		}
 
-        JLabel groupTitle = new JLabel(title);
-        groupTitle.setForeground(Color.WHITE);
-        groupTitle.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-        groupTitle.setBorder(new EmptyBorder(10, 15, 5, 0));
+		// 메뉴 그룹 추가
+		addMenuGroups();
+	}
 
-        group.add(Box.createVerticalStrut(10));
-        group.add(groupTitle);
-        group.add(Box.createVerticalStrut(5));
-        for (JLabel item : items) {
-            group.add(item);
-        }
-        group.add(Box.createVerticalStrut(10));
+	private void addMenuGroups() {
+		if ("headquartersUser".equals(role)) {
+			p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
+			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail));
+			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_stock));
+			p_west.add(createMenuGroup("지점관리", false, la_branch));
+			p_west.add(createMenuGroup("공급사관리", false, la_supplier));
+			p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거
+		} else if ("locationUser".equals(role)) {
+			p_west.add(createMenuGroup("주문하기", false, la_order, la_orderList));
 
-        Border outerBorder = noBottomBar
-                ? BorderFactory.createEmptyBorder() // 마지막이면 하단 선 없음
-                : BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE);
+		}
 
-        group.setBorder(BorderFactory.createCompoundBorder(
-                outerBorder,
-                BorderFactory.createEmptyBorder(5, 0, 5, 0)
-        ));
+	}
 
-        return group;
-    }
+	private JLabel createMenuItem(String text, int pageIndex) {
+		JLabel label = new JLabel(text);
+		label.setForeground(Color.WHITE);
+		label.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+		label.setBorder(new EmptyBorder(5, 30, 5, 0));
+		label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		label.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				// 페이지 이동 구현 예정
+			}
 
-    private void connect() {
-        conn = dbManager.getConnection();
-    }
-    
+			public void mouseEntered(MouseEvent e) {
+				label.setForeground(Color.YELLOW);
+			}
+
+			public void mouseExited(MouseEvent e) {
+				label.setForeground(Color.WHITE);
+			}
+		});
+		return label;
+	}
+
+	/**
+	 * @param title       그룹 이름
+	 * @param noBottomBar true면 마지막 그룹이라 하단 선 제거
+	 * @param items       메뉴 항목들
+	 */
+	private JPanel createMenuGroup(String title, boolean noBottomBar, JLabel... items) {
+		JPanel group = new JPanel();
+		group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
+		group.setOpaque(false);
+
+		JLabel groupTitle = new JLabel(title);
+		groupTitle.setForeground(Color.WHITE);
+		groupTitle.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+		groupTitle.setBorder(new EmptyBorder(10, 15, 5, 0));
+
+		group.add(Box.createVerticalStrut(10));
+		group.add(groupTitle);
+		group.add(Box.createVerticalStrut(5));
+		for (JLabel item : items) {
+			group.add(item);
+		}
+		group.add(Box.createVerticalStrut(10));
+
+		Border outerBorder = noBottomBar ? BorderFactory.createEmptyBorder() // 마지막이면 하단 선 없음
+				: BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE);
+
+		group.setBorder(BorderFactory.createCompoundBorder(outerBorder, BorderFactory.createEmptyBorder(5, 0, 5, 0)));
+
+		return group;
+	}
+
+	private void connect() {
+		conn = dbManager.getConnection();
+	}
+
 	/**
 	 * 쇼핑몰에 사용할 모든 페이지 생성 및 부착
 	 */
 	public void createPage() {
-		pages = new Page[3];
 
-		pages[0] = new MainPage(this);
-		pages[1] = new InboundReceiptPage(this);
-		pages[2] = new InboundPlanItemPage(this);
-		
+		if ("headquartersUser".equals(role)) {
+			pages = new Page[8];
+
+			pages[0] = new MainPage(this);
+			pages[1] = new InboundReceiptPage(this);
+			pages[2] = new InboundPlanItemPage(this);
+			pages[3] = null;
+			pages[4] = null;
+			pages[5] = null;
+			pages[6] = null;
+			pages[7] = new InventoryPage(this);
+
+		} else if ("locationUser".equals(role)) {
+			pages = new Page[2];
+
+			pages[0] = new OrderPage(this);
+			pages[1] = new OrderListPage(this);
+		}
 
 		for (int i = 0; i < pages.length; i++) {
-			p_content.add(pages[i]);
+			if (pages[i] != null) {
+				p_content.add(pages[i]);
+			}
 		}
 	}
 
@@ -225,14 +285,12 @@ public class AppMain extends JFrame {
 	public void showPage(int target) {
 
 		for (int i = 0; i < pages.length; i++) {
-			pages[i].setVisible((i == target) ? true : false);
+			if (pages[i] != null) {
+				pages[i].setVisible(i == target);
+			}
 		}
 	}
-	
-	
-	
-
+}
 //    public static void main(String[] args) {
 //        new AppMain();
 //    }
-}

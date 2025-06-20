@@ -53,8 +53,6 @@ public class MemberLogin extends JFrame{
 		bt_admin = new JButton("관리자");
 		bt_location = new JButton("지점");
 		
-		
-		
 		la_login.setHorizontalAlignment(JLabel.CENTER);
 		la_login.setFont(new Font("맑은고딕", Font.BOLD, 24));
 		
@@ -63,15 +61,13 @@ public class MemberLogin extends JFrame{
 		t_pwd.setPreferredSize(d);
 		
 		
-		
 		//제조
 		p_center.add(la_login);
 		p_center.add(t_id);
 		p_center.add(t_pwd);
 		p_center.add(bt_admin);
 		p_center.add(bt_location);
-		
-		
+	
 
 		//이벤트 
 		bt_admin.addMouseListener(new MouseAdapter() {
@@ -79,21 +75,22 @@ public class MemberLogin extends JFrame{
 			public void mouseClicked(MouseEvent e) {
 				AppMain appMain=new AppMain();
 				appMain.headquartersUser=user;
+				appMain.initUI();
 			}
 		});
-		
 		
 		bt_location.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				AppMain appMain=new AppMain();
 				appMain.locationUser=locationUser;
+				appMain.initUI();
 			}
 		});
+		
 		add(p_center);
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
 		setVisible(true);
-	
 	}
 	
 	public static void main(String[] args) {
