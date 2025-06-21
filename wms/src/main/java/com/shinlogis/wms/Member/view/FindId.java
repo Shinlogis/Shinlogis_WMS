@@ -1,5 +1,6 @@
 package com.shinlogis.wms.Member.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -12,12 +13,14 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.headquarters.repository.HeadquartersDAO;
+import com.shinlogis.wms.location.repository.LocationUserDAO;
 
 public class FindId extends JFrame{
 	
@@ -29,9 +32,11 @@ public class FindId extends JFrame{
 	JTextField t_email;
 	JComboBox cb_email;
 	
+	JPanel p_north;
 	JButton bt;
 	
 	HeadquartersDAO headquartersDAO;
+	LocationUserDAO locationUserDAO;
 	
 	 public FindId() {
 		 p_center = new JPanel();
@@ -40,6 +45,11 @@ public class FindId extends JFrame{
 		 la_at = new JLabel("@");
 		 t_email = new JTextField();
 		 cb_email = new JComboBox();
+		 bt = new JButton("찾기");
+		 p_north = new JPanel(new FlowLayout());
+		 
+		 headquartersDAO = new HeadquartersDAO();
+		 locationUserDAO = new LocationUserDAO();
 		 
 		getContentPane().setBackground(Color.WHITE);
 		this.setLayout(new java.awt.GridBagLayout());
@@ -61,7 +71,13 @@ public class FindId extends JFrame{
 		//조립
 		p_center.add(createCenterLine(la_findID));
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
+		//버튼
+		p_north.setOpaque(false);
+		p_north.add(bt);
+		p_center.add(p_north);
+		
 		add(p_center);
+		
 		 
 		//이벤트
 		bt.addActionListener(e->{
@@ -84,6 +100,7 @@ public class FindId extends JFrame{
 			box.setPreferredSize(new Dimension(120, 30));
 			panel.add(label);
 			panel.add(field);
+			panel.add(at);
 			panel.add(box);
 			return panel;
 		}
@@ -105,7 +122,18 @@ public class FindId extends JFrame{
 		//이메일 통해 아이디 찾기
 		public void findIdByEmailText() {
 			
-			headquartersDAO.findIdByEmail(t_email.getText(), (String)cb_email.getSelectedItem());
+			String headquartersId = headquartersDAO.findIdByEmail(t_email.getText() + "@" + (String)cb_email.getSelectedItem());
+			String locationUsersId = locationUserDAO.findIdByEmail(t_email.getText() + "@" + (String)cb_email.getSelectedItem());
+			
+			if(headquartersId != null) {
+				new UploadDialog(this, headquartersId);
+				
+			}else if(locationUsersId != null) {
+				new UploadDialog(this, locationUsersId);
+			} else {
+				JOptionPane.showMessageDialog(this, "해당 이메일로 등록된 아이디가 없습니다.");
+			}
+			
 		}
 
 	

@@ -5,7 +5,9 @@ public class LocationUser {
     private String id;
     private String pw;
     private String email;
+    private Location location;
     
+	
 	public int getHeadquartersUserId() {
 		return headquartersUserId;
 	}
@@ -27,7 +29,13 @@ public class LocationUser {
 	public String getEmail() {
 		return email;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	public void setEmail(String textEmail, String combEmail) {
+		this.email = textEmail + "@" + combEmail;
+	}
+	public Location getLocation() {
+		return location;
+	}
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 }

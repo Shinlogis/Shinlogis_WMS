@@ -23,7 +23,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.locationuser.orderList.view.OrderListPage;
-import com.shinlogis.wms.Member.view.MemberJoin;
+import com.shinlogis.wms.Member.view.HeadquartersJoin;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
@@ -41,7 +41,7 @@ public class AppMain extends JFrame {
 	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product;
 	Page[] pages;
 
-	MemberJoin memberJoin;
+	HeadquartersJoin memberJoin;
 	boolean login = false;
 
 	DBManager dbManager = DBManager.getInstance();

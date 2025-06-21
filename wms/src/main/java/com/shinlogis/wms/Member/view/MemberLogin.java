@@ -14,6 +14,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -24,7 +25,10 @@ import javax.swing.border.LineBorder;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
+import com.shinlogis.wms.headquarters.repository.HeadquartersDAO;
 import com.shinlogis.wms.location.model.LocationUser;
+import com.shinlogis.wms.location.repository.LocationDAO;
+import com.shinlogis.wms.location.repository.LocationUserDAO;
 
 public class MemberLogin extends JFrame{
 	
@@ -46,9 +50,10 @@ public class MemberLogin extends JFrame{
 	JLabel headquarters_join;
 	JLabel location_join;
 	
-	
-	HeadquartersUser user=new HeadquartersUser();
-	LocationUser locationUser=new LocationUser(); //나중에 new 지우고 로그인 성공 시 new 하
+	HeadquartersDAO headquartersDAO;
+	LocationUserDAO locationUserDAO;
+	HeadquartersUser user;
+	LocationUser locationUser;
 	
 	public MemberLogin() {
 		
@@ -75,6 +80,9 @@ public class MemberLogin extends JFrame{
 		p_bt = new JPanel();
 		bt_admin = new JButton("관리자");
 		bt_location = new JButton("지점");
+		
+		locationUserDAO = new LocationUserDAO();
+		headquartersDAO = new HeadquartersDAO();
 		
 		
 		//스타일
@@ -107,12 +115,20 @@ public class MemberLogin extends JFrame{
 		
 
 		//이벤트 
+		//본사로 로그인
 		bt_admin.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				AppMain appMain=new AppMain();
-				appMain.headquartersUser=user;
-				appMain.initUI();
+				headquartersUserLogin();
+				
+			}
+		});
+		
+		//지점으로 로그인 
+		bt_location.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				locationUserLogin();
 			}
 		});
 		
@@ -121,7 +137,7 @@ public class MemberLogin extends JFrame{
 		headquarters_join.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new MemberJoin(headquarters_join.getText().substring(0,2));
+				new HeadquartersJoin();
 			}
 		});
 		
@@ -129,7 +145,7 @@ public class MemberLogin extends JFrame{
 		location_join.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new MemberJoin(location_join.getText().substring(0,2));
+				new LocationJoin();
 			}
 		});
 		
@@ -199,6 +215,36 @@ public class MemberLogin extends JFrame{
 		
 		panel.add(comp);
 		return panel;
+	}
+	
+	
+	//본사 로그인
+	public void headquartersUserLogin() {
+	
+		if(headquartersDAO.Login(t_id.getText(), new String(t_pwd.getPassword()))) {
+			JOptionPane.showMessageDialog(this, "로그인 완료");
+			user = new HeadquartersUser();
+			AppMain appMain=new AppMain();
+			appMain.headquartersUser=user;
+			appMain.initUI();
+		}else {
+			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
+			return;
+		}
+	}
+	
+	//지점 로그인
+	public void locationUserLogin() {
+		if(locationUserDAO.Login(t_id.getText(), new String(t_pwd.getPassword()))) {
+			JOptionPane.showMessageDialog(this, "로그인 완료");
+			locationUser = new LocationUser();
+			AppMain appMain=new AppMain();
+			appMain.locationUser=locationUser;
+			appMain.initUI();
+		}else {
+			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
+			return;
+		}
 	}
 	
 	

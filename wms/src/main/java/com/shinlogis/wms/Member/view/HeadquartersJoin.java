@@ -27,7 +27,7 @@ import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.headquarters.repository.HeadquartersDAO;
 
-public class MemberJoin extends JFrame{
+public class HeadquartersJoin extends JFrame{
 	
 	JPanel p_center;
 	
@@ -49,10 +49,9 @@ public class MemberJoin extends JFrame{
 	
 	DBManager dbManager = DBManager.getInstance();
 	HeadquartersDAO headquartersDAO;
-	String role;
-	public MemberJoin(String role) {
-		System.out.println(role);
-		this.role=role;
+	
+	
+	public HeadquartersJoin() {
 		p_center = new JPanel();
 		
 		getContentPane().setBackground(Color.WHITE);
@@ -62,7 +61,7 @@ public class MemberJoin extends JFrame{
 		p_center.setBackground(Color.WHITE);
 		p_center.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2)); 
 		
-		la_join = new JLabel(role + "회원가입");
+		la_join = new JLabel("본사 회원가입");
 		la_id = new JLabel("아이디");
 		bt_idCheck = new JButton("확인");
 		la_pwd = new JLabel("비밀번호");
@@ -172,16 +171,19 @@ public class MemberJoin extends JFrame{
 	
 	//회원가입
 	public void regist() throws HeadquartersException{
-		HeadquartersUser headquartersUser = new HeadquartersUser();
-		headquartersUser.setId(t_id.getText());
-		headquartersUser.setPw(new String(t_pwd.getPassword()));
-		headquartersUser.setEmail(t_email.getText(), (String)cb_email.getSelectedItem());
-		
-		if(role.equals("본사")) {
-			headquartersDAO.insert(headquartersUser);
-		}else if(role.equals("지점")){
+		try {
+			HeadquartersUser headquartersUser = new HeadquartersUser();
+			headquartersUser.setId(t_id.getText());
+			headquartersUser.setPw(new String(t_pwd.getPassword()));
+			headquartersUser.setEmail(t_email.getText(), (String)cb_email.getSelectedItem());
 			
+			headquartersDAO.insert(headquartersUser);
+			
+		} catch (HeadquartersException e) {
+			e.printStackTrace();
+			throw new HeadquartersException(e.getMessage(), e);
 		}
+		
 	}
 	
 	//아이디 중복 검사
@@ -195,6 +197,8 @@ public class MemberJoin extends JFrame{
 		}
 	}
 	
+	
+
 	
 	
 	//유효성 검사
@@ -212,6 +216,9 @@ public class MemberJoin extends JFrame{
 			return;
 		}else if(!Arrays.equals(t_pwd.getPassword(), t_pwdCheck.getPassword())) {
 			JOptionPane.showMessageDialog(this, "비밀번호를 다시 확인해 주세요");
+			return;
+		}else if(!headquartersDAO.checkEmail(t_email.getText()+"@"+(String)cb_email.getSelectedItem())) {
+			JOptionPane.showMessageDialog(this, "중복된 이메일입니다. 다시 확인해 주세요");
 			return;
 		}
 		else {
