@@ -20,6 +20,27 @@ public class IOReceipt {
 	private Location location;
 	private String supplierName;
 
+	private String firstProductName;
+	private int itemCount;
+
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
+	}
+
+	public String getFirstProductName() {
+		return firstProductName;
+	}
+
+	public void setFirstProductName(String firstProductName) {
+		this.firstProductName = firstProductName;
+	}
+
+
+
 	public String getSupplierName() {
 		return supplierName;
 	}

@@ -28,7 +28,7 @@ import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
+import com.shinlogis.wms.inOutBound.view.InboundDetailPage;
 import com.shinlogis.wms.inOutBound.view.InboundReceiptPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
@@ -258,7 +258,7 @@ public class AppMain extends JFrame {
 
 			pages[0] = new MainPage(this);
 			pages[1] = new InboundReceiptPage(this);
-			pages[2] = new InboundPlanItemPage(this);
+			pages[2] = new InboundDetailPage(this);
 			pages[3] = null;
 			pages[4] = null;
 			pages[5] = null;
