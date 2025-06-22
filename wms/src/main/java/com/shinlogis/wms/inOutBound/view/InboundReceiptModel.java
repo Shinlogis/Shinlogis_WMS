@@ -1,11 +1,11 @@
 package com.shinlogis.wms.inOutBound.view;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import com.shinlogis.wms.inOutBound.model.IOReceipt;
 import com.shinlogis.wms.inOutBound.repository.IOReceiptDAO;
@@ -22,14 +22,29 @@ public class InboundReceiptModel extends AbstractTableModel {
 	IOReceiptDAO ioReceiptDAO = new IOReceiptDAO();
 	SnapshotDAO snapshotDAO = new SnapshotDAO();
 	List<IOReceipt> inboundList;
-	List<Map<String, Object>> FirstProductAndPCountList;
+	List<Map<String, Object>> infoList;
 	
-	String[] column = { "입고예정ID", "입고 품목", "공급사명", "입고예정일", "상태", "등록일",
-			"처리일", "상세보기"};
+	String[] column = { "입고예정ID", "입고 품목", "공급사명", "입고예정일", "상태", "등록일", "처리일", "상세보기"};
 
+	/**
+	 * 생성자
+	 */
 	public InboundReceiptModel() {
-		inboundList = ioReceiptDAO.selectAllInbound();
+		// 초기에는 필터가 없으므로 Collections.emptyMap()를 넘겨 빈 필터로 전체를 불러옴
+		inboundList = ioReceiptDAO.selectInboundReceiptsWithItemInfo(Collections.emptyMap());
 	}
+
+	/**
+	 * 값을 새로 설정하는 메서드
+	 * @auther 김예진
+	 * @since 2025-06-22
+	 * @param filters
+	 */
+	public void setData(Map<String,Object> filters) {
+		this.inboundList = ioReceiptDAO.selectInboundReceiptsWithItemInfo(filters);
+		fireTableDataChanged();
+	}
+	
 
 	@Override
 	public int getRowCount() {
@@ -52,13 +67,14 @@ public class InboundReceiptModel extends AbstractTableModel {
 	 * @return
 	 */
 	private Map<String, Object> findProductInfo(int receiptId) {
-		for (Map<String, Object> map : FirstProductAndPCountList) {
+		for (Map<String, Object> map : infoList) {
 			if (((Integer) map.get("io_receipt_id")) == receiptId) {
 				return map;
 			}
 		}
 		return null;
 	}
+
 
 
 	/**
@@ -72,16 +88,16 @@ public class InboundReceiptModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		String value = null;
 		IOReceipt ioReceipt = inboundList.get(rowIndex); // 입고예정 레코드 값 불러오기
-		FirstProductAndPCountList = ioReceiptDAO.selectFirstProductAndItemCountByReceipt();
-		Map<String, Object> productInfo = findProductInfo(ioReceipt.getIoReceiptId()); 
+//		infoList = ioReceiptDAO.selectFirstProductAndItemCount();
+//		Map<String, Object> productInfo = findProductInfo(ioReceipt.getIoReceiptId());
 		
 		switch (columnIndex) {
 		case 0:
 			return ioReceipt.getIoReceiptId();
 		case 1:
-			return productInfo.get("first_product_name")+" 포함 "+productInfo.get("item_count") + "건";
+			return ioReceipt.getFirstProductName() + " 포함 " + ioReceipt.getItemCount() + "건";
 		case 2:
-			return productInfo.get("supplier_name");
+			return ioReceipt.getSupplierName();
 		case 3:
 			return ioReceipt.getScheduledDate();
 		case 4:

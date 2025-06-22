@@ -8,6 +8,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,6 +25,8 @@ import javax.swing.table.DefaultTableModel;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inOutBound.model.IOReceipt;
+import com.shinlogis.wms.inOutBound.repository.IOReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -49,13 +55,14 @@ public class InboundReceiptPage extends Page{
     private JTable tblPlan; // 입고예정 목록 테이블
     private JScrollPane scTable;
     private InboundReceiptModel iModel;
-    private DefaultTableModel model;     
 
     private JPanel pTableNorth;
     private JButton btnRegister;  // 입고예정등록
     
 	public InboundReceiptPage(AppMain appMain) {
 		super(appMain);
+
+        IOReceiptDAO ioReceiptDAO = new IOReceiptDAO();
 		
 		/* ==== 검색 영역 ==== */
 		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
@@ -109,10 +116,27 @@ public class InboundReceiptPage extends Page{
 
         // 검색 버튼
         btnSearch = new JButton("검색");
-        // 버튼 클릭 시 입력한 검색어를 조건으로 select
-        btnSearch.addActionListener(e ->{
-        	
+        // 검색 버튼 클릭 시 입력한 검색어를 조건으로 select
+        btnSearch.addActionListener(e -> {
+            // 검색 필터를 저장
+            Map<String,Object> filters = new HashMap<>();
+            if (!tfPlanId.getText().trim().isEmpty())
+                filters.put("io_receipt_id", Integer.parseInt(tfPlanId.getText().trim()));
+            if (chooser.getDate() != null)
+                filters.put("scheduled_date", new java.sql.Date(chooser.getDate().getTime()));
+            if (!tfSupplierName.getText().trim().isEmpty())
+                filters.put("supplier_name", tfSupplierName.getText().trim());
+            String status = (String)cbStatus.getSelectedItem();
+            if (!"전체".equals(status))
+                filters.put("status", status);
+            if (!tfProduct.getText().trim().isEmpty())
+                filters.put("product_name", tfProduct.getText().trim());
+
+            // 모델에 필터 적용
+            iModel.setData(filters);
+            laPlanCount.setText("총 " + iModel.getRowCount() + "개의 입고예정 검색");
         });
+
         gbc.gridx = 10;
         pSearch.add(btnSearch, gbc);
         
@@ -154,7 +178,6 @@ public class InboundReceiptPage extends Page{
 		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, Config.TABLE_HEIGHT - 60));
 				
 		pTable.add(laPlanCount);
-		pTable.add(scTable);
         
         pTable.add(pTableNorth);
         pTable.add(scTable);
