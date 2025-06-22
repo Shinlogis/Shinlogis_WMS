@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.shinlogis.wms.common.Exception.HeadquartersException;
 import com.shinlogis.wms.common.util.DBManager;
@@ -209,7 +211,7 @@ public class HeadquartersDAO {
 	}
 	
 	//로그인
-	public boolean Login(String id, String pw) {
+	public HeadquartersUser Login(HeadquartersUser headquartersUser) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -221,17 +223,18 @@ public class HeadquartersDAO {
 		
 		try {
 			
-			String securedPass = StringUtil.getSecuredPass(pw); //암호화된 비밀번호 꺼내기
+			String securedPass = StringUtil.getSecuredPass(headquartersUser.getPw()); // 사용자가 입력한 평문 비밀번호 암호화
 			
 			pstmt = con.prepareStatement(sql.toString());
-			pstmt.setString(1, id);
+			pstmt.setString(1, headquartersUser.getId());
 			pstmt.setString(2, securedPass);
 			rs = pstmt.executeQuery();
 			
 			if(rs.next()) {
-				return true;
-			} else {
-				return false;
+				headquartersUser = new HeadquartersUser();
+				headquartersUser.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
+				headquartersUser.setId(rs.getString("id"));
+				
 			}
 			
 		} catch (SQLException e) {
@@ -239,7 +242,86 @@ public class HeadquartersDAO {
 		}finally {
 			dbManager.release(pstmt, rs);
 		}
-		return false;
+		return headquartersUser;
+		
+	}
+	
+	
+	//회원 한명 정보 가져오기
+	public HeadquartersUser selectById(int pk) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		HeadquartersUser headquartersUser = null;
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select * from headquarters_user where headquarters_user_id = ?");
+		
+		
+		try {
+			
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setInt(1, pk);
+			rs = pstmt.executeQuery();
+			
+			
+			if(rs.next()) {
+				headquartersUser = new HeadquartersUser();
+				
+				String email = rs.getString("email");
+				String[] emailParts = email.split("@");
+		
+				headquartersUser.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
+				headquartersUser.setId(rs.getString("id"));
+				headquartersUser.setPw(rs.getString("pw"));
+				headquartersUser.setEmail(emailParts[0], emailParts[1]);
+				
+			}
+			
+			System.out.println("PK FROM DB: " + rs.getInt("headquarters_user_id"));
+				
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			dbManager.release(pstmt, rs);
+		}
+		
+		return headquartersUser;
+	}
+	
+	
+	
+	//수정하기
+	public void edit(HeadquartersUser headquartersUser) throws HeadquartersException{
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("update headquarters_user set id = ?, pw = ?, email = ? where headquarters_user_id = ?");
+		
+		try {
+			String securedPass = StringUtil.getSecuredPass(headquartersUser.getPw());
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, headquartersUser.getId());
+			pstmt.setString(2, securedPass);
+			pstmt.setString(3, headquartersUser.getEmail());
+			pstmt.setInt(4, headquartersUser.getHeadquartersUserId());
+			
+			int result = pstmt.executeUpdate();
+			
+			if(result <1) {
+				throw new HeadquartersException("비밀번호 변경에 실패하였습니다.");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new HeadquartersException("비밀번호 변경 시 문제 발생", e); 
+		} finally {
+			dbManager.release(pstmt);
+		}
+		
 		
 	}
 	

@@ -208,7 +208,7 @@ public class LocationUserDAO {
 		}
 		
 		//로그인
-		public boolean Login(String id, String pw) {
+		public LocationUser Login(LocationUser locationUser) {
 			Connection con = null;
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
@@ -220,17 +220,18 @@ public class LocationUserDAO {
 			
 			try {
 				
-				String securedPass = StringUtil.getSecuredPass(pw); //암호화된 비밀번호 꺼내기
+				String securedPass = StringUtil.getSecuredPass(locationUser.getPw()); //암호화된 비밀번호 꺼내기
 				
 				pstmt = con.prepareStatement(sql.toString());
-				pstmt.setString(1, id);
+				pstmt.setString(1, locationUser.getId());
 				pstmt.setString(2, securedPass);
 				rs = pstmt.executeQuery();
 				
 				if(rs.next()) {
-					return true;
+					locationUser = new LocationUser();
+					locationUser.setId(rs.getString("id"));
 				} else {
-					return false;
+					locationUser = null;
 				}
 				
 			} catch (SQLException e) {
@@ -238,7 +239,7 @@ public class LocationUserDAO {
 			}finally {
 				dbManager.release(pstmt, rs);
 			}
-			return false;
+			return locationUser;
 			
 		}
 		

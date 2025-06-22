@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 
 import com.shinlogis.wms.common.Exception.EmailException;
 import com.shinlogis.wms.common.Exception.HeadquartersException;
+import com.shinlogis.wms.common.Exception.LocationException;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.util.MailSender;
 import com.shinlogis.wms.headquarters.repository.HeadquartersDAO;
@@ -138,8 +139,10 @@ public class FindPwd extends JFrame {
 	// 비밀번호 찾기
 	public void findPwdByIdEmail() throws HeadquartersException{
 		try {
-			String pwd = headquartersDAO.findPwd(t_id.getText(), t_email.getText() + "@" + (String) cb_email.getSelectedItem());
+			String headquartersPwd = headquartersDAO.findPwd(t_id.getText(), t_email.getText() + "@" + (String) cb_email.getSelectedItem());
+			String locationUserPwd =  locationUserDAO.findPwd(t_id.getText(), t_email.getText() + "@" + (String) cb_email.getSelectedItem());
 			
+			String pwd = (headquartersPwd!= null)?headquartersPwd : locationUserPwd;
 			
 			if (pwd != null) {
 
@@ -163,6 +166,9 @@ public class FindPwd extends JFrame {
 		} catch (EmailException e) {
 			e.printStackTrace();
 			throw new EmailException(e.getMessage(), e);
+		} catch (LocationException e) {
+			e.printStackTrace();
+			throw new LocationException(e.getMessage(), e);
 		}
 
 	}

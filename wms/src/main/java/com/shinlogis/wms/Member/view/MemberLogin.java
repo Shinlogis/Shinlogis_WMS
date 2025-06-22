@@ -52,7 +52,7 @@ public class MemberLogin extends JFrame{
 	
 	HeadquartersDAO headquartersDAO;
 	LocationUserDAO locationUserDAO;
-	HeadquartersUser user;
+	HeadquartersUser headquartersUser;
 	LocationUser locationUser;
 	
 	public MemberLogin() {
@@ -220,12 +220,17 @@ public class MemberLogin extends JFrame{
 	
 	//본사 로그인
 	public void headquartersUserLogin() {
+		
+		HeadquartersUser user = new HeadquartersUser();
+		user.setId(t_id.getText());
+		user.setPw(new String(t_pwd.getPassword()));
+		
+		headquartersUser = headquartersDAO.Login(user);
 	
-		if(headquartersDAO.Login(t_id.getText(), new String(t_pwd.getPassword()))) {
+		if(headquartersUser != null) {
 			JOptionPane.showMessageDialog(this, "로그인 완료");
-			user = new HeadquartersUser();
-			AppMain appMain=new AppMain();
-			appMain.headquartersUser=user;
+
+			AppMain appMain=new AppMain(headquartersUser, null);
 			appMain.initUI();
 		}else {
 			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
@@ -233,13 +238,22 @@ public class MemberLogin extends JFrame{
 		}
 	}
 	
+	
+	
+	
 	//지점 로그인
 	public void locationUserLogin() {
-		if(locationUserDAO.Login(t_id.getText(), new String(t_pwd.getPassword()))) {
+		
+		LocationUser user = new LocationUser();
+		user.setId(t_id.getText());
+		user.setPw(new String(t_pwd.getPassword()));
+		
+		locationUser = locationUserDAO.Login(user);
+		
+		if(locationUser != null) {
 			JOptionPane.showMessageDialog(this, "로그인 완료");
-			locationUser = new LocationUser();
-			AppMain appMain=new AppMain();
-			appMain.locationUser=locationUser;
+			
+			AppMain appMain=new AppMain(null, locationUser);
 			appMain.initUI();
 		}else {
 			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
