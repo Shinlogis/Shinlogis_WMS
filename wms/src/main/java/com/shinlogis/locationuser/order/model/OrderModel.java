@@ -13,7 +13,7 @@ import com.shinlogis.wms.product.model.Product;
 //상품목록 테이블에 값 채워넣기 
 public class OrderModel extends AbstractTableModel{
 	OrderDAO orderDAO;
-	List<StoreOrder> list;
+	//List<StoreOrder> list;
 	
 	String [] column= {
 			"선택","상품명","가격","수량 입력 "
@@ -34,13 +34,14 @@ public class OrderModel extends AbstractTableModel{
 	
 	@Override
 	public int getRowCount() {
-		return list.size();
+//		return list.size();
+		return 0;
 	}
 	
 	//행열에 값 넣기 
 	@Override
 	public Object getValueAt(int row, int col) {
-		StoreOrder storeOrder=list.get(row);
+		//StoreOrder storeOrder=list.get(row);
 		
 		switch (col) {
 //        case 0: return product.isChecked();

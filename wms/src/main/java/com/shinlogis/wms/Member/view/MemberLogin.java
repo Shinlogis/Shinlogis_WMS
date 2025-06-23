@@ -134,7 +134,6 @@ public class MemberLogin extends JFrame{
 		});
 		
 		
-		
 		//본사 회원가입
 		headquarters_join.addMouseListener(new MouseAdapter() {
 			@Override
