@@ -1,0 +1,16 @@
+package com.shinlogis.wms.common.Exception;
+
+public class EmailException extends RuntimeException{
+
+	public EmailException(String msg) {
+		super(msg);
+	}
+	
+	public EmailException(Throwable e) {
+		super(e);
+	}
+	
+	public EmailException(String msg, Throwable e) {
+		super(msg, e);
+	}
+}
