@@ -2,6 +2,7 @@ package com.shinlogis.wms.inbound.view;
 
 import com.shinlogis.wms.inbound.model.IODetail;
 import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ public class EditInboundDetailDialog extends JDialog {
 
     private JTextField tfProductCode;
     private JLabel laProductName;
-    private JTextField tfSupplierName;
+    private JLabel laSupplierName;
     private JTextField tfQuantity;
     private JComboBox<String> cbStatus;
     private JButton btnSearch;
@@ -23,6 +24,11 @@ public class EditInboundDetailDialog extends JDialog {
     private JButton btnCancel;
 
     private IODetail ioDetail;
+    private ProductDAO productDAO = new ProductDAO();
+    
+    private String beforeProductCode;
+    private int beforeQuantity;
+    private String beforeStatus;
 
     public EditInboundDetailDialog(Frame owner, IODetail detail) {
         super(owner, "입고상세 수정", true);
@@ -33,14 +39,27 @@ public class EditInboundDetailDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // 상품코드 필드와 검색 버튼
-        tfProductCode = new JTextField(detail.getProductSnapshot().getProductCode());
+        tfProductCode = new JTextField(detail.getProductSnapshot().getProductCode(), 10); 
         btnSearch = new JButton("검색");
+        btnSearch.addActionListener(e -> {
+        	Product product = productDAO.selectByCode(tfProductCode.getText().trim());
+        	if (product != null) {
+        		laProductName.setText(product.getProductName());
+        		laProductName.setForeground(Color.BLUE);
+        		laSupplierName.setText(product.getSupplier().getName());
+        		laSupplierName.setForeground(Color.BLUE);
+        	} else {
+        		JOptionPane.showMessageDialog(this, "존재하지 않는 상품입니다.");
+        	}
+        });
+        
         laProductName = new JLabel(detail.getProductSnapshot().getProductName());
 
         gbc.gridx = 0; gbc.gridy = 0;
         add(new JLabel("상품코드"), gbc);
         gbc.gridx = 1;
         add(tfProductCode, gbc);
+        beforeProductCode = tfProductCode.getText(); // 기존 상품 코드 저장
         gbc.gridx = 2;
         add(btnSearch, gbc);
 
@@ -51,11 +70,11 @@ public class EditInboundDetailDialog extends JDialog {
         gbc.gridwidth = 1;
 
         // 공급사명
-        tfSupplierName = new JTextField(detail.getProductSnapshot().getSupplierName());
+        laSupplierName = new JLabel(detail.getProductSnapshot().getSupplierName());
         gbc.gridx = 0; gbc.gridy = 2;
         add(new JLabel("공급사명"), gbc);
         gbc.gridx = 1; gbc.gridwidth = 2;
-        add(tfSupplierName, gbc);
+        add(laSupplierName, gbc);
         gbc.gridwidth = 1;
 
         // 수량
@@ -64,11 +83,13 @@ public class EditInboundDetailDialog extends JDialog {
         add(new JLabel("예정 수량"), gbc);
         gbc.gridx = 1; gbc.gridwidth = 2;
         add(tfQuantity, gbc);
+        beforeQuantity = Integer.parseInt(tfQuantity.getText()); // 기존 상품 수량 저장
         gbc.gridwidth = 1;
 
         // 상태
-        cbStatus = new JComboBox<>(new String[]{"예정", "진행 중", "완료", "보류"});
+        cbStatus = new JComboBox<>(new String[]{"예정", "진행 중", "보류"});
         cbStatus.setSelectedItem(detail.getStatus());
+        beforeStatus = detail.getStatus();
         gbc.gridx = 0; gbc.gridy = 4;
         add(new JLabel("상태"), gbc);
         gbc.gridx = 1; gbc.gridwidth = 2;
@@ -85,36 +106,58 @@ public class EditInboundDetailDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 3;
         add(pButtons, gbc);
 
-        // 검색 버튼 동작
-        btnSearch.addActionListener(e -> {
-//            String code = tfProductCode.getText().trim();
-//            Product product = ProductDAO.findByCode(code);
-//            if (product != null) {
-//                laProductName.setText(product.getProductName());
-//                tfSupplierName.setText(product.getSupplierName());
-//            } else {
-//                laProductName.setText("상품 없음");
-//                tfSupplierName.setText("공급사 없음");
-//            }
-        });
-
 
         // 저장 버튼
         btnSave.addActionListener(e -> {
-            try {
-                int quantity = Integer.parseInt(tfQuantity.getText());
-                ioDetail.setPlannedQuantity(quantity);
-                ioDetail.getProductSnapshot().setProductCode(tfProductCode.getText());
-                ioDetail.getProductSnapshot().setProductName(laProductName.getText());
-                ioDetail.getProductSnapshot().setSupplierName(tfSupplierName.getText());
-                ioDetail.setStatus((String) cbStatus.getSelectedItem());
+            String productCode = tfProductCode.getText().trim();
+            String quantityStr = tfQuantity.getText().trim();
+            String productName = laProductName.getText().trim();
+            String supplierName = laSupplierName.getText().trim();
 
-                JOptionPane.showMessageDialog(this, "수정 완료");
-                dispose();
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "수량은 숫자만 입력해주세요");
+            // 검증 1: 상품코드 입력 여부
+            if (productCode.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "상품코드를 입력해주세요.");
+                return;
             }
+
+            // 검증 2: 검색된 상품 정보가 표시되었는지
+            if (productName.isEmpty() || supplierName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "상품 검색을 먼저 진행해주세요.");
+                return;
+            }
+
+            // 검증 3: 수량 숫자 여부 및 음수 방지
+            int quantity;
+            try {
+                quantity = Integer.parseInt(quantityStr);
+                if (quantity < 0) {
+                    JOptionPane.showMessageDialog(this, "수량은 0 이상이어야 합니다.");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "수량은 숫자만 입력해주세요.");
+                return;
+            }
+
+            // 검증 4: 상태 선택 여부
+            String status = (String) cbStatus.getSelectedItem();
+            if (status == null || status.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "상태를 선택해주세요.");
+                return;
+            }
+
+            // TODO: 저장 update
+            // 상품코드가 변경되었을 경우
+            if (beforeProductCode != tfProductCode.getText()) {
+            	
+            }
+            // 상품수량이 변경되었을 경우
+            // 상태가 변경되었을 경우
+
+            JOptionPane.showMessageDialog(this, "수정 완료");
+            dispose();
         });
+
 
         btnCancel.addActionListener(e -> dispose());
 
