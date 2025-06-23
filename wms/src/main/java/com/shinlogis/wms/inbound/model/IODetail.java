@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inOutBound.model;
+package com.shinlogis.wms.inbound.model;
 
 import java.sql.Date;
 

@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inOutBound.view;
+package com.shinlogis.wms.inbound.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,14 +8,18 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.common.config.ButtonEditor;
+import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.inOutBound.model.IODetail;
+import com.shinlogis.wms.inbound.model.IODetail;
 import com.toedter.calendar.JDateChooser;
 
 
@@ -124,7 +128,33 @@ public class InboundDetailPage extends Page {
 		btnSearch = new JButton("검색");
 		// 버튼 클릭 시 입력한 검색어를 조건으로 select
 		btnSearch.addActionListener(e -> {
+			// 검색 필터를 저장
+			Map<String, Object> filters = new HashMap<>();
+			if (!tfPlanId.getText().trim().isEmpty())
+				filters.put("io_receipt_id", Integer.parseInt(tfPlanId.getText().trim()));
+			
+			if (!tfPlanItemId.getText().trim().isEmpty())
+				filters.put("io_detail_id", Integer.parseInt(tfPlanItemId.getText().trim()));
+			
+			if (!tfProductCode.getText().trim().isEmpty())
+				filters.put("product_code", tfProductCode.getText().trim());
+			
+			if (!tfProduct.getText().trim().isEmpty())
+				filters.put("product_name", tfProduct.getText().trim());
 
+			if (!tfSupplierName.getText().trim().isEmpty())
+				filters.put("supplier_name", tfSupplierName.getText().trim());
+
+			String status = (String) cbStatus.getSelectedItem();
+			if (!"전체".equals(status))
+				filters.put("status", status);
+			
+			if (chooser.getDate() != null)
+				filters.put("scheduled_date", new java.sql.Date(chooser.getDate().getTime()));
+
+			// 모델에 필터 적용
+			inboundDetailModel.setData(filters);
+			laPlanCount.setText("총 " + inboundDetailModel.getRowCount() + "개의 입고상세 검색");
 		});
 		gbc.gridx = 7;
 		pSearch.add(btnSearch, gbc);
@@ -139,7 +169,7 @@ public class InboundDetailPage extends Page {
 		pTableNorth = new JPanel(new FlowLayout());
 		pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
 
-		laPlanCount = new JLabel("총 0개의 입고예정 검색");
+		laPlanCount = new JLabel("총 0개의 입고상세 검색");
 		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
 		pTableNorth.add(laPlanCount);
 
@@ -147,34 +177,20 @@ public class InboundDetailPage extends Page {
 		pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
 
 		tblPlan = new JTable(inboundDetailModel = new InboundDetailModel());
-		// JTable에 버튼을 그리고 기능 추가
+		// JTable에 버튼을 setCellRenderer로 그리고 setCellEditor로 기능 추가
+		// 수정 버튼
 		tblPlan.getColumn("수정").setCellRenderer(new ButtonRenderer());
-		tblPlan.getColumn("수정").setCellEditor(new ButtonEditor(new JCheckBox()));
+		tblPlan.getColumn("수정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+		    IODetail detail = inboundDetailModel.getIODetailAt(row);
+		    EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, detail);
+		    dialog.setVisible(true);
+		}));
 
-		// 클릭 이벤트 처리
-		tblPlan.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				int row = tblPlan.rowAtPoint(e.getPoint());
-				int col = tblPlan.columnAtPoint(e.getPoint());
-				if (row == -1) return;
-
-				// 8번 열: 검수하기
-				if (col == 8) {
-					IODetail selectedDetail = inboundDetailModel.getIODetailAt(row);
-					System.out.println("검수하기 클릭: io_detail_id=" + selectedDetail.getIoItemId());
-					// TODO: 검수 로직 호출
-				}
-				// 9번 열: 수정
-				else if (col == 9) {
-					IODetail selectedDetail = inboundDetailModel.getIODetailAt(row);
-					System.out.println("수정 클릭: io_detail_id=" + selectedDetail.getIoItemId());
-					EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, selectedDetail);
-					dialog.setVisible(true);
-					// TODO: 다이얼로그에서 저장 후 상세 목록 갱신
-				}
-			}
-		});
+		// 입고처리 검수 버튼
+		tblPlan.getColumn("입고처리").setCellRenderer(new ButtonRenderer());
+		tblPlan.getColumn("입고처리").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+		    // TODO: 검수버튼 로직
+		}));
 
 
 		scTable = new JScrollPane(tblPlan);

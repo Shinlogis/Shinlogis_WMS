@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inOutBound.view;
+package com.shinlogis.wms.inbound.view;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,8 +7,9 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inOutBound.model.IOReceipt;
-import com.shinlogis.wms.inOutBound.repository.IOReceiptDAO;
+import com.shinlogis.wms.inbound.model.IODetail;
+import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 
 /**
@@ -19,7 +20,7 @@ import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
  */
 public class InboundReceiptModel extends AbstractTableModel {
 
-	IOReceiptDAO ioReceiptDAO = new IOReceiptDAO();
+	InboundReceiptDAO ioReceiptDAO = new InboundReceiptDAO();
 	SnapshotDAO snapshotDAO = new SnapshotDAO();
 	List<IOReceipt> inboundList;
 	List<Map<String, Object>> infoList;
@@ -32,6 +33,19 @@ public class InboundReceiptModel extends AbstractTableModel {
 	public InboundReceiptModel() {
 		// 초기에는 필터가 없으므로 Collections.emptyMap()를 넘겨 빈 필터로 전체를 불러옴
 		inboundList = ioReceiptDAO.selectInboundReceiptsWithItemInfo(Collections.emptyMap());
+	}
+	
+	public IOReceipt getIOReceiptAt(int rowIndex) {
+		if (rowIndex >= 0 && rowIndex < inboundList.size()) {
+			return inboundList.get(rowIndex);
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return columnIndex == 7;
 	}
 
 	/**

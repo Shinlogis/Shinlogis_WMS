@@ -30,6 +30,7 @@ public class ButtonEditor extends DefaultCellEditor {
     /**
      * 생성자: 버튼 클릭 시 실행할 리스너를 외부에서 주입
      * 
+     * @author 김예진
      * @param checkBox 편집기 부모 컴포넌트 
      * @param listener 버튼 클릭 시 실행할 사용자 정의 동작
      */

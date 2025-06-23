@@ -1,12 +1,14 @@
-package com.shinlogis.wms.inOutBound.view;
+package com.shinlogis.wms.inbound.view;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inOutBound.model.IODetail;
-import com.shinlogis.wms.inOutBound.repository.IODetailDAO;
-import com.shinlogis.wms.inOutBound.repository.IOReceiptDAO;
+import com.shinlogis.wms.inbound.model.IODetail;
+import com.shinlogis.wms.inbound.repository.InboundDetailDAO;
+import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
 
@@ -15,17 +17,17 @@ import com.shinlogis.wms.snapshot.model.Snapshot;
  * @author 김예진
  */
 public class InboundDetailModel extends AbstractTableModel {
-	IODetailDAO ioDetailDAO = new IODetailDAO();
-	IOReceiptDAO ioReceiptDAO = new IOReceiptDAO();
+	InboundDetailDAO ioDetailDAO = new InboundDetailDAO();
+	InboundReceiptDAO ioReceiptDAO = new InboundReceiptDAO();
 	Snapshot snapshot = new Snapshot();
 	
 	List<IODetail> inblundPlanItemList;
 	String[] column = { "입고예정ID", "입고예정상세ID", "상품코드", "상품명", "상태", "공급사명",
-			"수량", "입고예정일", "입고처리", "수정"};
+			"수량", "입고예정일", "처리일", "입고처리", "수정"};
 
 	public InboundDetailModel() {
 		// 전체 목록 로드
-		this.inblundPlanItemList = ioDetailDAO.selectIODetails();
+		this.inblundPlanItemList = ioDetailDAO.selectIODetails(Collections.emptyMap());
 	}
 
 	/**
@@ -43,11 +45,21 @@ public class InboundDetailModel extends AbstractTableModel {
 		}
 	}
 
+	/**
+	 * 값을 새로 설정하는 메서드
+	 * @author 김예진
+	 * @since 2025-06-23
+	 * @param filters
+	 */
+	public void setData(Map<String,Object> filters) {
+		this.inblundPlanItemList = ioDetailDAO.selectIODetails(filters);
+		fireTableDataChanged();
+	}
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// 예: 마지막 컬럼(수정 버튼)이면 편집 가능
-		return column == 9;
+		// 편집 가능 컬럼들 반환 
+		return column == 10 || column == 9;
 	}
 
 	@Override
@@ -89,8 +101,10 @@ public class InboundDetailModel extends AbstractTableModel {
 			case 7:
 				return ioDetail.getIoReceipt().getScheduledDate();
 			case 8:
-				return "검수하기";
+				return ioDetail.getProccessedDate(); 
 			case 9:
+				return "입고처리";
+			case 10:
 				return "수정";
 
 		default:
