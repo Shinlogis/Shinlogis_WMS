@@ -1,6 +1,6 @@
-package com.shinlogis.wms.inOutBound.view;
+package com.shinlogis.wms.inbound.view;
 
-import com.shinlogis.wms.inOutBound.model.IODetail;
+import com.shinlogis.wms.inbound.model.IODetail;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
@@ -24,9 +24,6 @@ public class EditInboundDetailDialog extends JDialog {
 
     private IODetail ioDetail;
 
-    // 예시 상품코드 ↔ 상품명 매핑 (실제로는 DAO에서 가져와야 함)
-    private Map<String, String> productNameMap = new HashMap<>();
-
     public EditInboundDetailDialog(Frame owner, IODetail detail) {
         super(owner, "입고상세 수정", true);
         this.ioDetail = detail;
@@ -34,11 +31,6 @@ public class EditInboundDetailDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // 샘플 데이터 설정
-        productNameMap.put("P001", "Apple");
-        productNameMap.put("P002", "Banana");
-        productNameMap.put("P003", "Cherry");
 
         // 상품코드 필드와 검색 버튼
         tfProductCode = new JTextField(detail.getProductSnapshot().getProductCode());
