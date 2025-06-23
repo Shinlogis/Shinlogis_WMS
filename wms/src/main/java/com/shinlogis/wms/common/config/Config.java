@@ -23,7 +23,15 @@ public class Config {
 	public static final int LOCATION_PAGE = 9;
 	public static final int SUPPLIER_PAGE = 10;
 	public static final int CHATTING_PAGE = 11;
-	public static final int MY_PAGE = 12;
+	public static final int HEADQUATERS_MY_PAGE = 12;
+	
+	
+	/*-------------------------------------
+	 지 페이지 정의
+	 --------------------------------------*/
+	public static final int ORDER_PAGE = 0; 
+	public static final int ORDER_LIST_PAGE = 1; 
+	public static final int LOCATION_MY_PAGE = 2; 
 	
 	/*-------------------------------------
 	 관리자 앱 메인 설정

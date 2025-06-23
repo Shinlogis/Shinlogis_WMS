@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -58,7 +59,7 @@ public class MemberLogin extends JFrame{
 	public MemberLogin() {
 		
 		getContentPane().setBackground(Color.WHITE);
-		this.setLayout(new java.awt.GridBagLayout());
+		this.setLayout(new GridBagLayout());
 		p_center = new JPanel(new FlowLayout());
 		p_center.setLayout(new BoxLayout(p_center, BoxLayout.Y_AXIS));
 		p_center.setPreferredSize(new Dimension(400,400));

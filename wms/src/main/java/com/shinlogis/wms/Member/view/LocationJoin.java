@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
@@ -54,13 +55,16 @@ public class LocationJoin extends JFrame{
 	
 	LocationDAO locationDAO;
 	LocationUserDAO locationUserDAO;
+	Location dummy;
+	boolean idCheck = false;
+	
 	
 	
 	public LocationJoin() {
 		p_center = new JPanel();
 		
 		getContentPane().setBackground(Color.WHITE);
-		this.setLayout(new java.awt.GridBagLayout());
+		this.setLayout(new GridBagLayout());
 		p_center.setLayout(new BoxLayout(p_center, BoxLayout.Y_AXIS));
 		p_center.setPreferredSize(new Dimension(500,500));
 		p_center.setBackground(Color.WHITE);
@@ -103,7 +107,10 @@ public class LocationJoin extends JFrame{
 		p_center.add(createLine(la_pwdCheck, t_pwdCheck));
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
 		
-		for(int i=11; i<20; i++) {
+		dummy = new Location();
+		dummy.setLocationName("지점 선택");
+		cb_location.addItem(dummy);
+		for(int i=1; i<10; i++) {
 			cb_location.addItem("지점" + i);
 		}
 		p_center.add(createLocationLine(la_location, cb_location));
@@ -114,6 +121,7 @@ public class LocationJoin extends JFrame{
 		//아이디 체크
 		bt_idCheck.addActionListener(e -> {
 			idCheck();
+			idCheck = true;
 		});
 		
 		
@@ -200,8 +208,7 @@ public class LocationJoin extends JFrame{
 			Location location = new Location();
 			location.setLocationName((String)cb_location.getSelectedItem());
 			location.setAddress("서울시 강남구" + (cb_location.getSelectedIndex() +1) + "번지");
-			//locationDAO.insertLocation(location);
-			location.setLocationId(locationDAO.insertLocation(location));
+			locationDAO.getLocation(location);
 			
 			LocationUser locationUser = new LocationUser();
 			locationUser.setId(t_id.getText());
@@ -237,7 +244,9 @@ public class LocationJoin extends JFrame{
 	public void checkValid(){
 		if(t_id.getText().length() == 0) {
 			JOptionPane.showMessageDialog(this,"아이디를 입력하세요");
-		}else if(t_pwd.getPassword().length==0) {
+		}else if(!idCheck) {
+			JOptionPane.showMessageDialog(this, "아이디 중복 검사를 하세요");
+		} else if(t_pwd.getPassword().length==0) {
 			JOptionPane.showMessageDialog(this, "비밀번호를 입력하세요");
 		} else if(t_pwdCheck.getPassword().length ==0) {
 			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");
@@ -251,6 +260,9 @@ public class LocationJoin extends JFrame{
 			return;
 		}else if(!locationUserDAO.checkEmail(t_email.getText()+"@"+(String)cb_email.getSelectedItem())) {
 			JOptionPane.showMessageDialog(this, "중복된 이메일입니다. 다시 확인해 주세요");
+			return;
+		}else if(cb_location.getSelectedItem() == dummy) {
+			JOptionPane.showMessageDialog(this, "지점을 선택해 주세요");
 			return;
 		}
 		else {

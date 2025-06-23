@@ -91,13 +91,12 @@ public class HeadquartersDAO {
 		
 	}
 	
-	
 	/**
 	 * 중복 이메일을 검증하는 메서드 
 	 * @param insertId 사용자가 입력한 id 
 	 * @return true: 사용가능한 아이디 / false: 중복 아이디 
 	 */
-	public boolean checkEmail(String insertEmail) {
+	public boolean checkEmail(String email) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -105,11 +104,50 @@ public class HeadquartersDAO {
 		con = dbManager.getConnection();
 		
 		StringBuffer sql = new StringBuffer();
+		//본인 아이디와 같지 않은 이메일 중복 체크
 		sql.append("select * from headquarters_user where email = ?");
 		
 		try {
 			pstmt = con.prepareStatement(sql.toString());
-			pstmt.setString(1, insertEmail); //sql문에 사용자가 입력한 아이디를 매핑 
+			pstmt.setString(1, email);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				//rs.next()가 존재하는 경우 -> 값이 있다는 것 -> 중복 아이디 (db에 존재하므로 값이 select 된 것)
+				return false; // 중복아이디
+			} else { 
+				//rs.next()가 존재하지 않는 경우 경우 -> 값이 없다는 것 -> 중복 아이디가 아님 (db에 중복되는 값이 없음)
+				return true; // 사용 가능한 아이디 
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			dbManager.release(pstmt, rs);
+			
+		}
+		return false;
+		
+	}
+	
+	
+	//수정시 본인 이메일은 중복방지 제외
+	public boolean checkEmailById(String email, int id) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		con = dbManager.getConnection();
+		
+		StringBuffer sql = new StringBuffer();
+		//본인 아이디와 같지 않은 이메일 중복 체크
+		sql.append("select * from headquarters_user where email = ? and headquarters_user_id != ?");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, email);
+			pstmt.setInt(2, id);
 			
 			rs = pstmt.executeQuery();
 			
@@ -215,6 +253,7 @@ public class HeadquartersDAO {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		HeadquartersUser user =null;
 		
 		con = dbManager.getConnection();
 		StringBuffer sql = new StringBuffer();
@@ -231,9 +270,9 @@ public class HeadquartersDAO {
 			rs = pstmt.executeQuery();
 			
 			if(rs.next()) {
-				headquartersUser = new HeadquartersUser();
-				headquartersUser.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
-				headquartersUser.setId(rs.getString("id"));
+				user = new HeadquartersUser();
+				user.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
+				user.setId(rs.getString("id"));
 				
 			}
 			
@@ -242,7 +281,7 @@ public class HeadquartersDAO {
 		}finally {
 			dbManager.release(pstmt, rs);
 		}
-		return headquartersUser;
+		return user;
 		
 	}
 	
@@ -277,9 +316,11 @@ public class HeadquartersDAO {
 				headquartersUser.setPw(rs.getString("pw"));
 				headquartersUser.setEmail(emailParts[0], emailParts[1]);
 				
+				System.out.println("PK FROM DB: " + rs.getInt("headquarters_user_id"));
+			}else {
+			    System.out.println("❗해당 ID로 사용자 정보 없음");
 			}
 			
-			System.out.println("PK FROM DB: " + rs.getInt("headquarters_user_id"));
 				
 			
 		} catch (SQLException e) {
@@ -300,15 +341,20 @@ public class HeadquartersDAO {
 		
 		con = dbManager.getConnection();
 		StringBuffer sql = new StringBuffer();
-		sql.append("update headquarters_user set id = ?, pw = ?, email = ? where headquarters_user_id = ?");
 		
 		try {
-			String securedPass = StringUtil.getSecuredPass(headquartersUser.getPw());
-			pstmt = con.prepareStatement(sql.toString());
-			pstmt.setString(1, headquartersUser.getId());
-			pstmt.setString(2, securedPass);
-			pstmt.setString(3, headquartersUser.getEmail());
-			pstmt.setInt(4, headquartersUser.getHeadquartersUserId());
+			if(headquartersUser.getPw() == null || headquartersUser.getPw().isEmpty()) {
+				sql.append("update headquarters_user set email = ? where headquarters_user_id = ?");
+				pstmt = con.prepareStatement(sql.toString());
+				pstmt.setString(1, headquartersUser.getEmail());
+				pstmt.setInt(2, headquartersUser.getHeadquartersUserId());
+			} else {
+				sql.append("update headquarters_user set pw =?, email = ? where headquarters_user_id = ?");
+				pstmt = con.prepareStatement(sql.toString());
+				pstmt.setString(1, StringUtil.getSecuredPass(headquartersUser.getPw()));
+				pstmt.setString(2, headquartersUser.getEmail());
+				pstmt.setInt(3, headquartersUser.getHeadquartersUserId());
+			}
 			
 			int result = pstmt.executeUpdate();
 			
@@ -321,7 +367,6 @@ public class HeadquartersDAO {
 		} finally {
 			dbManager.release(pstmt);
 		}
-		
 		
 	}
 	

@@ -14,7 +14,7 @@ public class LocationDAO {
 	DBManager dbManager = DBManager.getInstance();
 	
 	//회원가입
-	public int insertLocation(Location location) throws LocationException{
+	public int getLocation(Location location) throws LocationException{
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -22,27 +22,22 @@ public class LocationDAO {
 		
 		con = dbManager.getConnection();
 		StringBuffer sql = new StringBuffer();
-		sql.append("insert into location (location_name, address)values (?,?)");
+		sql.append("select * from location where location_name = ?");
 		
 		try {
 			pstmt = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
 			pstmt.setString(1, location.getLocationName());
-			pstmt.setString(2, location.getAddress());
-			int result = pstmt.executeUpdate();
+			rs = pstmt.executeQuery();
 			
-			if(result <1) {
-				throw new LocationException("회원가입에 실패했습니다.");
-			}
-			
-			rs = pstmt.getGeneratedKeys();
 			
 			if(rs.next()) {
-				locationId = rs.getInt(1);
+				location.setLocationId(rs.getInt("location_id"));
+				location.setLocationName(rs.getString("location_name"));
+				location.setAddress(rs.getString("address"));
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new LocationException("회원가입 중 문제 발생");
 		}finally {
 			dbManager.release(pstmt,rs);
 		}

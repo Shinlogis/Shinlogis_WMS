@@ -24,8 +24,6 @@ import javax.swing.border.EmptyBorder;
 
 import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.locationuser.orderList.view.OrderListPage;
-import com.shinlogis.wms.Member.view.HeadquartersJoin;
-import com.shinlogis.wms.Member.view.MemberLogin;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
@@ -35,7 +33,10 @@ import com.shinlogis.wms.inOutBound.view.InboundPlanItemPage;
 import com.shinlogis.wms.inOutBound.view.InboundReceiptPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
+import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
+import com.shinlogis.wms.Member.view.HeadquartersJoin;
+import com.shinlogis.wms.Member.view.MemberLogin;
 
 public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
@@ -209,8 +210,13 @@ public class AppMain extends JFrame {
 		la_logout.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				headquartersUser = null;
-				new MemberLogin();
+				if(headquartersUser != null) {
+					headquartersUser = null;
+					new MemberLogin();
+				}else if(locationUser != null) {
+					locationUser = null;
+					new MemberLogin();
+				}
 			}
 		});
 		
@@ -219,9 +225,9 @@ public class AppMain extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(headquartersUser != null) {
-					showPage(Config.MY_PAGE);
+					showPage(Config.HEADQUATERS_MY_PAGE);
 				}else if(locationUser != null) {
-					//showPage(지점 페이지 연결);
+					showPage(Config.LOCATION_MY_PAGE);
 				}
 			}
 		});
@@ -323,10 +329,11 @@ public class AppMain extends JFrame {
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 
 		} else if ("locationUser".equals(role)) {
-			pages = new Page[2];
+			pages = new Page[3];
 
 			pages[0] = new OrderPage(this);
 			pages[1] = new OrderListPage(this);
+			pages[2] = new LocatoinMyPage(this);
 		}
 
 		for (int i = 0; i < pages.length; i++) {

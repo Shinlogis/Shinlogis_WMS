@@ -23,4 +23,7 @@ public class Location {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+	public String toString() {
+	    return locationName;  // 콤보박스에서 보일 텍스트
+	}
 }

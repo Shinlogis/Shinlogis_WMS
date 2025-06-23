@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -49,13 +50,14 @@ public class HeadquartersJoin extends JFrame{
 	
 	DBManager dbManager = DBManager.getInstance();
 	HeadquartersDAO headquartersDAO;
+	boolean idCheck = false;
 	
 	
 	public HeadquartersJoin() {
 		p_center = new JPanel();
 		
 		getContentPane().setBackground(Color.WHITE);
-		this.setLayout(new java.awt.GridBagLayout());
+		this.setLayout(new GridBagLayout());
 		p_center.setLayout(new BoxLayout(p_center, BoxLayout.Y_AXIS));
 		p_center.setPreferredSize(new Dimension(500,500));
 		p_center.setBackground(Color.WHITE);
@@ -100,6 +102,7 @@ public class HeadquartersJoin extends JFrame{
 		//아이디 체크
 		bt_idCheck.addActionListener(e -> {
 			idCheck();
+			idCheck = true;
 		});
 		
 		
@@ -207,7 +210,9 @@ public class HeadquartersJoin extends JFrame{
 			JOptionPane.showMessageDialog(this,"아이디를 입력하세요");
 		}else if(t_pwd.getPassword().length==0) {
 			JOptionPane.showMessageDialog(this, "비밀번호를 입력하세요");
-		} else if(t_pwdCheck.getPassword().length ==0) {
+		}else if(!idCheck) {
+			JOptionPane.showMessageDialog(this, "아이디 중복검사를 하세요");
+		}else if(t_pwdCheck.getPassword().length ==0) {
 			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");
 		}else if(t_email.getText().length() ==0) {
 			JOptionPane.showMessageDialog(this, "이메일을 입력하세요");

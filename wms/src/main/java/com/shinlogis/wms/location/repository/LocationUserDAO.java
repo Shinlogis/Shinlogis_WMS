@@ -212,6 +212,7 @@ public class LocationUserDAO {
 			Connection con = null;
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
+			LocationUser user = null;
 			
 			con = dbManager.getConnection();
 			StringBuffer sql = new StringBuffer();
@@ -219,7 +220,6 @@ public class LocationUserDAO {
 			
 			
 			try {
-				
 				String securedPass = StringUtil.getSecuredPass(locationUser.getPw()); //암호화된 비밀번호 꺼내기
 				
 				pstmt = con.prepareStatement(sql.toString());
@@ -228,18 +228,17 @@ public class LocationUserDAO {
 				rs = pstmt.executeQuery();
 				
 				if(rs.next()) {
-					locationUser = new LocationUser();
-					locationUser.setId(rs.getString("id"));
-				} else {
-					locationUser = null;
-				}
+					user = new LocationUser();
+					user = new LocationUser();
+					user.setId(rs.getString("id"));
+				} 
 				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}finally {
 				dbManager.release(pstmt, rs);
 			}
-			return locationUser;
+			return user;
 			
 		}
 		
