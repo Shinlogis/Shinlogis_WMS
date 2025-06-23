@@ -9,18 +9,13 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inOutBound.model.IODetail;
 import com.toedter.calendar.JDateChooser;
 
 
@@ -28,7 +23,7 @@ import com.toedter.calendar.JDateChooser;
  * 입고예정상세 페이지입니다.
  * @author 김예진
  */
-public class InboundPlanItemPage extends Page {
+public class InboundDetailPage extends Page {
 	/* ────────── 페이지명 영역 구성 요소 ────────── */
 	private JPanel pPageName; // 페이지명 패널
 	private JLabel laPageName; // 페이지명
@@ -52,11 +47,11 @@ public class InboundPlanItemPage extends Page {
 	private JTable tblPlan; // 입고예정 목록 테이블
 	private JScrollPane scTable;
 	private DefaultTableModel model;
-	private InboundPlanItemModel inboundPlanItemModel;
+	private InboundDetailModel inboundDetailModel;
 
 	private JPanel pTableNorth;
 
-	public InboundPlanItemPage(AppMain appMain) {
+	public InboundDetailPage(AppMain appMain) {
 		super(appMain);
 
 		/* ==== 검색 영역 ==== */
@@ -121,9 +116,7 @@ public class InboundPlanItemPage extends Page {
 		pSearch.add(new JLabel("입고예정일자"), gbc);
 		chooser = new JDateChooser();
 		chooser.setDateFormatString("yyyy-MM-dd");
-		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height)); // 권장 높이보다 넓어지지 않게 하려고 높이를
-																							// chooser.getPreferredSize().height로
-																							// 설정
+		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height)); // 권장 높이보다 넓어지지 않게 하려고 높이를 chooser.getPreferredSize().height로 설정
 		gbc.gridx = 5;
 		pSearch.add(chooser, gbc);
 
@@ -153,25 +146,41 @@ public class InboundPlanItemPage extends Page {
 		/* ==== 테이블 영역 ==== */
 		pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
 
-		tblPlan = new JTable(inboundPlanItemModel = new InboundPlanItemModel());
+		tblPlan = new JTable(inboundDetailModel = new InboundDetailModel());
+		// JTable에 버튼을 그리고 기능 추가
+		tblPlan.getColumn("수정").setCellRenderer(new ButtonRenderer());
+		tblPlan.getColumn("수정").setCellEditor(new ButtonEditor(new JCheckBox()));
+
+		// 클릭 이벤트 처리
 		tblPlan.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int row = tblPlan.rowAtPoint(e.getPoint());
 				int col = tblPlan.columnAtPoint(e.getPoint());
+				if (row == -1) return;
 
-				// 8번 열(=상세보기)을 클릭했을 때만 출력
-				if (col == 8 && row != -1) {
-					System.out.println("click. row: " + row + ", io_receipt_id: " + tblPlan.getValueAt(row, 0));
+				// 8번 열: 검수하기
+				if (col == 8) {
+					IODetail selectedDetail = inboundDetailModel.getIODetailAt(row);
+					System.out.println("검수하기 클릭: io_detail_id=" + selectedDetail.getIoItemId());
+					// TODO: 검수 로직 호출
+				}
+				// 9번 열: 수정
+				else if (col == 9) {
+					IODetail selectedDetail = inboundDetailModel.getIODetailAt(row);
+					System.out.println("수정 클릭: io_detail_id=" + selectedDetail.getIoItemId());
+					EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, selectedDetail);
+					dialog.setVisible(true);
+					// TODO: 다이얼로그에서 저장 후 상세 목록 갱신
 				}
 			}
 		});
+
 
 		scTable = new JScrollPane(tblPlan);
 		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, Config.TABLE_HEIGHT - 60));
 
 		pTable.add(laPlanCount);
-		pTable.add(pTableNorth);
 		pTable.add(scTable);
 
 		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));

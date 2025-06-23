@@ -24,7 +24,8 @@ public class Config {
 	public static final int SUPPLIER_PAGE = 10;
 	public static final int CHATTING_PAGE = 11;
 	public static final int MY_PAGE = 12;
-	
+	public static final int INBOUND_DETAIL_EDIT_DIALOG_PAGE = 13;
+
 	/*-------------------------------------
 	 관리자 앱 메인 설정
 	 --------------------------------------*/

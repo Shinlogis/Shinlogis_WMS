@@ -123,5 +123,37 @@ target/
 .classpath
 .project
 
+# IntelliJ 설정 파일 무시
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# IDEA 내부 파일들 (사용자/환경별 변경 많은 파일)
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/aws.xml
+.idea/**/contentModel.xml
+.idea/**/dataSources*
+.idea/**/sqlDataSources.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+.idea/**/gradle.xml
+.idea/**/libraries
+.idea/**/mongoSettings.xml
+.idea/replstate.xml
+.idea/httpRequests
+.idea/sonarlint/
+.idea/**/sonarIssues.xml
+.idea/**/markdown-navigator*
+.idea/codestream.xml
+.idea/**/azureSettings.xml
+.idea/$CACHE_FILE$
+
+# 빌드 산출물 (일반적으로 무시)
+out/
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,eclipse,java,macos
