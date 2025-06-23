@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inOutBound.view;
+package com.shinlogis.wms.outbound.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,7 +50,7 @@ public class OutboundReceiptPage extends Page {
 	private JTable tb_plan; // 입고예정 목록 테이블
 	private JScrollPane sc_table;
 	private DefaultTableModel model;
-	private InboundPlanItemModel inboundPlanItemModel;
+//	private InboundPlanItemModel inboundPlanItemModel;
 
 	public OutboundReceiptPage(AppMain app) {
 

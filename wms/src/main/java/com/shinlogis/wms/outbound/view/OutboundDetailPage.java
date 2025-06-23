@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inOutBound.view;
+package com.shinlogis.wms.outbound.view;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Page;

@@ -1,6 +1,7 @@
-package com.shinlogis.wms.inOutBound.model;
+package com.shinlogis.wms.inbound.model;
 
-import java.util.Date;
+
+import java.sql.Date;
 
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.location.model.Location;
@@ -19,6 +20,27 @@ public class IOReceipt {
 	private String status;
 	private Location location;
 	private String supplierName;
+
+	private String firstProductName;
+	private int itemCount;
+
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
+	}
+
+	public String getFirstProductName() {
+		return firstProductName;
+	}
+
+	public void setFirstProductName(String firstProductName) {
+		this.firstProductName = firstProductName;
+	}
+
+
 
 	public String getSupplierName() {
 		return supplierName;
