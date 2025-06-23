@@ -468,6 +468,4 @@ public class IOReceiptDAO {
 
         return result;
     }
-
-
 }
