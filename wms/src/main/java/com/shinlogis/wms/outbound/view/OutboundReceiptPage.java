@@ -164,8 +164,6 @@ public class OutboundReceiptPage extends Page {
 		
 		
 		
-		
-		
 		//page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);
