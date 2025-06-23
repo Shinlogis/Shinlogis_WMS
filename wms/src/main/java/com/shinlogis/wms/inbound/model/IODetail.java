@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inOutBound.model;
+package com.shinlogis.wms.inbound.model;
 
 import java.sql.Date;
 
@@ -11,7 +11,7 @@ import com.shinlogis.wms.snapshot.model.Snapshot;
  * @author 김예진
  * @since 2025-06-20
  */
-public class IOPlanItem {
+public class IODetail {
 	private int ioItemId;
 	private IOReceipt ioReceipt;
 	private int plannedQuantity;
@@ -20,6 +20,15 @@ public class IOPlanItem {
 	private int damageQuantity;
 	private int actualQuantity;
 	private Date proccessedDate;
+	private String status;
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 	public Date getProccessedDate() {
 		return proccessedDate;
