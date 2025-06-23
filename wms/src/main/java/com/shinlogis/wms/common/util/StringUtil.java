@@ -34,4 +34,16 @@ public class StringUtil {
 		}
 		return sb.toString();
 	}
+	
+	
+	public static String getRandomPwd() {
+		String pwd = "";
+		
+		for(int i=0; i<6; i++) {
+			int random = (int)(Math.random()*10);
+			pwd += random;
+		}
+		
+		return pwd;
+	}
 }

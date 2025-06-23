@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,15 +24,18 @@ import javax.swing.border.EmptyBorder;
 
 import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.locationuser.orderList.view.OrderListPage;
-import com.shinlogis.wms.Member.view.MemberJoin;
+import com.shinlogis.wms.Member.view.HeadquartersJoin;
+import com.shinlogis.wms.Member.view.MemberLogin;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
+import com.shinlogis.wms.headquarters.view.HeadquatersMyPage;
 import com.shinlogis.wms.inbound.view.InboundDetailPage;
 import com.shinlogis.wms.inbound.view.InboundReceiptPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
+import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
 import com.shinlogis.wms.outbound.view.OutboundDetailPage;
 import com.shinlogis.wms.outbound.view.OutboundReceiptPage;
@@ -41,9 +45,10 @@ public class AppMain extends JFrame {
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
 	JLabel la_outboundPlan, la_outboundDetail;
 	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product;
+	JLabel la_user, la_logout;
 	Page[] pages;
 
-	MemberJoin memberJoin;
+	HeadquartersJoin memberJoin;
 	boolean login = false;
 
 	DBManager dbManager = DBManager.getInstance();
@@ -52,7 +57,10 @@ public class AppMain extends JFrame {
 	public LocationUser locationUser;
 	private String role; // 내부적으로 사용할 역할(관리자,지점)
 
-	public AppMain() {
+	public AppMain(HeadquartersUser headquartersUser, LocationUser locationUser) {
+		this.headquartersUser = headquartersUser;
+		this.locationUser = locationUser;
+		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				dbManager.release(conn);
@@ -81,6 +89,7 @@ public class AppMain extends JFrame {
 		// 상단 바 설정
 		p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));
 		p_north.setBackground(Color.YELLOW);
+		createMyPage();
 
 		// 사이드 바 설정
 		createSidebar();
@@ -195,6 +204,55 @@ public class AppMain extends JFrame {
 		// 메뉴 그룹 추가
 		addMenuGroups();
 	}
+	
+	private void createMyPage() {
+		p_north.setLayout(new FlowLayout(FlowLayout.RIGHT, 30, 0)); // 오른쪽 정렬
+		p_north.removeAll();
+		
+		la_user = new JLabel();
+		la_user.setFont(new Font("맑은 고딕{", Font.BOLD, 20));
+		la_logout = new JLabel("로그아웃");
+		la_logout.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		
+		if(headquartersUser != null) {
+			la_user.setText(headquartersUser.getId());
+		} else if(locationUser != null) {
+			la_user.setText(locationUser.getId());
+		}
+		
+		la_logout.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // 위쪽에 여백 추가
+		la_user.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // 위쪽에 여백 추가
+		p_north.add(la_user);
+		p_north.add(la_logout);
+		
+		//이벤트
+		//로그아웃
+		la_logout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(headquartersUser != null) {
+					headquartersUser = null;
+					new MemberLogin();
+				}else if(locationUser != null) {
+					locationUser = null;
+					new MemberLogin();
+				}
+			}
+		});
+		
+		//본사 마이페이지
+		la_user.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(headquartersUser != null) {
+					showPage(Config.HEADQUATERS_MY_PAGE);
+				}else if(locationUser != null) {
+					showPage(Config.LOCATION_MY_PAGE);
+				}
+			}
+		});
+	}
+	
 
 	private void addMenuGroups() {
 		if ("headquartersUser".equals(role)) {
@@ -274,7 +332,7 @@ public class AppMain extends JFrame {
 	public void createPage() {
 
 		if ("headquartersUser".equals(role)) {
-			pages = new Page[8];
+			pages = new Page[13];
 
 			pages[0] = new MainPage(this);
 			pages[1] = new InboundReceiptPage(this);
@@ -284,12 +342,18 @@ public class AppMain extends JFrame {
 			pages[5] = new OutboundDetailPage(this);
 			pages[6] = null;
 			pages[7] = new InventoryPage(this);
+			pages[8] = null;
+			pages[8] = null;
+			pages[10] = null;
+			pages[11] = null;
+			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 
 		} else if ("locationUser".equals(role)) {
-			pages = new Page[2];
+			pages = new Page[3];
 
 			pages[0] = new OrderPage(this);
 			pages[1] = new OrderListPage(this);
+			pages[2] = new LocatoinMyPage(this);
 		}
 
 		for (int i = 0; i < pages.length; i++) {
