@@ -42,8 +42,8 @@ public class OrderPage extends Page{
     private DefaultTableModel model;     
 
     private JPanel pTable; //content 영역 
-    private JPanel pTableNorth; //content 제목 영역 
-    private JPanel pTableCenter; //content 내용 영역 
+    private JPanel pTable_Content_title; //content 제목 영역 
+    private JPanel pTable_Content; //content 내용 영역 
     private JButton btnOrder;  // 주문하기버튼 
    
     
@@ -81,38 +81,39 @@ public class OrderPage extends Page{
         pPageName.add(laPageName);
         
         
-        pTableNorth = new JPanel(new FlowLayout());
-        pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
+        
+        //1.pTable 영역 
+        pTable = new JPanel(new FlowLayout()); // 전체 
+        pTable_Content = new JPanel(); //전체 > 내용 
+        pTable_Content_title = new JPanel(new FlowLayout()); //전체 > 내용 > 제목 
         
         laPlanCount = new JLabel("총 몇개의 상품");
-        laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH-150, 30));
-        pTableNorth.add(laPlanCount);
+        pTable_Content_title.add(laPlanCount);
         
-        //content 내용 영역 
-        pTableCenter = new JPanel(new FlowLayout());
-        pTableCenter.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT-Config.TABLE_NORTH_HEIGHT));
-        pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
         OrderModel model = new OrderModel();
         JTable table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(350, 150));  // 원하는 크기 설정
+        JPanel btnPanel = new JPanel();
         btnOrder = new JButton("주문하기");
+        btnPanel.add(btnOrder);
         
-        pTableCenter.add(scrollPane);
-        pTableCenter.add(btnOrder);
-        pTableCenter.setBackground(Color.PINK);
-   
 
-//	 	tblPlan = new JTable(model);
-//		scTable = new JScrollPane(tblPlan);
-//		scTable.setPreferredSize(new Dimension()); 
-		
-		pTable.add(pTableNorth,BorderLayout.NORTH); //content 영역에  
-		pTable.add(pTableCenter); //content 영역에  
-		//pTable.add(scTable);
-       // pTable.add(pTableSouth);
+        pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
+        pTable_Content.setPreferredSize(new Dimension(700, 500));
+        pTable_Content_title.setPreferredSize(new Dimension(500, Config.TABLE_NORTH_HEIGHT));
+        laPlanCount.setPreferredSize(new Dimension(500, 30));
+        scrollPane.setPreferredSize(new Dimension(500, 200));  
+        btnPanel.setPreferredSize(new Dimension(500, 80)); 
+        btnOrder.setPreferredSize(new Dimension(100, 50));
         
-		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
+    
+        pTable_Content.add(pTable_Content_title);
+        pTable_Content.add(scrollPane,BorderLayout.CENTER);
+        pTable_Content.add(btnPanel);
+        pTable_Content.setBackground(Color.PINK);
+   
+        //pTable에 부착  
+		pTable.add(pTable_Content); 
 		pTable.setBackground(Color.red);
 		
 		/* ==== 레이아웃 배치 ==== */
