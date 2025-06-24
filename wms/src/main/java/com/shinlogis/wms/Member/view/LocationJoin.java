@@ -5,7 +5,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -108,11 +110,14 @@ public class LocationJoin extends JFrame{
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
 		
 		dummy = new Location();
-		dummy.setLocationName("지점 선택");
+		dummy.setLocationName("지점선택");
 		cb_location.addItem(dummy);
-		for(int i=1; i<10; i++) {
-			cb_location.addItem("지점" + i);
+		
+		List<Location> locations = new ArrayList<>();
+		for(Location loc : locationDAO.getLocation()) {
+			cb_location.addItem(loc);
 		}
+
 		p_center.add(createLocationLine(la_location, cb_location));
 		
 		p_center.add(createCenterLine(bt_join));
@@ -206,9 +211,10 @@ public class LocationJoin extends JFrame{
 	public void regist() throws HeadquartersException{
 		try {
 			Location location = new Location();
-			location.setLocationName((String)cb_location.getSelectedItem());
+			Location selectLocation = (Location)cb_location.getSelectedItem();
+			location.setLocationId(selectLocation.getLocationId()); 
+			location.setLocationName(selectLocation.getLocationName());
 			location.setAddress("서울시 강남구" + (cb_location.getSelectedIndex() +1) + "번지");
-			locationDAO.getLocation(location);
 			
 			LocationUser locationUser = new LocationUser();
 			locationUser.setId(t_id.getText());

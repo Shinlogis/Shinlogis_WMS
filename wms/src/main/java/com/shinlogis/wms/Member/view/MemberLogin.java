@@ -221,7 +221,6 @@ public class MemberLogin extends JFrame{
 	
 	//본사 로그인
 	public void headquartersUserLogin() {
-		
 		HeadquartersUser user = new HeadquartersUser();
 		user.setId(t_id.getText());
 		user.setPw(new String(t_pwd.getPassword()));
@@ -229,6 +228,7 @@ public class MemberLogin extends JFrame{
 		headquartersUser = headquartersDAO.Login(user);
 	
 		if(headquartersUser != null) {
+			System.out.println("로그인 여부확인");
 			JOptionPane.showMessageDialog(this, "로그인 완료");
 
 			AppMain appMain=new AppMain(headquartersUser, null);

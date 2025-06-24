@@ -32,6 +32,8 @@ public class LocationUserDAO {
 			pstmt.setString(3, locationUser.getEmail());
 			pstmt.setInt(4, locationUser.getLocation().getLocationId());
 			
+			System.out.println(locationUser.getLocation().getLocationId());
+			
 			int result = pstmt.executeUpdate();
 			
 			if(result < 1) {
