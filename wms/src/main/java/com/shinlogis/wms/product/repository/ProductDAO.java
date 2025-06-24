@@ -3,24 +3,14 @@ package com.shinlogis.wms.product.repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-<<<<<<< HEAD
-
-import com.shinlogis.wms.common.util.DBManager;
-import com.shinlogis.wms.product.model.Product;
-import com.shinlogis.wms.storageType.model.StorageType;
-import com.shinlogis.wms.supplier.model.Supplier;
-
-public class ProductDAO {
-	DBManager dbManager = DBManager.getInstance();
-=======
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.shinlogis.wms.common.util.DBManager;
-import com.shinlogis.wms.damagedCode.model.DamagedCode;
 import com.shinlogis.wms.product.model.Product;
-import com.shinlogis.wms.snapshot.model.Snapshot;
+import com.shinlogis.wms.storageType.model.StorageType;
+import com.shinlogis.wms.supplier.model.Supplier;
 
 public class ProductDAO {
 //    id, product_code, product_name, storage_type_id, supplier_id, price
@@ -59,7 +49,6 @@ public class ProductDAO {
 
 		return list;
 	}
->>>>>>> d2d0fd5ea70d958520a8e5a136a94c00c488661d
 
 	/**
 	 * 상품코드가 일치하는 product를 select하는 메서드
