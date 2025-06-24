@@ -26,6 +26,7 @@ import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.locationuser.orderList.view.OrderListPage;
 import com.shinlogis.wms.Member.view.HeadquartersJoin;
 import com.shinlogis.wms.Member.view.MemberLogin;
+import com.shinlogis.wms.chat.view.ChattingPage;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
@@ -42,7 +43,7 @@ public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
 	JLabel la_outboundPlan, la_outboundDetail;
-	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product;
+	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat;
 	JLabel la_user, la_logout;
 	Page[] pages;
 
@@ -158,11 +159,19 @@ public class AppMain extends JFrame {
 					System.out.println("click");
 				}
 			});
+			
+			la_chat.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.CHATTING_PAGE);
+				}
+			});
 
 		} else if ("locationUser".equals(role)) {
 			la_order = createMenuItem("물품 신청", Config.OUTBOUNT_PROCESS_PAGE);
 			la_orderList = createMenuItem("발주내역 조회", Config.OUTBOUND_PLAN_PAGE);
-
+			la_location_chat = createMenuItem("본사와 채팅하기", Config.CHATTING_PAGE);
+			
 			// 이벤트 연결
 			la_order.addMouseListener(new MouseAdapter() {
 				@Override
@@ -244,6 +253,7 @@ public class AppMain extends JFrame {
 			p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거
 		} else if ("locationUser".equals(role)) {
 			p_west.add(createMenuGroup("주문하기", false, la_order, la_orderList));
+			p_west.add(createMenuGroup("채팅하기", false, la_location_chat));
 
 		}
 
@@ -325,7 +335,7 @@ public class AppMain extends JFrame {
 			pages[8] = null;
 			pages[8] = null;
 			pages[10] = null;
-			pages[11] = null;
+			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 
 		} else if ("locationUser".equals(role)) {

@@ -10,7 +10,14 @@ public class Product {
 	private StorageType storageType;
 	private Supplier supplier;
 	private int price;
+	private boolean isChecked;
 	
+	public boolean isChecked() {
+		return isChecked;
+	}
+	public void setChecked(boolean isChecked) {
+		this.isChecked = isChecked;
+	}
 	public int getProductId() {
 		return productId;
 	}
@@ -49,5 +56,13 @@ public class Product {
 	}
 	public void setPrice(int price) {
 		this.price = price;
+	}
+	private int quantity;
+
+	public int getQuantity() {
+	    return quantity;
+	}
+	public void setQuantity(int quantity) {
+	    this.quantity = quantity;
 	}
 }
