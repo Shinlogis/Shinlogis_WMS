@@ -6,6 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.shinlogis.locationuser.order.repository.OrderDAO;
 import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.product.repository.ProductDAO;
 
 
 
@@ -13,14 +14,15 @@ import com.shinlogis.wms.product.model.Product;
 //상품목록 테이블에 값 채워넣기 
 public class OrderModel extends AbstractTableModel{
 	OrderDAO orderDAO;
-	//List<StoreOrder> list;
+	ProductDAO productDAO;
+	List<Product> list;
 	
 	String [] column= {
 			"선택","상품명","가격","수량 입력 "
 	};
 	public OrderModel() {
-		orderDAO= new OrderDAO();
-		//list=orderDAO.selectOrderProduct();
+		productDAO= new ProductDAO();
+		list=productDAO.selectOrderProduct();
 		
 	}
 	@Override
@@ -34,19 +36,19 @@ public class OrderModel extends AbstractTableModel{
 	
 	@Override
 	public int getRowCount() {
-//		return list.size();
-		return 0;
+		return list.size();
+		
 	}
 	
 	//행열에 값 넣기 
 	@Override
 	public Object getValueAt(int row, int col) {
-		//StoreOrder storeOrder=list.get(row);
+		Product product=list.get(row);
 		
 		switch (col) {
-//        case 0: return product.isChecked();
-//        case 1: return product.getProductName(); 
-//        case 2: return product.getPrice(); 
+        case 0: return product.isChecked();
+        case 1: return product.getProductName(); 
+        case 2: return product.getPrice(); 
         case 3: return "";
         default: return null;
 		}

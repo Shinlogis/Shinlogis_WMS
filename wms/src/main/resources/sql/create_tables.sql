@@ -114,7 +114,7 @@ CREATE TABLE io_receipt (
     user_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     scheduled_date DATETIME NOT NULL,
-    status VARCHAR(100) NOT NULL,
+    status VARCHAR(100) NOT NULL DEFAULT '예정',
     processed_date DATETIME,
     location_id INT NOT NULL,
     CHECK (io_type IN ('IN', 'OUT')),
@@ -133,7 +133,7 @@ CREATE TABLE io_detail (
     actual_quantity INT NOT NULL,
     headquarters_user_id INT NOT NULL,
     processed_date DATETIME,
-    status VARCHAR(100) NOT NULL,
+    status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
     CHECK (actual_quantity >= 0),
@@ -157,7 +157,7 @@ CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
-    quantity INT,                           -- 수량
+    quantity INT CHECK(quantity > 0),                           -- 수량
 
     CONSTRAINT fk_store_order FOREIGN KEY (store_order_id) REFERENCES store_order(store_order_id),
 
