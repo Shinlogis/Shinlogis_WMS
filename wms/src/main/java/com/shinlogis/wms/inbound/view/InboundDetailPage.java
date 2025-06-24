@@ -22,9 +22,9 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inbound.model.IODetail;
 import com.toedter.calendar.JDateChooser;
 
-
 /**
  * 입고예정상세 페이지입니다.
+ * 
  * @author 김예진
  */
 public class InboundDetailPage extends Page {
@@ -120,7 +120,9 @@ public class InboundDetailPage extends Page {
 		pSearch.add(new JLabel("입고예정일자"), gbc);
 		chooser = new JDateChooser();
 		chooser.setDateFormatString("yyyy-MM-dd");
-		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height)); // 권장 높이보다 넓어지지 않게 하려고 높이를 chooser.getPreferredSize().height로 설정
+		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height)); // 권장 높이보다 넓어지지 않게 하려고 높이를
+																							// chooser.getPreferredSize().height로
+																							// 설정
 		gbc.gridx = 5;
 		pSearch.add(chooser, gbc);
 
@@ -132,13 +134,13 @@ public class InboundDetailPage extends Page {
 			Map<String, Object> filters = new HashMap<>();
 			if (!tfPlanId.getText().trim().isEmpty())
 				filters.put("io_receipt_id", Integer.parseInt(tfPlanId.getText().trim()));
-			
+
 			if (!tfPlanItemId.getText().trim().isEmpty())
 				filters.put("io_detail_id", Integer.parseInt(tfPlanItemId.getText().trim()));
-			
+
 			if (!tfProductCode.getText().trim().isEmpty())
 				filters.put("product_code", tfProductCode.getText().trim());
-			
+
 			if (!tfProduct.getText().trim().isEmpty())
 				filters.put("product_name", tfProduct.getText().trim());
 
@@ -148,7 +150,7 @@ public class InboundDetailPage extends Page {
 			String status = (String) cbStatus.getSelectedItem();
 			if (!"전체".equals(status))
 				filters.put("status", status);
-			
+
 			if (chooser.getDate() != null)
 				filters.put("scheduled_date", new java.sql.Date(chooser.getDate().getTime()));
 
@@ -181,17 +183,18 @@ public class InboundDetailPage extends Page {
 		// 수정 버튼
 		tblPlan.getColumn("수정").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("수정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-		    IODetail detail = inboundDetailModel.getIODetailAt(row);
-		    EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, detail);
-		    dialog.setVisible(true);
+			IODetail detail = inboundDetailModel.getIODetailAt(row);
+			EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, detail, inboundDetailModel);
+			dialog.setVisible(true);
 		}));
 
 		// 입고처리 검수 버튼
 		tblPlan.getColumn("입고처리").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("입고처리").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-		    // TODO: 검수버튼 로직
+			IODetail detail = inboundDetailModel.getIODetailAt(row);
+			CheckInboundDetailDialog dialog = new CheckInboundDetailDialog(appMain, detail, inboundDetailModel);
+			dialog.setVisible(true);
 		}));
-
 
 		scTable = new JScrollPane(tblPlan);
 		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, Config.TABLE_HEIGHT - 60));

@@ -51,4 +51,6 @@ public class InventoryDAO {
         }
         return list;
     }
+    
+    
 }

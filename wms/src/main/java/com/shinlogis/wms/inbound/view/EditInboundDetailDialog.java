@@ -1,16 +1,26 @@
 package com.shinlogis.wms.inbound.view;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.Collections;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import com.shinlogis.wms.inbound.model.IODetail;
+import com.shinlogis.wms.inbound.repository.InboundDetailDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
-import com.shinlogis.wms.snapshot.model.Snapshot;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Map;
-import java.util.HashMap;
+import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 
 public class EditInboundDetailDialog extends JDialog {
 
@@ -25,13 +35,18 @@ public class EditInboundDetailDialog extends JDialog {
 
     private IODetail ioDetail;
     private ProductDAO productDAO = new ProductDAO();
+    private SnapshotDAO snapshotDAO = new SnapshotDAO();
+    private InboundDetailDAO inboundDetailDAO = new InboundDetailDAO();
     
     private String beforeProductCode;
     private int beforeQuantity;
     private String beforeStatus;
+    
 
-    public EditInboundDetailDialog(Frame owner, IODetail detail) {
+    public EditInboundDetailDialog(Frame owner, IODetail detail, InboundDetailModel model) {
         super(owner, "입고상세 수정", true);
+        
+        
         this.ioDetail = detail;
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -87,7 +102,7 @@ public class EditInboundDetailDialog extends JDialog {
         gbc.gridwidth = 1;
 
         // 상태
-        cbStatus = new JComboBox<>(new String[]{"예정", "진행 중", "보류"});
+        cbStatus = new JComboBox<>(new String[]{"예정", "진행 중", "완료", "보류"});
         cbStatus.setSelectedItem(detail.getStatus());
         beforeStatus = detail.getStatus();
         gbc.gridx = 0; gbc.gridy = 4;
@@ -148,14 +163,22 @@ public class EditInboundDetailDialog extends JDialog {
 
             // TODO: 저장 update
             // 상품코드가 변경되었을 경우
-            if (beforeProductCode != tfProductCode.getText()) {
-            	
+            if (!tfProductCode.getText().trim().equals(beforeProductCode)) {
+            	// 스냅샷을 변경
+            	snapshotDAO.updateSnapshotByCode(detail.getProductSnapshot().getSnapshotId(), tfProductCode.getText().trim());          	
             }
             // 상품수량이 변경되었을 경우
+            if (Integer.parseInt(tfQuantity.getText().trim()) != beforeQuantity) {
+                inboundDetailDAO.updatePlanQuantity(detail.getIoItemId(), Integer.parseInt(tfQuantity.getText().trim()));
+            }
             // 상태가 변경되었을 경우
+            if (!cbStatus.getSelectedItem().equals(beforeStatus)) {
+            	inboundDetailDAO.updateStatus(detail.getIoItemId(), (String)cbStatus.getSelectedItem());
+            }
 
             JOptionPane.showMessageDialog(this, "수정 완료");
             dispose();
+            model.setData(Collections.emptyMap());
         });
 
 
@@ -163,6 +186,6 @@ public class EditInboundDetailDialog extends JDialog {
 
         setSize(450, 350);
         setLocationRelativeTo(owner);
-        setVisible(true);
+        
     }
 }
