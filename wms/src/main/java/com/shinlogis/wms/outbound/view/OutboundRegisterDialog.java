@@ -9,11 +9,13 @@ import java.awt.Font;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 
 public class OutboundRegisterDialog extends JDialog {
 
 	JPanel p_table;
-
+	JTable tb_regist;
+	
 	public OutboundRegisterDialog() {
 		// 제목 서식.
 		setTitle("출고 예정 등록");

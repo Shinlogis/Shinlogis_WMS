@@ -139,7 +139,6 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.OUTBOUNT_PROCESS_PAGE);
-					System.out.println("출고상세 불러왔습니다.");
 				}
 			});
 			
@@ -148,7 +147,6 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.OUTBOUND_PLAN_PAGE);
-					System.out.println("출고예정 불러왔습니다.");
 				}
 			});
 			

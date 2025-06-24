@@ -31,6 +31,7 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inbound.model.IODetail;
 import com.shinlogis.wms.inbound.model.IOReceipt;
 import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
+import com.shinlogis.wms.outbound.repository.OutBoundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -64,9 +65,9 @@ public class InboundReceiptPage extends Page {
 	private JPanel pTableNorth;
 	private JButton btnRegister; // 입고예정등록
 
+	
 	public InboundReceiptPage(AppMain appMain) {
 		super(appMain);
-
 		InboundReceiptDAO ioReceiptDAO = new InboundReceiptDAO();
 
 		/* ==== 검색 영역 ==== */

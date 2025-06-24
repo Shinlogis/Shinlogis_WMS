@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.outbound.repository.OutBoundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -29,11 +30,11 @@ import com.toedter.calendar.JDateChooser;
  * @author 이세형
  */
 public class OutboundReceiptPage extends Page {
-	// 페이지 명
+	/* ================= 페이지 목록 영역 ================ */
 	private JPanel p_pageTitle; // 페이지명 패널
 	private JLabel la_pageTitle; // 페이지명 담을 라벨
 
-	// 검색영역
+	/* ================= 검색 영역 ================ */
 	private JPanel p_search; // 검색 Bar
 
 	private JTextField tf_outboundPlanId; // 출고예정ID
@@ -44,22 +45,24 @@ public class OutboundReceiptPage extends Page {
 	private JComboBox<String> cb_status; // 상태 (전체/예정/처리 중/완료/보류)
 	private JButton bt_search; // 검색 버튼
 
-	/* ============= 목록 영역 구성 요소 ============= */
-	private JPanel p_table;//테이블 출력 영역
+	/* ================= 목록 영역 ================ */
 	private JPanel p_tableNorth;//데이터 수 라벨, 조회, 등록버튼 패널
+	private JPanel p_tableSouth;//데이터 수 라벨, 조회, 등록버튼 패널
 	private JPanel buttonPanel;//버튼 두개 붙일 패널
 
 	private JLabel la_counter;
-	private JTable tb_plan; // 출고예정 목록 테이블
 	private JButton bt_regist;// 출고예정 등록버튼
 	private JButton bt_confirm;// 출고신청 조회
-//	private JScrollPane sc_table;
-//	private DefaultTableModel model;
+	private JTable tb_plan; // 출고예정 목록 테이블
+	private JScrollPane sc_table;
+	private DefaultTableModel model;
 //	private InboundPlanItemModel inboundPlanItemModel;
-
+	OutBoundReceiptDAO outboundReceiptDAO;
+	
 	public OutboundReceiptPage(AppMain appMain) {
-
+		
 		super(appMain);
+		outboundReceiptDAO = new OutBoundReceiptDAO();
 		/* ===================제목 영역================= */
 		p_pageTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		la_pageTitle = new JLabel("출고관리 > 출고예정");
@@ -140,8 +143,11 @@ public class OutboundReceiptPage extends Page {
 		});
 		gbcSearch.gridx = 8;// (7,1)
 		p_search.add(bt_search, gbcSearch);
+		
+		
 
-		/* ===================테이블 영역================= */
+		/* ===================테이블 콘텐트 영역================= */
+
 		
 		/* ================ 검색 결과 카운트, 등록 및 조회 버튼 영역 ========== */
 		GridBagConstraints gbcTableNorth = new GridBagConstraints();
@@ -169,8 +175,6 @@ public class OutboundReceiptPage extends Page {
 		p_tableNorth.add(buttonPanel, gbcTableNorth);
 
 
-		p_table = new JPanel(new FlowLayout());
-		tb_plan = new JTable();
 		
 		//등록버튼에 다이얼로그 불러오는 이벤트연결
 		bt_regist.addMouseListener(new MouseAdapter() {
@@ -180,20 +184,43 @@ public class OutboundReceiptPage extends Page {
 			}
 		});
 		
+		/* ===================테이블 영역================= */
+		p_tableSouth = new JPanel();		
+		p_tableSouth.setBackground(Color.GREEN);
+		p_tableSouth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH,Config.TABLE_HEIGHT ));
+		
+		//테이블 디자인	
+		model = new DefaultTableModel();
+		model.setColumnCount(7);
+		model.setRowCount(11);
+		
+		
+		tb_plan = new JTable(model);
+		// 예시: 7개의 컬럼 각각 너비 설정
+		int[] columnWidths = {100, 150, 80, 120, 90, 110, 130}; // 원하는 너비 지정
+
+		for (int i = 0; i < columnWidths.length; i++) {
+		    table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+		}
+		
+		tb_plan.setRowHeight(45);
+		
 		
 		
 		// 테이블(컨텐트영역) 디자인
 
-		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-		p_table.add(p_tableNorth);
-		p_table.add(tb_plan);
-		p_table.setBackground(Color.GRAY);
+//		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
+//		p_table.setBackground(Color.GRAY);
+//		p_table.add(p_tableSouth);
+//		p_table.add(sc_table);
 
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);
 		add(p_search);
-		add(p_table);
+		add(p_tableNorth);
+		add(tb_plan);
+//		add(p_table);
 
 	}
 
