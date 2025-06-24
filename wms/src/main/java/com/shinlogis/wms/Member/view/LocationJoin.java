@@ -109,6 +109,7 @@ public class LocationJoin extends JFrame{
 		p_center.add(createLine(la_pwdCheck, t_pwdCheck));
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
 		
+		//지점 더미데이터 및 콤보스 채우기
 		dummy = new Location();
 		dummy.setLocationName("지점선택");
 		cb_location.addItem(dummy);

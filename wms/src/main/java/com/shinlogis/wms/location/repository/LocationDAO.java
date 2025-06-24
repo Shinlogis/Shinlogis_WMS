@@ -28,7 +28,6 @@ public class LocationDAO {
 		
 		try {
 			pstmt = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
-			//pstmt.setString(1, location.getLocationName());
 			rs = pstmt.executeQuery();
 			
 			
