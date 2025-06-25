@@ -87,7 +87,7 @@ public class DetailModel extends AbstractTableModel {
 			case 0:
 				return ioDetail.getIoReceipt().getIoReceiptId();
 			case 1:
-				return ioDetail.getIoItemId();
+				return ioDetail.getIoDetailId();
 			case 2:
 				return ioDetail.getProductSnapshot().getProductCode();
 			case 3:

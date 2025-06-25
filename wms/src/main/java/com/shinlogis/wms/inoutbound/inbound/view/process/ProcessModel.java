@@ -84,7 +84,7 @@ public class ProcessModel extends AbstractTableModel {
 		
 		switch (columnIndex) {
 			case 0:
-				return ioDetail.getIoItemId();
+				return ioDetail.getIoDetailId();
 			case 1:
 				return ioDetail.getProductSnapshot().getProductCode();
 			case 2:

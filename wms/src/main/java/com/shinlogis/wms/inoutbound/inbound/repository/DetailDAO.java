@@ -44,7 +44,7 @@ public class DetailDAO {
 			connection = dbManager.getConnection();
 			try {
 				pstmt = connection.prepareStatement(sql);
-				pstmt.setInt(1, item.getIoItemId());
+				pstmt.setInt(1, item.getIoDetailId());
 				pstmt.setInt(2, item.getPlannedQuantity());
 				pstmt.setInt(3, item.getProductSnapshot().getSnapshotId());
 				pstmt.setInt(4, item.getDamagedCode().getDamageCodeId());
@@ -136,7 +136,7 @@ public class DetailDAO {
 
 			while (rs.next()) {
 				IODetail detail = new IODetail();
-				detail.setIoItemId(rs.getInt("io_detail_id"));
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
 
 				IOReceipt receipt = new IOReceipt();
 				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));
@@ -332,7 +332,7 @@ public class DetailDAO {
 
 			while (rs.next()) {
 				IODetail detail = new IODetail();
-				detail.setIoItemId(rs.getInt("io_detail_id"));
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
 
 				IOReceipt receipt = new IOReceipt();
 				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));

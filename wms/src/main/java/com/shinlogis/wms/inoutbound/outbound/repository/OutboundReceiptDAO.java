@@ -12,73 +12,92 @@ import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.location.model.Location;
 
-/**출고예정 전표DAO
+/**
+ * 출고예정 전표DAO
  * 
  * @author 이세형
- * */
+ */
 public class OutboundReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
 
 //	public OutBoundReceiptDAO(){}
-	
-	public List selectAllOutbounds() {//IoReceipt의 모든 레코드 가져오는 메서드
+
+	public List selectAllOutbounds() {// IoReceipt의 모든 레코드 가져오는 메서드
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		ArrayList list = new ArrayList();
-		
+
 		con = dbManager.getConnection();
-		
 
 		try {
 			StringBuffer sql = new StringBuffer();
-			//sql문 필요한거 join. 필요한만큼 계속 조인해서 쓸거임.
-			sql.append("select * from io_receipt ir "
-					+ " inner join location l"
-					+ " on ir.location_id = l.location_id"
+			// sql문 필요한거 join. 필요한만큼 계속 조인해서 쓸거임.
+			sql.append("select * from io_receipt ir " + " inner join location l" + " on ir.location_id = l.location_id"
 					+ " order by io_receipt_id desc");
 			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
-			
-			while(rs.next()) {
+
+			while (rs.next()) {
 				IOReceipt outboundReceipt = new IOReceipt();
-				outboundReceipt.setIoReceiptId(rs.getInt("io_receipt_id"));//pk넣어주기
+				outboundReceipt.setIoReceiptId(rs.getInt("io_receipt_id"));// pk넣어주기
 				outboundReceipt.setIoType(rs.getString("io_type"));
-				
 				HeadquartersUser user = new HeadquartersUser();
-				//headquarters유저의 pk가져옴, user에 할당
+				// headquarters유저의 pk가져옴, user에 할당
 				user.setHeadquartersUserId(rs.getInt("user_id"));
-				//user객체에서 받아온user
+				// user객체에서 받아온user
 				outboundReceipt.setUser(user);
-				
+
 				Location location = new Location();
 				location.setLocationId(rs.getInt("ir.location_id"));
 				location.setLocationName(rs.getString("l.location_name"));
 				outboundReceipt.setLocation(location);
-				
+
 				outboundReceipt.setCreatedAt(rs.getDate("created_at"));
 				outboundReceipt.setScheduledDate(rs.getDate("scheduled_date"));
 				outboundReceipt.setProcessedDate(rs.getDate("processed_date"));
 				outboundReceipt.setStatus(rs.getString("status"));
-				
-				list.add(outboundReceipt);
 
+				list.add(outboundReceipt);
 			}
-			
+
 //			System.out.println("1번" + rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
-			dbManager.release(pstmt,rs);
+		} finally {
+			dbManager.release(pstmt, rs);
 		}
 		return list;
+	}
+
+	public int countTotal() {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int totalCount = 0;
+
+		try {
+			con = dbManager.getConnection();
+			// total로서 sql문을 받아온다.
+			String sql = "SELECT COUNT(*) AS total FROM io_receipt";
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				totalCount = rs.getInt("total");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(pstmt, rs);
+		}
+		return totalCount;
 	}
 
 }
 //			출고예정, 출고예정ID
 //		sql.append("select io_receipt_id");
 //		sql.append(" from io_receipt;");
-
 
 //			//출고예정, 출고품목
 //			sql.append("select s.product_name");

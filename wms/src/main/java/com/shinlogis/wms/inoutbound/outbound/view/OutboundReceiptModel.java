@@ -8,17 +8,18 @@ import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
 
 public class OutboundReceiptModel extends AbstractTableModel{
-	List<IOReceipt> outboundList;
+	List<IOReceipt> outboundReceiptList;
 	String[] column = {"출고예정ID","출고품목","출고지점","출고예정일","상태","등록일","상세보기"};
 	
 	public OutboundReceiptModel() {
 		OutboundReceiptDAO outboundReceiptDAO = new OutboundReceiptDAO();
-		outboundList = outboundReceiptDAO.selectAllOutbounds();
+		outboundReceiptDAO.countTotal();
+		outboundReceiptList = outboundReceiptDAO.selectAllOutbounds();
 	}
 	
 	@Override
 	public int getRowCount() {
-		return outboundList.size();
+		return outboundReceiptList.size();
 	}
 
 	@Override
@@ -33,7 +34,7 @@ public class OutboundReceiptModel extends AbstractTableModel{
 	
 	@Override
 	public Object getValueAt(int row, int col) {
-		IOReceipt outboundReceipt = outboundList.get(row);
+		IOReceipt outboundReceipt = outboundReceiptList.get(row);
 		String value = null;
 		/*임시로 지정해둠 나중에 구해서 붙일것*/
 		outboundReceipt.setFirstProductName("대표물품(수정)");

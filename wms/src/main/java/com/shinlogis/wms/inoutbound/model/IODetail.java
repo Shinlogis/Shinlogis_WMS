@@ -14,7 +14,7 @@ import com.shinlogis.wms.warehouse.model.Warehouse;
  * @since 2025-06-20
  */
 public class IODetail {
-	private int ioItemId;
+	private int ioDetailId;
 	private IOReceipt ioReceipt;
 	private int plannedQuantity;
 	private Snapshot productSnapshot;
@@ -25,11 +25,12 @@ public class IODetail {
 	private Date proccessedDate;
 	private String status;
 	private HeadquartersUser user;
-	public int getIoItemId() {
-		return ioItemId;
+	
+	public int getIoDetailId() {
+		return ioDetailId;
 	}
-	public void setIoItemId(int ioItemId) {
-		this.ioItemId = ioItemId;
+	public void setIoDetailId(int ioDetailId) {
+		this.ioDetailId = ioDetailId;
 	}
 	public IOReceipt getIoReceipt() {
 		return ioReceipt;
@@ -91,6 +92,5 @@ public class IODetail {
 	public void setUser(HeadquartersUser user) {
 		this.user = user;
 	}
-
 	
 }

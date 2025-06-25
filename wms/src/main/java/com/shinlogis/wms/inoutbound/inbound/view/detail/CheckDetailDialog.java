@@ -62,7 +62,7 @@ public class CheckDetailDialog extends JDialog {
 
 		this.ioDetail = detail;
 		laIOReceipt = new JLabel(String.valueOf(detail.getIoReceipt().getIoReceiptId()));
-		laIODetail = new JLabel(String.valueOf(detail.getIoItemId()));
+		laIODetail = new JLabel(String.valueOf(detail.getIoDetailId()));
 		laProductCode = new JLabel(detail.getProductSnapshot().getProductCode());
 		laProductName = new JLabel(detail.getProductSnapshot().getProductName());
 		laSupplierName = new JLabel(detail.getProductSnapshot().getSupplierName());
