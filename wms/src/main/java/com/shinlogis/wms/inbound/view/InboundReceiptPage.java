@@ -28,9 +28,9 @@ import com.shinlogis.wms.common.config.ButtonEditor;
 import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inbound.model.IOReceipt;
 import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.outbound.repository.OutboundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 
 /**
  * 입고예정 전표 DAO입니다.

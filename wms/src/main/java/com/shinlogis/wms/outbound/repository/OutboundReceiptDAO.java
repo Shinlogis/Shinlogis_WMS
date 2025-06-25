@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.location.model.Location;
 
 /**출고예정 전표DAO
@@ -75,9 +75,9 @@ public class OutboundReceiptDAO {
 	}
 
 }
-//출고예정, 출고예정ID
-//sql.append("select io_receipt_id");
-//sql.append(" from io_receipt;");
+//			출고예정, 출고예정ID
+//		sql.append("select io_receipt_id");
+//		sql.append(" from io_receipt;");
 
 
 //			//출고예정, 출고품목

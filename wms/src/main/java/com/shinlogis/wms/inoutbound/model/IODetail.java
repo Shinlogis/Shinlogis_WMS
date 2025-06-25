@@ -1,8 +1,9 @@
-package com.shinlogis.wms.inbound.model;
+package com.shinlogis.wms.inoutbound.model;
 
 import java.sql.Date;
 
 import com.shinlogis.wms.damagedCode.model.DamagedCode;
+import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
 /**
@@ -21,6 +22,15 @@ public class IODetail {
 	private int actualQuantity;
 	private Date proccessedDate;
 	private String status;
+	private HeadquartersUser user;
+
+	public HeadquartersUser getUser() {
+		return user;
+	}
+
+	public void setUser(HeadquartersUser user) {
+		this.user = user;
+	}
 
 	public String getStatus() {
 		return status;
@@ -85,7 +95,6 @@ public class IODetail {
 	public void setDamageCode(DamagedCode damageCode) {
 		this.damagedCode = damageCode;
 	}
-
 
 
 	public int getDamageQuantity() {

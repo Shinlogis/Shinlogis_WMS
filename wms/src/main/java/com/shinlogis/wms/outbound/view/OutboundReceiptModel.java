@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.outbound.repository.OutboundReceiptDAO;
 
 public class OutboundReceiptModel extends AbstractTableModel{

@@ -7,9 +7,9 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inbound.model.IOReceipt;
 import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 
 /**
