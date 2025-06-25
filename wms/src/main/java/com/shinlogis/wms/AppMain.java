@@ -38,6 +38,8 @@ import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
+import com.shinlogis.wms.outbound.view.OutboundDetailPage;
+import com.shinlogis.wms.outbound.view.OutboundReceiptPage;
 
 public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
@@ -133,6 +135,22 @@ public class AppMain extends JFrame {
 			la_supplier = createMenuItem("공급사 관리", Config.SUPPLIER_PAGE);
 			la_chat = createMenuItem("지점과 채팅하기", Config.CHATTING_PAGE);
 
+			//출고상세 이벤트 연결 추가
+			la_outboundDetail.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.OUTBOUNT_PROCESS_PAGE);
+				}
+			});
+			
+			//출고예정 페이지 보여주는 이벤트 연결@이세형
+			la_outboundPlan.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.OUTBOUND_PLAN_PAGE);
+				}
+			});
+			
 			// 이벤트 연결
 			la_inboundPlan.addMouseListener(new MouseAdapter() {
 				@Override
@@ -328,8 +346,8 @@ public class AppMain extends JFrame {
 			pages[1] = new InboundReceiptPage(this);
 			pages[2] = new InboundDetailPage(this);
 			pages[3] = null;
-			pages[4] = null;
-			pages[5] = null;
+			pages[4] = new OutboundReceiptPage(this);
+			pages[5] = new OutboundDetailPage(this);
 			pages[6] = null;
 			pages[7] = new InventoryPage(this);
 			pages[8] = null;

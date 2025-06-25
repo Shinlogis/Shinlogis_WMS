@@ -1,5 +1,6 @@
 package com.shinlogis.wms.inbound.view;
 
+
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -18,6 +19,7 @@ import javax.swing.JTextField;
 
 import com.shinlogis.wms.inbound.model.IODetail;
 import com.shinlogis.wms.inbound.repository.InboundDetailDAO;
+
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;

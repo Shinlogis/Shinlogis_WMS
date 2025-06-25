@@ -11,8 +11,8 @@ import java.util.Map;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.damagedCode.model.DamagedCode;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
 /**
