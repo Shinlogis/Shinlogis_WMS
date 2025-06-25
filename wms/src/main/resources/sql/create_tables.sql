@@ -135,6 +135,7 @@ CREATE TABLE io_detail (
     actual_quantity INT NOT NULL,
     headquarters_user_id INT NOT NULL,
     processed_date DATETIME,
+    warehouse_id INT,
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
@@ -143,7 +144,8 @@ CREATE TABLE io_detail (
     FOREIGN KEY (io_receipt_id) REFERENCES io_receipt(io_receipt_id),
     FOREIGN KEY (snapshot_id) REFERENCES snapshot(snapshot_id),
     FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id),
-    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id)
+    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id),
+    FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
 );
 
 
@@ -577,3 +579,22 @@ WHERE io_receipt_id IN (
     GROUP BY io_receipt_id
     HAVING SUM(CASE WHEN status != '예정' THEN 1 ELSE 0 END) = 0
 );
+
+-- [입고상세에 창고 연결]
+-- ROOM 저장창고 연결 (예: warehouse_id = 3)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 3
+WHERE s.storage_type_code = 'ROOM';
+
+-- COLD 저장창고 연결 (예: warehouse_id = 1)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 1
+WHERE s.storage_type_code = 'COLD';
+
+-- FROZEN 저장창고 연결 (예: warehouse_id = 2)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 2
+WHERE s.storage_type_code = 'FROZEN';
