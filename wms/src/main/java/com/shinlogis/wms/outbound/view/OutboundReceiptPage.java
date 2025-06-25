@@ -192,13 +192,12 @@ public class OutboundReceiptPage extends Page {
 		
 		//테이블 디자인
 		
-		
 		tb_plan = new JTable(model = new OutboundReceiptModel());
 		
 		tb_plan.setRowHeight(45);
-		tb_plan.setPreferredSize(new Dimension(1150,660));
 		 
-		
+		sc_table= new JScrollPane(tb_plan);
+		sc_table.setPreferredSize(new Dimension(1150,660));
 		
 		// 테이블(컨텐트영역) 디자인
 
@@ -212,7 +211,8 @@ public class OutboundReceiptPage extends Page {
 		add(p_pageTitle);
 		add(p_search);
 		add(p_tableNorth);
-		add(tb_plan);
+//		add(tb_plan);
+		add(sc_table);
 //		add(p_table);
 
 	}

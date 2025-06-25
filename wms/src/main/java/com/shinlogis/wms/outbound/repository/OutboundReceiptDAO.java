@@ -12,6 +12,10 @@ import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inbound.model.IOReceipt;
 import com.shinlogis.wms.location.model.Location;
 
+/**출고예정 전표DAO
+ * 
+ * @author 이세형
+ * */
 public class OutboundReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
 
@@ -28,6 +32,7 @@ public class OutboundReceiptDAO {
 
 		try {
 			StringBuffer sql = new StringBuffer();
+			//sql문 필요한거 join. 필요한만큼 계속 조인해서 쓸거임.
 			sql.append("select * from io_receipt ir "
 					+ " inner join location l"
 					+ " on ir.location_id = l.location_id"
@@ -59,7 +64,6 @@ public class OutboundReceiptDAO {
 				list.add(outboundReceipt);
 
 			}
-			System.out.println(list);
 			
 //			System.out.println("1번" + rs);
 		} catch (SQLException e) {
