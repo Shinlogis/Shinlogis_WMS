@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view;
+package com.shinlogis.wms.inoutbound.inbound.view.receipt;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -6,11 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -21,17 +17,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.ButtonEditor;
 import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
-import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
-import com.shinlogis.wms.outbound.repository.OutboundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -39,7 +32,7 @@ import com.toedter.calendar.JDateChooser;
  * 
  * @author 김예진
  */
-public class InboundReceiptPage extends Page {
+public class ReceiptPage extends Page {
 	/* ────────── 페이지명 영역 구성 요소 ────────── */
 	private JPanel pPageName; // 페이지명 패널
 	private JLabel laPageName; // 페이지명
@@ -60,15 +53,15 @@ public class InboundReceiptPage extends Page {
 	private JLabel laPlanCount;
 	private JTable tblPlan; // 입고예정 목록 테이블
 	private JScrollPane scTable;
-	private InboundReceiptModel iModel;
+	private ReceiptModel iModel;
 
 	private JPanel pTableNorth;
 	private JButton btnRegister; // 입고예정등록
 
-	
-	public InboundReceiptPage(AppMain appMain) {
+	public ReceiptPage(AppMain appMain) {
 		super(appMain);
-		InboundReceiptDAO ioReceiptDAO = new InboundReceiptDAO();
+
+		ReceiptDAO ioReceiptDAO = new ReceiptDAO();
 
 		/* ==== 검색 영역 ==== */
 		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
@@ -169,7 +162,7 @@ public class InboundReceiptPage extends Page {
 		/* ==== 테이블 영역 ==== */
 		pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
 
-		tblPlan = new JTable(iModel = new InboundReceiptModel());
+		tblPlan = new JTable(iModel = new ReceiptModel());
 		// 상세보기 버튼
 		tblPlan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("상세보기").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {

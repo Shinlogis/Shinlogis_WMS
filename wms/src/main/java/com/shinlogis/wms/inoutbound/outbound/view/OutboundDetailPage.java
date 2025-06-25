@@ -1,4 +1,4 @@
-package com.shinlogis.wms.outbound.view;
+package com.shinlogis.wms.inoutbound.outbound.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
