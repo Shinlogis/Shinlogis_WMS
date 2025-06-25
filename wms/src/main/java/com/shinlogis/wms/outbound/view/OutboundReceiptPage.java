@@ -16,12 +16,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.outbound.repository.OutBoundReceiptDAO;
+import com.shinlogis.wms.outbound.repository.OutboundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -55,14 +56,14 @@ public class OutboundReceiptPage extends Page {
 	private JButton bt_confirm;// 출고신청 조회
 	private JTable tb_plan; // 출고예정 목록 테이블
 	private JScrollPane sc_table;
-	private DefaultTableModel model;
+	private AbstractTableModel model;
 //	private InboundPlanItemModel inboundPlanItemModel;
-	OutBoundReceiptDAO outboundReceiptDAO;
+	OutboundReceiptDAO outboundReceiptDAO;
 	
 	public OutboundReceiptPage(AppMain appMain) {
 		
 		super(appMain);
-		outboundReceiptDAO = new OutBoundReceiptDAO();
+		outboundReceiptDAO = new OutboundReceiptDAO();
 		/* ===================제목 영역================= */
 		p_pageTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		la_pageTitle = new JLabel("출고관리 > 출고예정");
@@ -189,22 +190,14 @@ public class OutboundReceiptPage extends Page {
 		p_tableSouth.setBackground(Color.GREEN);
 		p_tableSouth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH,Config.TABLE_HEIGHT ));
 		
-		//테이블 디자인	
-		model = new DefaultTableModel();
-		model.setColumnCount(7);
-		model.setRowCount(11);
+		//테이블 디자인
 		
 		
-		tb_plan = new JTable(model);
-		// 예시: 7개의 컬럼 각각 너비 설정
-		int[] columnWidths = {100, 150, 80, 120, 90, 110, 130}; // 원하는 너비 지정
-
-		for (int i = 0; i < columnWidths.length; i++) {
-		    table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
-		}
+		tb_plan = new JTable(model = new OutboundReceiptModel());
 		
 		tb_plan.setRowHeight(45);
-		
+		tb_plan.setPreferredSize(new Dimension(1150,660));
+		 
 		
 		
 		// 테이블(컨텐트영역) 디자인
