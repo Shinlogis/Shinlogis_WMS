@@ -574,3 +574,22 @@ WHERE io_receipt_id IN (
     GROUP BY io_receipt_id
     HAVING SUM(CASE WHEN status != '예정' THEN 1 ELSE 0 END) = 0
 );
+
+-- [입고상세에 창고 연결]
+-- ROOM 저장창고 연결 (예: warehouse_id = 3)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 3
+WHERE s.storage_type_code = 'ROOM';
+
+-- COLD 저장창고 연결 (예: warehouse_id = 1)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 1
+WHERE s.storage_type_code = 'COLD';
+
+-- FROZEN 저장창고 연결 (예: warehouse_id = 2)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 2
+WHERE s.storage_type_code = 'FROZEN';
