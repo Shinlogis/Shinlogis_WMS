@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.shinlogis.wms.common.util.DBManager;
+import com.shinlogis.wms.storageType.model.StorageType;
 import com.shinlogis.wms.warehouse.model.Warehouse;
 
 public class WarehouseDAO {
@@ -33,8 +34,14 @@ public class WarehouseDAO {
 				wh.setWarehouseId(rs.getInt("warehouse_id"));
 				wh.setWarehouseName(rs.getString("warehouse_name"));
 				wh.setAddress(rs.getString("address"));
-				wh.setStorageTypeId(rs.getInt("storage_type_id"));
 				wh.setWarehouseCode(rs.getString("warehouse_code"));
+
+				StorageType storageType = new StorageType();
+				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				storageType.setTypeCode(rs.getString("type_name"));
+				storageType.setTypeName(rs.getString("type_code"));
+				wh.setStorageType(storageType);
+				
 
 				list.add(wh);
 			}
@@ -59,13 +66,19 @@ public class WarehouseDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String sql = "SELECT warehouse_id, warehouse_name, address, storage_type_id, warehouse_code "
-				+ "FROM warehouse " + "where warehouse_code = " + code;
+		String sql = "select warehouse_id, warehouse_code, warehouse_name, address"
+				   + "	, st.storage_type_id, type_name, type_code "
+				   + "from warehouse w "
+				   + "join storage_type st "
+				   + "on w.storage_type_id  = st.storage_type_id "
+		           + "where warehouse_code = ?";
+		System.out.println(sql);
 
 		try {
 			conn = dbManager.getConnection();
 
 			ps = conn.prepareStatement(sql);
+			ps.setString(1, code);
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
@@ -73,8 +86,12 @@ public class WarehouseDAO {
 				wh.setWarehouseId(rs.getInt("warehouse_id"));
 				wh.setWarehouseName(rs.getString("warehouse_name"));
 				wh.setAddress(rs.getString("address"));
-				wh.setStorageTypeId(rs.getInt("storage_type_id"));
-				wh.setWarehouseCode(rs.getString("warehouse_code"));
+				
+				StorageType storageType = new StorageType();
+				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				storageType.setTypeCode(rs.getString("type_name"));
+				storageType.setTypeName(rs.getString("type_code"));
+				wh.setStorageType(storageType);
 
 				list.add(wh);
 			}

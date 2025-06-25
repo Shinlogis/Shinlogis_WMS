@@ -136,6 +136,7 @@ CREATE TABLE io_detail (
     headquarters_user_id INT NOT NULL,
     processed_date DATETIME,
     warehouse_id INT,
+
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
@@ -164,7 +165,11 @@ CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
-    quantity INT,                           -- 수량
+
+
+    quantity INT CHECK(quantity > 0),                           -- 수량
+
+
 
     CONSTRAINT fk_store_order FOREIGN KEY (store_order_id) REFERENCES store_order(store_order_id),
 
