@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view.detail;
+package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.shinlogis.wms.inbound.repository.DetailDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;

@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view.process;
+package com.shinlogis.wms.inoutbound.inbound.view.process;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inbound.repository.DetailDAO;
-import com.shinlogis.wms.inbound.repository.ReceiptDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 

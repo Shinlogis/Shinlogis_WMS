@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.repository;
+package com.shinlogis.wms.inoutbound.inbound.repository;
 
 import java.sql.*;
 import java.util.ArrayList;

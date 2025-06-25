@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view.detail;
+package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
 import java.awt.FlowLayout;
 import java.awt.Frame;

@@ -1,4 +1,4 @@
-package com.shinlogis.wms.outbound.repository;
+package com.shinlogis.wms.inoutbound.outbound.repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

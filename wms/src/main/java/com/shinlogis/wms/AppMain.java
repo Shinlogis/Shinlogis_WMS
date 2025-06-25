@@ -32,15 +32,15 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.headquarters.view.HeadquatersMyPage;
-import com.shinlogis.wms.inbound.view.detail.DetailPage;
-import com.shinlogis.wms.inbound.view.process.ProcessPage;
-import com.shinlogis.wms.inbound.view.receipt.ReceiptPage;
+import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailPage;
+import com.shinlogis.wms.inoutbound.inbound.view.process.ProcessPage;
+import com.shinlogis.wms.inoutbound.inbound.view.receipt.ReceiptPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundDetailPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundReceiptPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
-import com.shinlogis.wms.outbound.view.OutboundDetailPage;
-import com.shinlogis.wms.outbound.view.OutboundReceiptPage;
 
 public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;

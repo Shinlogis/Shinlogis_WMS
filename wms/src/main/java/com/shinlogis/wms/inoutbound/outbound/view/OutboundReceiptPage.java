@@ -1,4 +1,4 @@
-package com.shinlogis.wms.outbound.view;
+package com.shinlogis.wms.inoutbound.outbound.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.outbound.repository.OutboundReceiptDAO;
+import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
 /**
