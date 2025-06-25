@@ -1,34 +1,55 @@
 package com.shinlogis.locationuser.orderList.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
+import com.shinlogis.locationuser.order.model.StoreOrder;
+import com.shinlogis.locationuser.order.model.StoreOrderModel;
+import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.product.repository.ProductDAO;
 import com.toedter.calendar.JDateChooser;
 
-public class OrderListPage extends Page {
-	
+public class OrderListPage extends Page{
+
 	/* ────────── 페이지명 영역 구성 요소 ────────── */    
 	private JPanel pPageName; // 페이지명 패널
 	private JLabel laPageName; // 페이지명
 		
 	/* ────────── 검색 영역 구성 요소 ────────── */
-    private JPanel pSearch; // 검색 Bar
+	private JPanel pSearch; // 검색 Bar
 
     private JTextField tfPlanId; // 입고예정ID        
     private JDateChooser chooser; // 달력
@@ -38,16 +59,17 @@ public class OrderListPage extends Page {
     private JButton btnSearch; // 검색 버튼
 
     /* ────────── 목록 영역 구성 요소 ────────── */
-    private JPanel pTable;
     
-    private JLabel laPlanCount;
-    private JTable tblPlan; // 입고예정 목록 테이블
-    private JScrollPane scTable;
-    private DefaultTableModel model;     
+    private JLabel laContentTitle;
 
-    private JPanel pTableNorth;
-    private JButton btnRegister;  // 입고예정등록
-    
+    private StoreOrderModel model;
+    ProductDAO productDao = new ProductDAO();
+
+    private JPanel pTable; //content 영역 
+    private JPanel pTable_Content_title; //content 제목 영역 
+    private JPanel pTable_Content; //content 내용 영역 
+    private JButton btnOrder;  // 주문하기버튼 
+   
 	public OrderListPage(AppMain appMain) {
 		super(appMain);
 		
@@ -93,6 +115,7 @@ public class OrderListPage extends Page {
         cbStatus = new JComboBox<>(new String[] { "전체", "예정", "처리 중", "완료" });
         gbc.gridx = 7;
         pSearch.add(cbStatus, gbc);
+		
 
         // 상품명
         gbc.gridx = 8;
@@ -109,42 +132,71 @@ public class OrderListPage extends Page {
         /* ==== 페이지명 영역 ==== */
         pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
-        laPageName = new JLabel("입고관리 > 입고예정");
+        laPageName = new JLabel("주문하기 > 물품신청");
         pPageName.add(laPageName);
+        pPageName.setBackground(new Color(0xF1F1F1));
         
-        /* ==== 검색 결과 카운트, 등록 버튼 영역 ==== */
-        pTableNorth = new JPanel(new FlowLayout());
-        pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
         
-        laPlanCount = new JLabel("총 0개의 입고예정 검색");
-        laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH-150, 30));
-        pTableNorth.add(laPlanCount);
         
-        btnRegister = new JButton("입고예정 등록");
-        pTableNorth.add(btnRegister);
-		
-        /* ==== 테이블 영역 ==== */
-        pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
-
-//		tblPlan = new JTable(productModel = new ProductModel());
-//		scTable = new JScrollPane(tblPlan);
-//		scTable.setPreferredSize(new Dimension());
-//		
-//		pTable.add(laPlanCount);
-//		pTable.add(scTable);
+        //1.pTable 영역 
+        pTable = new JPanel(); // 전체 
+        pTable_Content = new JPanel(); //전체 > 내용 
+        pTable_Content_title = new JPanel(new FlowLayout()); //전체 > 내용 > 제목 
+        laContentTitle = new JLabel("총 몇개의 상품"); //전체 > 내용 > 제목(라벨)
+        model = new StoreOrderModel(); 
+        JTable table = new JTable(model); //전체 > 내용 > 테이블  
+        JScrollPane scrollPane = new JScrollPane(table);
         
-        pTable.add(pTableNorth);
+        //1.1 pTable 스타일영역 
+        pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
+        pTable_Content.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 550));
+        pTable_Content_title.setPreferredSize(new Dimension(800, Config.TABLE_NORTH_HEIGHT));
+        laContentTitle.setPreferredSize(new Dimension(800, 30));
+        scrollPane.setPreferredSize(new Dimension(800, 480));  
         
-		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-		pTable.setBackground(Color.WHITE);
-		
-		/* ==== 레이아웃 배치 ==== */
+        pTable_Content_title.setBackground(Color.white);
+        pTable_Content.setBackground(Color.WHITE);
+        pTable.setBackground(new Color(0xF1F1F1));
+        
+        
+        //정렬 적용
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        TableColumnModel columnModel = table.getColumnModel();
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+            columnModel.getColumn(i).setCellRenderer(centerRenderer);
+        }
+        
+        //헤더 가운데 정렬 
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        // 첫 번째 열(Column 0 = 체크박스)
+        table.getColumnModel().getColumn(0).setMinWidth(60);     // 최소 너비
+        table.getColumnModel().getColumn(0).setMaxWidth(60);     // 최대 너비
+        table.getColumnModel().getColumn(0).setPreferredWidth(60); // 선호 너비
+        table.getColumnModel().getColumn(4).setMinWidth(100);     // 최소 너비
+        table.getColumnModel().getColumn(4).setMaxWidth(100);     // 최대 너비
+        table.getColumnModel().getColumn(4).setPreferredWidth(100); // 선호 너비
+ 
+        //1.2 pTable 부착 영역  
+        pTable_Content_title.add(laContentTitle);
+        pTable_Content.add(pTable_Content_title);
+        pTable_Content.add(scrollPane,BorderLayout.CENTER);
+		pTable.add(pTable_Content); 
+	
 		setLayout(new FlowLayout());
 		add(pPageName);
 		add(pSearch); 
-		add(pTable);
+		add(pTable); //content 영역 
+
+		setBackground(new Color(0xF1F1F1));
 		
-		setBackground(Color.YELLOW);
-				
+		//검색 이벤트 
+		btnSearch.addActionListener(e->{
+			List<Product> p=productDao.selectSearchProduct(tfProduct.getText());
+			model.setList(p);
+			pTable.updateUI();
+		});
 	}
 }

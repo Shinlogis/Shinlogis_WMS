@@ -9,6 +9,8 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -34,10 +36,13 @@ import javax.swing.table.TableColumnModel;
 
 import com.shinlogis.locationuser.order.model.OrderModel;
 import com.shinlogis.locationuser.order.model.StoreOrder;
-import com.shinlogis.locationuser.order.repository.OrderDAO;
+import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
+import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.common.Exception.OrderInsertException;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.toedter.calendar.JDateChooser;
@@ -55,7 +60,7 @@ public class OrderPage extends Page{
 
     /* ────────── 목록 영역 구성 요소 ────────── */
     
-    private JLabel laPlanCount;
+    private JLabel laContentTitle;
 
     private OrderModel model;
     ProductDAO productDao = new ProductDAO();
@@ -64,6 +69,7 @@ public class OrderPage extends Page{
     private JPanel pTable_Content_title; //content 제목 영역 
     private JPanel pTable_Content; //content 내용 영역 
     private JButton btnOrder;  // 주문하기버튼 
+    DBManager dbManager=DBManager.getInstance();
    
 	public OrderPage(AppMain appMain) {
 		super(appMain);
@@ -106,13 +112,14 @@ public class OrderPage extends Page{
         pTable = new JPanel(); // 전체 
         pTable_Content = new JPanel(); //전체 > 내용 
         pTable_Content_title = new JPanel(new FlowLayout()); //전체 > 내용 > 제목 
-        
-        laPlanCount = new JLabel("총 몇개의 상품");
-        pTable_Content_title.add(laPlanCount);
-        
+        laContentTitle = new JLabel("총 몇개의 상품");  //전체 > 내용 > 제목(라벨)
         model = new OrderModel();
         JTable table = new JTable(model);
-
+        JScrollPane scrollPane = new JScrollPane(table); //전체 > 내용 > 테이블 
+        JPanel btnPanel = new JPanel();  //전체 > 내용 > 버튼 
+        btnOrder = new JButton("주문하기");
+        
+        //1-1.pTable 스타일 영역 
         // 첫 열 마지막 열 제외하고 정렬 적용
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -132,17 +139,12 @@ public class OrderPage extends Page{
         table.getColumnModel().getColumn(3).setMinWidth(100);     // 최소 너비
         table.getColumnModel().getColumn(3).setMaxWidth(100);     // 최대 너비
         table.getColumnModel().getColumn(3).setPreferredWidth(100); // 선호 너비
-        JScrollPane scrollPane = new JScrollPane(table);
-        
-        JPanel btnPanel = new JPanel();
-        btnOrder = new JButton("주문하기");
-        btnPanel.add(btnOrder);
-        
+
         pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
         pTable_Content.setPreferredSize(new Dimension(700, 500));
         pTable_Content_title.setPreferredSize(new Dimension(600, Config.TABLE_NORTH_HEIGHT));
-        laPlanCount.setPreferredSize(new Dimension(600, 30));
-        scrollPane.setPreferredSize(new Dimension(600, 200));  
+        laContentTitle.setPreferredSize(new Dimension(600, 30));
+        scrollPane.setPreferredSize(new Dimension(600, 350));  
         btnPanel.setPreferredSize(new Dimension(500, 80)); 
         btnOrder.setPreferredSize(new Dimension(100, 50));
         
@@ -151,11 +153,14 @@ public class OrderPage extends Page{
         btnPanel.setBackground(Color.white);
         pTable.setBackground(new Color(0xF1F1F1));
         
+        //1.2 pTable 부착 영역 
+        pTable_Content_title.add(laContentTitle);
         pTable_Content.add(pTable_Content_title);
         pTable_Content.add(scrollPane,BorderLayout.CENTER);
+        btnPanel.add(btnOrder);
         pTable_Content.add(btnPanel);
-   
-        //pTable에 부착  
+    
+        //pTable에 부착 
 		pTable.add(pTable_Content); 
 	
 		setLayout(new FlowLayout());
@@ -207,11 +212,44 @@ public class OrderPage extends Page{
 			}
 		
 			if(isConfirmed()) {
-				StoreOrder storeOrder =new StoreOrder();
-				OrderDAO orderDao = new OrderDAO();
+				Connection con=dbManager.getConnection();
+				try {
+					con.setAutoCommit(false);//start
+					StoreOrder storeOrder =new StoreOrder();
+					StoreOrderDAO storeOrderDao = new StoreOrderDAO();
+					StoreOrderItemDAO storeItemDao= new StoreOrderItemDAO();
+					
+					storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
+					
+					try {
+						storeOrderDao.insertStoreOrder(storeOrder);
+						int pk=storeOrderDao.getRecentId();
+						storeOrder.setStoreOrderId(pk);
+						storeItemDao.insertStoreOrderItem(storeOrder);
+						con.commit();
+					} catch (OrderInsertException e1) {
+						e1.printStackTrace();
+						throw new OrderInsertException(e1.getMessage());
+					}
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					try {
+						con.rollback();
+					} catch (SQLException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+				}finally {
+					try {
+						con.setAutoCommit(true);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}//start
+				}
 				
-				storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
-				orderDao.insertStoreOrder(storeOrder);
+				
 			}
 			
 			List<Product> p=productDao.selectOrderProduct();
