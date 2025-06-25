@@ -133,6 +133,7 @@ CREATE TABLE io_detail (
     actual_quantity INT NOT NULL,
     headquarters_user_id INT NOT NULL,
     processed_date DATETIME,
+    warehouse_id INT,
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
@@ -141,7 +142,8 @@ CREATE TABLE io_detail (
     FOREIGN KEY (io_receipt_id) REFERENCES io_receipt(io_receipt_id),
     FOREIGN KEY (snapshot_id) REFERENCES snapshot(snapshot_id),
     FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id),
-    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id)
+    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id),
+    FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
 );
 
 -- [주문서 테이블]
