@@ -144,7 +144,7 @@ public class OrderListPage extends Page {
 		add(pSearch); 
 		add(pTable);
 		
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(Color.YELLOW);
 				
 	}
 }
