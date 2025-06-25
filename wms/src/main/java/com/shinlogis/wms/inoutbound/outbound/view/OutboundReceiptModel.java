@@ -36,17 +36,19 @@ public class OutboundReceiptModel extends AbstractTableModel{
 	public Object getValueAt(int row, int col) {
 		IOReceipt outboundReceipt = outboundReceiptList.get(row);
 		String value = null;
+		
 		/*임시로 지정해둠 나중에 구해서 붙일것*/
 		outboundReceipt.setFirstProductName("대표물품(수정)");
+		
 		switch(col) {
 		case 0 : value = Integer.toString(outboundReceipt.getIoReceiptId());break;
-		case 1 : value = outboundReceipt.getFirstProductName() + "외" + (outboundReceipt.getItemCount()-1) + "건";break;
+		case 1 : value = outboundReceipt.getFirstProductName() + "외" + (outboundReceipt.getItemCount()-1) + " 건";break;
 		case 2 : value = outboundReceipt.getLocation().getLocationName();break;
 		case 3 :	value = outboundReceipt.getScheduledDate().toString();break;
 		case 4 : value = outboundReceipt.getStatus();break;
 		case 5 : value = outboundReceipt.getCreatedAt().toString();break;
 		case 6 : value = "상세보기";break;
-		
+		default : return null;
 		}
 		
 		return value;

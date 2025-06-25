@@ -13,8 +13,8 @@ import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.location.model.Location;
 
 /**
- * 출고예정 전표DAO
- * 
+ * <h2> 출고예정 전표DAO
+ * <li> 이건 oUT bound receadsf조회하는 함수에요 
  * @author 이세형
  */
 public class OutboundReceiptDAO {
@@ -33,7 +33,9 @@ public class OutboundReceiptDAO {
 		try {
 			StringBuffer sql = new StringBuffer();
 			// sql문 필요한거 join. 필요한만큼 계속 조인해서 쓸거임.
-			sql.append("select * from io_receipt ir " + " inner join location l" + " on ir.location_id = l.location_id"
+			sql.append("select * from io_receipt ir "
+					+ " inner join location l"
+					+ " on ir.location_id = l.location_id"
 					+ " order by io_receipt_id desc");
 			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();

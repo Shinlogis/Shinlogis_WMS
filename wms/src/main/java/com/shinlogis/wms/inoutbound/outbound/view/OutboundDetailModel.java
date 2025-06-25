@@ -57,6 +57,7 @@ public class OutboundDetailModel extends AbstractTableModel{
 				value = "출고 전";break;
 			}
 		case 11 : value = "수정";break;
+		default : return null;
 		}
 		
 		return value;

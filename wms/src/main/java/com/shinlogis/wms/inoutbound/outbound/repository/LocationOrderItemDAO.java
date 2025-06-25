@@ -8,42 +8,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.shinlogis.locationuser.order.model.StoreOrder;
+import com.shinlogis.locationuser.order.model.StoreOrderItem;
 import com.shinlogis.wms.common.util.DBManager;
 
-public class LocationOrderDAO {
+public class LocationOrderItemDAO {
 	DBManager dbManager = DBManager.getInstance();
 	
-	public List selectAllOrder() {
+	public List selectAllOrderItem() {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		ArrayList list = new ArrayList();
-	
-		con= dbManager.getConnection();
 		
+		con = dbManager.getConnection();
 		try {
 			StringBuffer sql = new StringBuffer();
 			//지점 주문, 지점주문 상세 나눴기 때문에 조인 해놓음
-			sql.append("select * "
-					+ " from store_order so"
-					+ " inner join store_order_item oi"
+			sql.append("select *"
+					+ " from store_oreder_item oi"
+					+ " inner join store_order so"
 					+ " on so.store_order_id = oi.store_order_id");
-			pstmt= con.prepareStatement(sql.toString());
+			
+			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
-				StoreOrder order = new StoreOrder();
-				order.setStoreOrderId(rs.getInt("store_order_id"));
-				order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
-				order.setLocationId(rs.getInt("l.location_id"));
-				order.setTotalPrice(rs.getInt("total_price"));
+				StoreOrderItem item = new StoreOrderItem();
 				
-				list.add(order);
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		
 		return list;
 	}
