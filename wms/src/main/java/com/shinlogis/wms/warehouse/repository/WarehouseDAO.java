@@ -72,7 +72,6 @@ public class WarehouseDAO {
 				   + "join storage_type st "
 				   + "on w.storage_type_id  = st.storage_type_id "
 		           + "where warehouse_code = ?";
-		System.out.println(sql);
 
 		try {
 			conn = dbManager.getConnection();
@@ -89,8 +88,8 @@ public class WarehouseDAO {
 				
 				StorageType storageType = new StorageType();
 				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
-				storageType.setTypeCode(rs.getString("type_name"));
-				storageType.setTypeName(rs.getString("type_code"));
+				storageType.setTypeCode(rs.getString("type_code"));
+				storageType.setTypeName(rs.getString("type_name"));
 				wh.setStorageType(storageType);
 
 				list.add(wh);
