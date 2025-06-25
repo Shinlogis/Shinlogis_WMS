@@ -1,11 +1,11 @@
-package com.shinlogis.wms.outbound.view;
+package com.shinlogis.wms.inoutbound.outbound.view;
 
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
-import com.shinlogis.wms.outbound.repository.OutboundReceiptDAO;
+import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
 
 public class OutboundReceiptModel extends AbstractTableModel{
 	List<IOReceipt> outboundList;

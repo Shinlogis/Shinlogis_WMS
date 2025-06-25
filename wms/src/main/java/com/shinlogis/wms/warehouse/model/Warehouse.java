@@ -1,10 +1,12 @@
 package com.shinlogis.wms.warehouse.model;
 
+import com.shinlogis.wms.storageType.model.StorageType;
+
 public class Warehouse {
 	private int warehouseId;
 	private String warehouseName;
 	private String address;
-	private int storageTypeId;
+	private StorageType storageType;
 	private String warehouseCode;
 
 	public int getWarehouseId() {
@@ -31,12 +33,13 @@ public class Warehouse {
 		this.address = address;
 	}
 
-	public int getStorageTypeId() {
-		return storageTypeId;
+
+	public StorageType getStorageType() {
+		return storageType;
 	}
 
-	public void setStorageTypeId(int storageTypeId) {
-		this.storageTypeId = storageTypeId;
+	public void setStorageType(StorageType storageType) {
+		this.storageType = storageType;
 	}
 
 	public String getWarehouseCode() {
