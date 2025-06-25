@@ -5,22 +5,20 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
 import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
 
-//상품목록 테이블에 값 채워넣기 
-public class OrderModel extends AbstractTableModel{
+public class StoreOrderModel extends AbstractTableModel {
 	StoreOrderDAO storeOrderDAO;
 	StoreOrder storeOrder;
 	ProductDAO productDAO;
 	public List<Product> list;
 
 	String [] column= {
-			"선택","상품명","가격","수량 입력 "
+			"주문ID","주문 품목","주문일시","총 가격","상세보기"
 	};
-	public OrderModel() {
+	public StoreOrderModel() {
 		productDAO= new ProductDAO();
 		list=productDAO.selectOrderProduct();  //디비에 있는 상품 다 가져와서 list에 넣기 
 		
@@ -46,40 +44,42 @@ public class OrderModel extends AbstractTableModel{
 		Product product=list.get(row);
 		
 		switch (col) {
-        case 0: return product.isChecked();
+        case 0: return product.getProductName();
         case 1: return product.getProductName(); 
         case 2: return product.getPrice(); 
-        case 3: return product.getQuantity() == 0 ? "" : product.getQuantity();
+        case 3: return product.getPrice(); 
+        case 4: return product.getPrice();
         default: return null;
 		}
 	}
 	
-	//값 가져오기 
-	//Object value => 사용자의 입력값 
-	@Override
-	public void setValueAt(Object value, int row, int col) {
-	    Product product = list.get(row);
-	    if (col == 0) {
-	        product.setChecked((Boolean) value);
-	    } else if (col == 3) {
-	        try {
-	            int quantity = Integer.parseInt(value.toString());
-	            product.setQuantity(quantity);
-	        } catch (NumberFormatException e) {
-	        	product.setQuantity(0);
-	        }
-	    }
-	    //변경 알림 
-	    fireTableCellUpdated(row, col);
-	}
+//	//값 가져오기 
+//	//Object value => 사용자의 입력값 
+//	@Override
+//	public void setValueAt(Object value, int row, int col) {
+//	    Product product = list.get(row);
+//	    if (col == 0) {
+//	        product.setChecked((Boolean) value);
+//	    } else if (col == 3) {
+//	        try {
+//	            int quantity = Integer.parseInt(value.toString());
+//	            product.setQuantity(quantity);
+//	        } catch (NumberFormatException e) {
+//	        	product.setQuantity(0);
+//	        }
+//	    }
+//	    //변경 알림 
+//	    fireTableCellUpdated(row, col);
+//	}
 	
 	@Override
 	public Class<?> getColumnClass(int col) {
 	    switch (col) {
-	        case 0: return Boolean.class;   // 체크박스 열
-	        case 1: return String.class;   // 상품명
-	        case 2: return Integer.class;  // 가격
-	        case 3: return Integer.class;  // 수량입력 
+	        case 0: return Integer.class;    //주문ID
+	        case 1: return String.class;     //주문품목 
+	        case 2: return Integer.class;    //주문일시 
+	        case 3: return Integer.class;    //총가격 
+	        case 4: return String.class;     //상세보기 
 	        default: return Object.class;   
 	    }
 	}
@@ -92,12 +92,12 @@ public class OrderModel extends AbstractTableModel{
 		this.list = list;
 	}
 	
-	//첫번째 열(체크박스),마지막 열 편집가능하게 하기 (1값을 반환할 경우 편집 가능)
-	@Override
-	public boolean isCellEditable(int row, int col) {
-		
-		return col == 0 ||col==3;
-	}
+//	//첫번째 열(체크박스),마지막 열 편집가능하게 하기 (1값을 반환할 경우 편집 가능)
+//	@Override
+//	public boolean isCellEditable(int row, int col) {
+//		
+//		return col==4;
+//	}
 
 	//체크박스 선택된 물건 가져오기 
 	public List<Product> getSelectedProducts() {
@@ -131,4 +131,5 @@ public class OrderModel extends AbstractTableModel{
 		
 		return storeOrder;
 	}
+
 }
