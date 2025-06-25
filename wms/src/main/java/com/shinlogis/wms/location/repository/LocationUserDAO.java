@@ -9,6 +9,7 @@ import com.shinlogis.wms.common.Exception.HeadquartersException;
 import com.shinlogis.wms.common.Exception.LocationException;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.common.util.StringUtil;
+import com.shinlogis.wms.location.model.Location;
 import com.shinlogis.wms.location.model.LocationUser;
 
 public class LocationUserDAO {
@@ -31,6 +32,8 @@ public class LocationUserDAO {
 			pstmt.setString(2, StringUtil.getSecuredPass(new String(locationUser.getPw())));
 			pstmt.setString(3, locationUser.getEmail());
 			pstmt.setInt(4, locationUser.getLocation().getLocationId());
+			
+			System.out.println(locationUser.getLocation().getLocationId());
 			
 			int result = pstmt.executeUpdate();
 			
@@ -216,7 +219,8 @@ public class LocationUserDAO {
 			
 			con = dbManager.getConnection();
 			StringBuffer sql = new StringBuffer();
-			sql.append("select * from location_user where id = ? and pw = ?");
+			sql.append("select * from location_user lu inner join location l");
+			sql.append(" on lu.location_id = l.location_id where id = ? and pw = ?");
 			
 			
 			try {
@@ -229,8 +233,19 @@ public class LocationUserDAO {
 				
 				if(rs.next()) {
 					user = new LocationUser();
-					user = new LocationUser();
 					user.setId(rs.getString("id"));
+					user.setPw(rs.getString("pw"));
+					String[] email = rs.getString("email").split("@");
+					user.setEmail(email[0], email[1]);
+					
+					Location location = new Location();
+					location.setLocationId(rs.getInt("location_id"));
+					location.setLocationName(rs.getString("location_name"));
+					location.setAddress(rs.getString("address"));
+					
+					user.setLocation(location);
+					
+					
 				} 
 				
 			} catch (SQLException e) {
