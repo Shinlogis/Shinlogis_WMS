@@ -11,6 +11,8 @@ SET FOREIGN_KEY_CHECKS = 0;
  DROP TABLE IF EXISTS `storage_type`;              
  DROP TABLE IF EXISTS `supplier`;                   
  DROP TABLE IF EXISTS `warehouse`;
+ DROP TABLE IF EXISTS `store_order`;
+ DROP TABLE IF EXISTS `store_order_item`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- [지점 정보 테이블]
@@ -133,6 +135,8 @@ CREATE TABLE io_detail (
     actual_quantity INT NOT NULL,
     headquarters_user_id INT NOT NULL,
     processed_date DATETIME,
+    warehouse_id INT,
+
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
@@ -141,23 +145,31 @@ CREATE TABLE io_detail (
     FOREIGN KEY (io_receipt_id) REFERENCES io_receipt(io_receipt_id),
     FOREIGN KEY (snapshot_id) REFERENCES snapshot(snapshot_id),
     FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id),
-    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id)
+    foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id),
+    FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
 );
+
 
 -- [주문서 테이블]
 CREATE TABLE store_order (
     store_order_id INT AUTO_INCREMENT PRIMARY KEY,
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     location_id INT NOT NULL,
+    total_price int not null,
     
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location(location_id)
 );
+
 -- [주문서 상세 테이블]
 CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
+
+
     quantity INT CHECK(quantity > 0),                           -- 수량
+
+
 
     CONSTRAINT fk_store_order FOREIGN KEY (store_order_id) REFERENCES store_order(store_order_id),
 
@@ -572,3 +584,22 @@ WHERE io_receipt_id IN (
     GROUP BY io_receipt_id
     HAVING SUM(CASE WHEN status != '예정' THEN 1 ELSE 0 END) = 0
 );
+
+-- [입고상세에 창고 연결]
+-- ROOM 저장창고 연결 (예: warehouse_id = 3)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 3
+WHERE s.storage_type_code = 'ROOM';
+
+-- COLD 저장창고 연결 (예: warehouse_id = 1)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 1
+WHERE s.storage_type_code = 'COLD';
+
+-- FROZEN 저장창고 연결 (예: warehouse_id = 2)
+UPDATE io_detail d
+JOIN snapshot s ON d.snapshot_id = s.snapshot_id
+SET d.warehouse_id = 2
+WHERE s.storage_type_code = 'FROZEN';

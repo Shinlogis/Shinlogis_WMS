@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view;
+package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inbound.repository.InboundDetailDAO;
-import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
+import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
 
@@ -16,16 +16,16 @@ import com.shinlogis.wms.snapshot.model.Snapshot;
  * InboundPlanItemModel 테이블모델 입니다.
  * @author 김예진
  */
-public class InboundDetailModel extends AbstractTableModel {
-	InboundDetailDAO ioDetailDAO = new InboundDetailDAO();
-	InboundReceiptDAO ioReceiptDAO = new InboundReceiptDAO();
+public class DetailModel extends AbstractTableModel {
+	DetailDAO ioDetailDAO = new DetailDAO();
+	ReceiptDAO ioReceiptDAO = new ReceiptDAO();
 	Snapshot snapshot = new Snapshot();
 	
 	List<IODetail> inblundPlanItemList;
 	String[] column = { "입고예정ID", "입고예정상세ID", "상품코드", "상품명", "상태", "공급사명",
 			"수량", "입고예정일", "처리일", "입고처리", "수정"};
 
-	public InboundDetailModel() {
+	public DetailModel() {
 		// 전체 목록 로드
 		this.inblundPlanItemList = ioDetailDAO.selectIODetails(Collections.emptyMap());
 	}

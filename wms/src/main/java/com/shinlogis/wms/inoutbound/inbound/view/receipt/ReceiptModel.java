@@ -1,15 +1,13 @@
-package com.shinlogis.wms.inbound.view;
+package com.shinlogis.wms.inoutbound.inbound.view.receipt;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inbound.model.IOReceipt;
-import com.shinlogis.wms.inbound.repository.InboundReceiptDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 
 /**
@@ -18,9 +16,9 @@ import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
  * @author 김예진
  * @since 2025-06-19
  */
-public class InboundReceiptModel extends AbstractTableModel {
+public class ReceiptModel extends AbstractTableModel {
 
-	InboundReceiptDAO ioReceiptDAO = new InboundReceiptDAO();
+	ReceiptDAO ioReceiptDAO = new ReceiptDAO();
 	SnapshotDAO snapshotDAO = new SnapshotDAO();
 	List<IOReceipt> inboundList;
 	List<Map<String, Object>> infoList;
@@ -30,7 +28,7 @@ public class InboundReceiptModel extends AbstractTableModel {
 	/**
 	 * 생성자
 	 */
-	public InboundReceiptModel() {
+	public ReceiptModel() {
 		// 초기에는 필터가 없으므로 Collections.emptyMap()를 넘겨 빈 필터로 전체를 불러옴
 		inboundList = ioReceiptDAO.selectInboundReceiptsWithItemInfo(Collections.emptyMap());
 	}

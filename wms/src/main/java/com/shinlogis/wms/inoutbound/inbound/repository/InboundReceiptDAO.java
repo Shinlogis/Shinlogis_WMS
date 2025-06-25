@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.repository;
+package com.shinlogis.wms.inoutbound.inbound.repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 
 /**
  * 입고예정 전표 DAO입니다.

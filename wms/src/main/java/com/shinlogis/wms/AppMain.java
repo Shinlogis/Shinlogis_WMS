@@ -33,8 +33,11 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.headquarters.view.HeadquatersMyPage;
-import com.shinlogis.wms.inbound.view.InboundDetailPage;
-import com.shinlogis.wms.inbound.view.InboundReceiptPage;
+import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailPage;
+import com.shinlogis.wms.inoutbound.inbound.view.process.ProcessPage;
+import com.shinlogis.wms.inoutbound.inbound.view.receipt.ReceiptPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundDetailPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundReceiptPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
@@ -134,6 +137,22 @@ public class AppMain extends JFrame {
 			la_supplier = createMenuItem("공급사 관리", Config.SUPPLIER_PAGE);
 			la_chat = createMenuItem("지점과 채팅하기", Config.CHATTING_PAGE);
 
+			//출고상세 이벤트 연결 추가
+			la_outboundDetail.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.OUTBOUNT_PROCESS_PAGE);
+				}
+			});
+			
+			//출고예정 페이지 보여주는 이벤트 연결@이세형
+			la_outboundPlan.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.OUTBOUND_PLAN_PAGE);
+				}
+			});
+			
 			// 이벤트 연결
 			la_inboundPlan.addMouseListener(new MouseAdapter() {
 				@Override
@@ -143,11 +162,20 @@ public class AppMain extends JFrame {
 				}
 			});
 			
-	        // 입고상세 이벤트 연결 추가 @author 김예진
+	        // 입고상세 이벤트 연결 추가
 	        la_inboundDetail.addMouseListener(new MouseAdapter() {
 	      		@Override
 	      		public void mouseClicked(MouseEvent e) {
 	      			showPage(Config.INBOUND_ITEM_PAGE);
+	      			System.out.println("click");
+	      		}
+	      	});
+	        
+	     // 입고처리 이벤트 연결 추가
+	        la_inboundProcess.addMouseListener(new MouseAdapter() {
+	      		@Override
+	      		public void mouseClicked(MouseEvent e) {
+	      			showPage(Config.INBOUND_PROCESS_PAGE);
 	      			System.out.println("click");
 	      		}
 	      	});
@@ -342,11 +370,11 @@ public class AppMain extends JFrame {
 			pages = new Page[13];
 
 			pages[0] = new MainPage(this);
-			pages[1] = new InboundReceiptPage(this);
-			pages[2] = new InboundDetailPage(this);
-			pages[3] = null;
-			pages[4] = null;
-			pages[5] = null;
+			pages[1] = new ReceiptPage(this);
+			pages[2] = new DetailPage(this);
+			pages[3] = new ProcessPage(this);
+			pages[4] = new OutboundReceiptPage(this);
+			pages[5] = new OutboundDetailPage(this);
 			pages[6] = null;
 			pages[7] = new InventoryPage(this);
 			pages[8] = null;

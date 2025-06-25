@@ -1,11 +1,14 @@
 package com.shinlogis.wms.product.model;
 
+import com.shinlogis.wms.storageType.model.StorageType;
+import com.shinlogis.wms.supplier.model.Supplier;
+
 public class Product {
 	private int productId;
 	private String productCode;
 	private String productName;
-	private int storageTypeId;
-	private int supplierId;
+	private StorageType storageType;
+	private Supplier supplier;
 	private int price;
 	private boolean isChecked;
 	
@@ -33,18 +36,21 @@ public class Product {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
-	public int getStorageTypeId() {
-		return storageTypeId;
+
+	
+	public Supplier getSupplier() {
+		return supplier;
 	}
-	public void setStorageTypeId(int storageTypeId) {
-		this.storageTypeId = storageTypeId;
+	public void setSupplier(Supplier supplier) {
+		this.supplier = supplier;
 	}
-	public int getSupplierId() {
-		return supplierId;
+	public StorageType getStorageType() {
+		return storageType;
 	}
-	public void setSupplierId(int supplierId) {
-		this.supplierId = supplierId;
+	public void setStorageType(StorageType storageType) {
+		this.storageType = storageType;
 	}
+
 	public int getPrice() {
 		return price;
 	}

@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.repository;
+package com.shinlogis.wms.inoutbound.inbound.repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,8 +11,8 @@ import java.util.Map;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.damagedCode.model.DamagedCode;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
 /**
@@ -45,7 +45,7 @@ public class InboundDetailDAO {
 				pstmt.setInt(1, item.getIoItemId());
 				pstmt.setInt(2, item.getPlannedQuantity());
 				pstmt.setInt(3, item.getProductSnapshot().getSnapshotId());
-				pstmt.setInt(4, item.getDamageCode().getDamageCodeId());
+				pstmt.setInt(4, item.getDamagedCode().getDamageCodeId());
 				pstmt.setInt(5, item.getDamageQuantity());
 				pstmt.setInt(6, item.getActualQuantity());
 
@@ -75,13 +75,11 @@ public class InboundDetailDAO {
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ip.io_detail_id, ip.planned_quantity, ip.damage_quantity, ip.actual_quantity, ")
-				.append("ip.processed_date, ip.status,")
-				.append("ir.io_receipt_id, ir.scheduled_date, ")
+				.append("ip.processed_date, ip.status,").append("ir.io_receipt_id, ir.scheduled_date, ")
 				.append("s.snapshot_id, s.product_code, s.product_name, s.storage_type_code, s.supplier_name, s.price, s.expiry_date, ")
 				.append("dc.damage_code_id, dc.code AS damage_code, ")
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email ")
-				.append("FROM io_detail ip ")
-				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
+				.append("FROM io_detail ip ").append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
 				.append(" JOIN damaged_code dc  ON ip.damage_code_id = dc.damage_code_id ")
 				.append("JOIN headquarters_user hu ON ip.headquarters_user_id = hu.headquarters_user_id ")
@@ -89,13 +87,13 @@ public class InboundDetailDAO {
 
 		// 검색 필터 추가
 		List<Object> params = new ArrayList<>();
-		if (filters.get("io_receipt_id") != null) {
-			sql.append("AND ir.io_receipt_id = ? ");
-			params.add(filters.get("io_receipt_id"));
-		}
 		if (filters.get("io_detail_id") != null) {
 			sql.append("AND ip.io_detail_id = ? ");
 			params.add(filters.get("io_detail_id"));
+		}
+		if (filters.get("io_receipt_id") != null) {
+			sql.append("AND ir.io_receipt_id = ? ");
+			params.add(filters.get("io_receipt_id"));
 		}
 		if (filters.get("product_code") != null) {
 			sql.append("AND s.product_code = ? ");
@@ -113,19 +111,20 @@ public class InboundDetailDAO {
 			sql.append("AND ip.status = ? ");
 			params.add(filters.get("status"));
 		}
-		 if (filters.get("scheduled_date") != null) {
-	            sql.append("AND DATE(ir.scheduled_date) = ? ");
-	            params.add(filters.get("scheduled_date"));
-	        }
-		
+		if (filters.get("scheduled_date") != null) {
+			sql.append("AND DATE(ir.scheduled_date) = ? ");
+			params.add(filters.get("scheduled_date"));
+		}
+
 		System.out.println(sql.toString());
 
 		List<IODetail> list = new ArrayList<>();
 
 		try {
 			conn = dbManager.getConnection();
-			ps = conn.prepareStatement(sql.toString());			
+			ps = conn.prepareStatement(sql.toString());
 			for (int i = 0; i < params.size(); i++) {
+			    ps.setObject(i + 1, params.get(i));
 			}
 			rs = ps.executeQuery();
 
@@ -157,10 +156,10 @@ public class InboundDetailDAO {
 				DamagedCode code = new DamagedCode();
 				code.setDamageCodeId(rs.getInt("damage_code_id"));
 				code.setCode(rs.getString("damage_code"));
-				detail.setDamageCode(code);
+				detail.setDamagedCode(code);
 
 				HeadquartersUser hq = new HeadquartersUser();
-				
+
 				hq.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
 				hq.setId(rs.getString("hq_user_id"));
 //				hq.setEmail(rs.getString("hq_user_email")); // TODO: setter을 수정하거나 db에서 받아온 email을 분리해서 저장하는 방법이 필요
@@ -175,6 +174,70 @@ public class InboundDetailDAO {
 		}
 
 		return list;
+	}
+
+	/**
+	 * 입고 상세의 수량을 변경하는 메서드
+	 * 
+	 * @auther 김예진
+	 * @since 2025-06-24
+	 * @param quantity
+	 * @return
+	 */
+	public int updatePlanQuantity(int id, int quantity) {
+
+		Connection conn = null;
+		PreparedStatement ps = null;
+		int result = 0;
+
+		String sql = "update io_detail set planned_quantity = ? where io_detail_id = ?";
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			ps.setInt(1, quantity);
+			ps.setInt(2, id);
+
+			result = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps);
+		}
+
+		return 0;
+	}
+
+	/**
+	 * 입고상세의 상태를 변경
+	 * @author 김예진
+	 * @since 2025-06-24
+	 * @param id
+	 * @param quantity
+	 * @return
+	 */
+	public int updateStatus(int id, String status) {
+
+		Connection conn = null;
+		PreparedStatement ps = null;
+		int result = 0;
+
+		String sql = "update io_detail set status = ? where io_detail_id = ?";
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			ps.setString(1, status);
+			ps.setInt(2, id);
+
+			result = ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps);
+		}
+
+		return 0;
 	}
 
 }
