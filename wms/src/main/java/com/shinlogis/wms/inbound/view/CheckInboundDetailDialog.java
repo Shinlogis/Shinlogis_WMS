@@ -1,6 +1,5 @@
 package com.shinlogis.wms.inbound.view;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -18,12 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
-import com.shinlogis.wms.inbound.model.IODetail;
-import com.shinlogis.wms.inventory.model.InventoryDTO;
-import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
-import com.shinlogis.wms.warehouse.model.Warehouse;
 import com.shinlogis.wms.warehouse.repository.WarehouseDAO;
 import com.toedter.calendar.JDateChooser;
 
