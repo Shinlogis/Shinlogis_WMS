@@ -11,6 +11,8 @@ SET FOREIGN_KEY_CHECKS = 0;
  DROP TABLE IF EXISTS `storage_type`;              
  DROP TABLE IF EXISTS `supplier`;                   
  DROP TABLE IF EXISTS `warehouse`;
+ DROP TABLE IF EXISTS `store_order`;
+ DROP TABLE IF EXISTS `store_order_item`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- [지점 정보 테이블]
@@ -147,21 +149,26 @@ CREATE TABLE io_detail (
     FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
 );
 
+
 -- [주문서 테이블]
 CREATE TABLE store_order (
     store_order_id INT AUTO_INCREMENT PRIMARY KEY,
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     location_id INT NOT NULL,
+    total_price int not null,
     
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location(location_id)
 );
+
 -- [주문서 상세 테이블]
 CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
 
+
     quantity INT CHECK(quantity > 0),                           -- 수량
+
 
 
     CONSTRAINT fk_store_order FOREIGN KEY (store_order_id) REFERENCES store_order(store_order_id),
