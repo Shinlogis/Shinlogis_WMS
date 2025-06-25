@@ -1,5 +1,4 @@
-package com.shinlogis.wms.inbound.view;
-
+package com.shinlogis.wms.inbound.view.detail;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -17,13 +16,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.shinlogis.wms.inbound.repository.InboundDetailDAO;
+import com.shinlogis.wms.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 
-public class EditInboundDetailDialog extends JDialog {
+public class EditDetailDialog extends JDialog {
 
     private JTextField tfProductCode;
     private JLabel laProductName;
@@ -37,14 +36,14 @@ public class EditInboundDetailDialog extends JDialog {
     private IODetail ioDetail;
     private ProductDAO productDAO = new ProductDAO();
     private SnapshotDAO snapshotDAO = new SnapshotDAO();
-    private InboundDetailDAO inboundDetailDAO = new InboundDetailDAO();
+    private DetailDAO inboundDetailDAO = new DetailDAO();
     
     private String beforeProductCode;
     private int beforeQuantity;
     private String beforeStatus;
     
 
-    public EditInboundDetailDialog(Frame owner, IODetail detail, InboundDetailModel model) {
+    public EditDetailDialog(Frame owner, IODetail detail, DetailModel model) {
         super(owner, "입고상세 수정", true);
         
         

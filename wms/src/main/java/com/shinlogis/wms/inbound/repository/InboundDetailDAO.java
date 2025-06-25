@@ -45,7 +45,7 @@ public class InboundDetailDAO {
 				pstmt.setInt(1, item.getIoItemId());
 				pstmt.setInt(2, item.getPlannedQuantity());
 				pstmt.setInt(3, item.getProductSnapshot().getSnapshotId());
-				pstmt.setInt(4, item.getDamageCode().getDamageCodeId());
+				pstmt.setInt(4, item.getDamagedCode().getDamageCodeId());
 				pstmt.setInt(5, item.getDamageQuantity());
 				pstmt.setInt(6, item.getActualQuantity());
 
@@ -156,7 +156,7 @@ public class InboundDetailDAO {
 				DamagedCode code = new DamagedCode();
 				code.setDamageCodeId(rs.getInt("damage_code_id"));
 				code.setCode(rs.getString("damage_code"));
-				detail.setDamageCode(code);
+				detail.setDamagedCode(code);
 
 				HeadquartersUser hq = new HeadquartersUser();
 

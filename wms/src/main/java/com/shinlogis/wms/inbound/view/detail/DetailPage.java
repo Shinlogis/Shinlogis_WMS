@@ -1,4 +1,4 @@
-package com.shinlogis.wms.inbound.view;
+package com.shinlogis.wms.inbound.view.detail;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,7 +24,6 @@ import com.shinlogis.wms.common.config.ButtonEditor;
 import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.inbound.view.detail.CheckDetailDialog;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.toedter.calendar.JDateChooser;
 
@@ -33,7 +32,7 @@ import com.toedter.calendar.JDateChooser;
  * 
  * @author 김예진
  */
-public class InboundDetailPage extends Page {
+public class DetailPage extends Page {
 	/* ────────── 페이지명 영역 구성 요소 ────────── */
 	private JPanel pPageName; // 페이지명 패널
 	private JLabel laPageName; // 페이지명
@@ -57,11 +56,11 @@ public class InboundDetailPage extends Page {
 	private JTable tblPlan; // 입고예정 목록 테이블
 	private JScrollPane scTable;
 	private DefaultTableModel model;
-	private InboundDetailModel inboundDetailModel;
+	private DetailModel inboundDetailModel;
 
 	private JPanel pTableNorth;
 
-	public InboundDetailPage(AppMain appMain) {
+	public DetailPage(AppMain appMain) {
 		super(appMain);
 
 		/* ==== 검색 영역 ==== */
@@ -184,13 +183,13 @@ public class InboundDetailPage extends Page {
 		/* ==== 테이블 영역 ==== */
 		pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
 
-		tblPlan = new JTable(inboundDetailModel = new InboundDetailModel());
+		tblPlan = new JTable(inboundDetailModel = new DetailModel());
 		// JTable에 버튼을 setCellRenderer로 그리고 setCellEditor로 기능 추가
 		// 수정 버튼
 		tblPlan.getColumn("수정").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("수정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 			IODetail detail = inboundDetailModel.getIODetailAt(row);
-			EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, detail, inboundDetailModel);
+			EditDetailDialog dialog = new EditDetailDialog(appMain, detail, inboundDetailModel);
 			dialog.setVisible(true);
 		}));
 
