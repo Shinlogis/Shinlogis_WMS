@@ -26,6 +26,7 @@ import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.locationuser.orderList.view.OrderListPage;
 import com.shinlogis.wms.Member.view.HeadquartersJoin;
 import com.shinlogis.wms.Member.view.MemberLogin;
+import com.shinlogis.wms.chat.client.location.LocationChat;
 import com.shinlogis.wms.chat.view.ChattingPage;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
@@ -160,10 +161,18 @@ public class AppMain extends JFrame {
 				}
 			});
 			
+			
 			la_chat.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					showPage(Config.CHATTING_PAGE);
+					if(headquartersUser.getId().equals("a")) {
+						showPage(Config.CHATTING_PAGE);
+						ChattingPage chattingPage = (ChattingPage)pages[Config.CHATTING_PAGE];
+						chattingPage.createConnection();
+						System.out.println("접속 시도 중");
+					}else {
+						JOptionPane.showMessageDialog(AppMain.this, "권한이 없습니다.");
+					}
 				}
 			});
 
@@ -186,6 +195,14 @@ public class AppMain extends JFrame {
 				public void mouseClicked(MouseEvent e) {
 					showPage(1);
 					System.out.println("click");
+				}
+			});
+			
+			la_location_chat.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					new LocationChat(AppMain.this);
+					
 				}
 			});
 		}
@@ -339,11 +356,12 @@ public class AppMain extends JFrame {
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 
 		} else if ("locationUser".equals(role)) {
-			pages = new Page[3];
+			pages = new Page[4];
 
 			pages[0] = new OrderPage(this);
 			pages[1] = new OrderListPage(this);
-			pages[2] = new LocatoinMyPage(this);
+			pages[2] = new LocatoinMyPage(this, locationUser.getLocationUserId());
+			pages[3] = null;
 		}
 
 		for (int i = 0; i < pages.length; i++) {

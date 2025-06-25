@@ -1,5 +1,4 @@
 
-
 package com.shinlogis.wms.headquarters.view;
 
 import java.awt.Color;
@@ -39,10 +38,9 @@ import com.shinlogis.wms.Member.view.MemberLogin;
 
 public class HeadquatersMyPage extends Page {
 
-
 	JPanel pPageName;
 	JLabel laPageName;
-	
+
 	JPanel p_center;
 
 	JLabel la_update;
@@ -59,16 +57,17 @@ public class HeadquatersMyPage extends Page {
 	JComboBox cb_email;
 
 	JButton bt_update;
+	JButton bt_delete;
 
 	DBManager dbManager = DBManager.getInstance();
 	private HeadquartersUser headquartersUser;
 	private HeadquartersDAO headquartersDAO;
 	int pk = 0;
-	
+
 	public HeadquatersMyPage(AppMain appMain, int pk) {
 		super(appMain);
 		this.pk = pk;
-		
+
 		pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
 		laPageName = new JLabel("마이페이지");
@@ -95,9 +94,9 @@ public class HeadquatersMyPage extends Page {
 		cb_email = new JComboBox();
 
 		bt_update = new JButton("수정");
+		bt_delete = new JButton("탈퇴");
 
 		headquartersDAO = new HeadquartersDAO();
-		
 
 		// 스타일
 		setBackground(Color.LIGHT_GRAY);
@@ -107,30 +106,22 @@ public class HeadquatersMyPage extends Page {
 		la_update.setHorizontalAlignment(JLabel.CENTER);
 		la_update.setFont(new Font("맑은고딕", Font.BOLD, 24));
 		bt_update.setPreferredSize(new Dimension(80, 50));
-		
-
 
 		// 조립
 		pPageName.add(laPageName);
 		add(pPageName);
-		add(Box.createVerticalStrut(50));  // 50px만큼 아래로 밀기
-		
+		add(Box.createVerticalStrut(50)); // 50px만큼 아래로 밀기
+
 		p_center.add(createCenterLine(la_update));
 		p_center.add(createIdLine(la_id, show_id));
 		p_center.add(createLine(la_pwd, t_pwd));
 		p_center.add(createLine(la_pwdCheck, t_pwdCheck));
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
-		p_center.add(createCenterLine(bt_update));
+		p_center.add(createButtonLine(bt_update, bt_delete));
 		add(p_center);
 
 		// 이벤트
-		// 아이디 체크
-//		bt_idCheck.addActionListener(e -> {
-//			idCheck();
-//			idCheck = true;
-//		});
-
-		//수정 버튼
+		// 수정 버튼
 		bt_update.addActionListener(e -> {
 			updateMyInfo();
 
@@ -189,48 +180,54 @@ public class HeadquatersMyPage extends Page {
 		return panel;
 	}
 
-	
+	// 버튼 수정, 탈퇴
+	public JPanel createButtonLine(JButton bt1, JButton bt2) {
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 1));
+		panel.setPreferredSize(new Dimension(400, 40)); // 높이 약간 더 확보
+		panel.setOpaque(false);
+		panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // 위쪽 여백
 
-	
-	//마이페이지 보여주기
+		panel.add(bt1);
+		panel.add(bt2);
+		return panel;
+	}
+
+	// 마이페이지 보여주기
 	public void showMyInfo() {
 		headquartersUser = headquartersDAO.selectById(pk);
 		show_id.setText(headquartersUser.getId());
 		t_pwd.setText("");
 		t_pwdCheck.setText("");
-		
+
 		String[] email = headquartersUser.getEmail().split("@");
 		t_email.setText(email[0]);
-		
+
 	}
-	
-	
-	//수정
-	public void updateMyInfo() throws HeadquartersException{
+
+	// 수정
+	public void updateMyInfo() throws HeadquartersException {
 		String pw = new String(t_pwd.getPassword());
 		String pwCheck = new String(t_pwdCheck.getPassword());
 		String email = t_email.getText().trim() + "@" + ((String) cb_email.getSelectedItem()).trim();
 
-		
-		if(!pw.isEmpty()) {
-			if(!pw.equals(pwCheck)) {
+		if (!pw.isEmpty()) {
+			if (!pw.equals(pwCheck)) {
 				JOptionPane.showMessageDialog(this, "비밀번호가 일치하지 않습니다.");
 				return;
 			}
 			headquartersUser.setPw(pw);
-		}else {
-			headquartersUser.setPw(null);		
+		} else {
+			headquartersUser.setPw(null);
 		}
 
-		
-		if(!headquartersUser.getEmail().trim().equals(email)){
-		    if (!headquartersDAO.checkEmailById(email, pk)) {
-		        JOptionPane.showMessageDialog(this, "중복된 이메일입니다. 다시 확인해 주세요");
-		        return;
-		    }
-		    headquartersUser.setEmail(t_email.getText().trim(), (String) cb_email.getSelectedItem());
+		if (!headquartersUser.getEmail().trim().equals(email)) {
+			if (!headquartersDAO.checkEmailById(email, pk)) {
+				JOptionPane.showMessageDialog(this, "중복된 이메일입니다. 다시 확인해 주세요");
+				return;
+			}
+			headquartersUser.setEmail(t_email.getText().trim(), (String) cb_email.getSelectedItem());
 		}
-		
+
 		try {
 			headquartersDAO.edit(headquartersUser);
 			JOptionPane.showMessageDialog(this, "변경이 완료되었습니다.");
@@ -238,7 +235,7 @@ public class HeadquatersMyPage extends Page {
 			e.printStackTrace();
 			throw new HeadquartersException(e.getMessage());
 		}
-		
+
 	}
 
 }

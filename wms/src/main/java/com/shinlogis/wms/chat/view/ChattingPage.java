@@ -3,6 +3,9 @@ package com.shinlogis.wms.chat.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +13,12 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.google.gson.Gson;
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.chat.client.head.HeadClientThread;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.common.util.Message;
 import com.shinlogis.wms.location.model.Location;
 import com.shinlogis.wms.location.repository.LocationDAO;
 
@@ -25,6 +31,11 @@ public class ChattingPage extends Page{
 	JComboBox cb_location;
 	
 	LocationDAO locationDAO;
+	List<Location> locations;
+	
+	
+	String ip = "192.168.60.12";
+	int port = 9999;
 	
 	
 	public ChattingPage(AppMain appMain) {
@@ -39,9 +50,10 @@ public class ChattingPage extends Page{
 		
 		locationDAO = new LocationDAO();
 		
-		List<Location> locations = new ArrayList<>();
-		for(Location loc : locationDAO.getLocation()) {
+		locations = locationDAO.getLocation();
+		for(Location loc : locations) {
 			cb_location.addItem(loc);
+			System.out.println(loc.getLocationName());
 		}
 		
 		
@@ -58,4 +70,38 @@ public class ChattingPage extends Page{
 		
 		
 	}
+	
+	//지점 수 만큼 서버와 연결해두기
+	public void createConnection() {
+		//System.out.println("지점 수는 " + locations.size());
+		for(int i=0; i<locations.size(); i++) {
+			try {
+				Socket socket = new Socket(ip, port);
+				HeadClientThread headClientThread = new HeadClientThread(this, socket);//지점 수 만큼 소켓 만들기
+				headClientThread.start();
+				//메세지 만들기
+				Message message = new Message();
+				message.setRequestType("user");
+				message.setFrom("head");
+				message.setTo(Integer.toString(locations.get(i).getLocationId()));
+				
+				Gson gson = new Gson();
+				String result = gson.toJson(message);
+				
+				headClientThread.send(result);
+				
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
 }

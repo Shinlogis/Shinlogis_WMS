@@ -1,4 +1,4 @@
-package com.shinlogis.wms.chat;
+package com.shinlogis.wms.chat.client.head;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,9 +11,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class Client extends JFrame{
+import com.shinlogis.wms.AppMain;
+
+public class HeadChat extends JFrame{
+	
 
 	JPanel p_north;
+	JTextField t_ip;
 	JTextField t_port;
 	JButton bt;
 
@@ -22,11 +26,14 @@ public class Client extends JFrame{
 	JTextField t_input;
 
 	JPanel p_south;
-
-	public Client() {
+	AppMain appMain;
+	
+	
+	public HeadChat() {
 		p_north = new JPanel();
-		t_port = new JTextField();
-		bt = new JButton("서버가동");
+		t_ip = new JTextField("192.168.60.12");
+		t_port = new JTextField("9999");
+		bt = new JButton("채팅하기");
 		
 		area = new JTextArea();
 		scroll = new JScrollPane(area);
@@ -34,8 +41,9 @@ public class Client extends JFrame{
 		
 		p_south = new JPanel();
 		
-		t_port.setPreferredSize(new Dimension(100,30));
-		bt.setPreferredSize(new Dimension(60,30));
+		t_ip.setPreferredSize(new Dimension(120,30));
+		t_port.setPreferredSize(new Dimension(90,30));
+		bt.setPreferredSize(new Dimension(80,30));
 		
 		scroll.setPreferredSize(new Dimension(300,400));
 		area.setBackground(Color.PINK);
@@ -43,7 +51,8 @@ public class Client extends JFrame{
 		t_input.setPreferredSize(new Dimension(300,30));
 		
 		
-		p_north.add(t_port);
+		
+		p_north.add(t_ip);
 		p_north.add(t_port);
 		p_north.add(bt);
 		
@@ -53,16 +62,11 @@ public class Client extends JFrame{
 		add(scroll);
 		add(p_south, BorderLayout.SOUTH);
 		
-		setBounds(200,100,350,500);
+		setBounds(600,200,400,500);
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		
 	}
-
-	public static void main(String[] args) {
-		new Client();
-
-	}
+	
+	
 
 }
