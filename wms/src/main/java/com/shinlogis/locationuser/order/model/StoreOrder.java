@@ -7,6 +7,7 @@ public class StoreOrder {
 	private int storeOrderId;
 	private int locationId;
 	private LocalDateTime orderDate;
+	private int totalPrice;
 	private List<StoreOrderItem> items;
 	
 	public int getStoreOrderId() {
@@ -27,10 +28,18 @@ public class StoreOrder {
 	public void setOrderDate(LocalDateTime orderDate) {
 		this.orderDate = orderDate;
 	}
+	public int getTotalPrice() {
+		return totalPrice;
+	}
+	public void setTotalPrice(int totalPrice) {
+		this.totalPrice = totalPrice;
+	}
 	public List<StoreOrderItem> getItems() {
 		return items;
 	}
 	public void setItems(List<StoreOrderItem> items) {
 		this.items = items;
 	}
+	
+	
 }
