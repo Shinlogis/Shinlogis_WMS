@@ -1,13 +1,16 @@
 package com.shinlogis.wms.snapshot.repository;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.shinlogis.wms.common.util.DBManager;
+import com.shinlogis.wms.inoutbound.model.InboundForm;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 import com.shinlogis.wms.storageType.model.StorageType;
@@ -104,6 +107,45 @@ public class SnapshotDAO {
 	}
 	
 	/**
+	 * 입고폼으로부터 스냅샷을 만드는 메서드
+	 * 
+	 * @author 김예진
+	 * @since 2025-06-26
+	 * @param form
+	 * @return
+	 */
+	public int createSnapshotFromForm(InboundForm form) {
+		int snapshotId = 0;
+	    Connection connection = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("insert into snapshot (product_code, product_name, storage_type_code, supplier_name, price) values(?, ?, ?, ?, ?)");
+		
+		try {
+			connection = dbManager.getConnection();
+			pstmt = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+			pstmt.setString(1, form.getProduct().getProductCode());
+			pstmt.setString(2, form.getProduct().getProductName());
+			pstmt.setString(3, form.getProduct().getStorageType().getTypeCode());
+			pstmt.setString(4, form.getProduct().getSupplier().getName());
+			pstmt.setInt(5, form.getProduct().getPrice());
+			
+			rs = pstmt.getGeneratedKeys();
+	        if (rs.next()) {
+	            snapshotId = rs.getInt(1);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        dbManager.release(pstmt, rs);
+	    }
+
+	    return snapshotId;
+	}
+	
+	/**
 	 * id에 해당하는 스냅샷의 정보를 상품코드에 일치하는 상품으로 업데이트하는 메서드
 	 * @author 김예진
 	 * @param id 업데이트할 스냅샷 id
@@ -180,4 +222,8 @@ public class SnapshotDAO {
 		}
 		return result;
 	}	
+	
+	
+	
+	
 }

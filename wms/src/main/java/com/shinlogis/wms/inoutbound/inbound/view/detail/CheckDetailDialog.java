@@ -1,5 +1,6 @@
 package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -42,14 +43,11 @@ public class CheckDetailDialog extends JDialog {
 	private JLabel laSupplierName;
 	private JLabel laPlannedQuantity;
 	private JComboBox<String> cbDamagedTypeCode;
-	private JTextField tfDamagedTypeCode;
 	private JTextField tfDamagedQuantity;
-	private JLabel laActualQuantity;
 	private JTextField tfWarehouseCode;
 	private JLabel laWarehouseName;
 	private JLabel laWarehouseType;
 
-	private JLabel laWarehouseCode;
 	private JDateChooser chooser; // 유통기한 선택 달력
 
 	private JButton btnSearch;
@@ -70,7 +68,6 @@ public class CheckDetailDialog extends JDialog {
 		laSupplierName = new JLabel(detail.getProductSnapshot().getSupplierName());
 		laPlannedQuantity = new JLabel(String.valueOf(detail.getPlannedQuantity()));
 		tfDamagedQuantity = new JTextField(10); 
-		tfDamagedTypeCode = new JTextField(10);
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -185,6 +182,15 @@ public class CheckDetailDialog extends JDialog {
 		gbc.gridx = 2;
 		laWarehouseType = new JLabel();
 		add(laWarehouseType, gbc);
+		
+		gbc.gridy = 8;
+		gbc.gridx = 0;
+		add(new JLabel("유통기한"), gbc);
+		gbc.gridx = 1;
+		chooser = new JDateChooser();
+		chooser.setDateFormatString("yyyy-MM-dd");
+		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height));
+		add(chooser, gbc);
 
 		// 버튼
 		btnSave = new JButton("저장");
@@ -193,8 +199,8 @@ public class CheckDetailDialog extends JDialog {
 		pButtons.add(btnSave);
 		pButtons.add(btnCancel);
 
+		gbc.gridy = 9;
 		gbc.gridx = 0;
-		gbc.gridy = 8;
 		gbc.gridwidth = 4;
 		add(pButtons, gbc);
 
@@ -212,7 +218,7 @@ public class CheckDetailDialog extends JDialog {
 
 		btnCancel.addActionListener(e -> dispose());
 
-		setSize(530, 420);
+		setSize(530, 460);
 		setLocationRelativeTo(owner);
 	}
 	

@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud.Update;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.inventory.model.InventoryDTO;
 
@@ -77,7 +78,6 @@ public class InventoryDAO {
 		return 0;
 	}
 
-	// TODO 창고에 재고로 존재하는 상품은, 기존의 재고를 업데이트하는 식으로 재고에 저장
 
     // 조회: 중복 항목 병합 (inventory_id 제외)
     public List<InventoryDTO> selectInventoryDetails(InventoryDTO inventoryDTO) {

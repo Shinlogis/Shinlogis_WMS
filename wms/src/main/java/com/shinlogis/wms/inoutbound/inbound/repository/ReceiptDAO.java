@@ -5,13 +5,17 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.InboundForm;
 
 /**
  * 입고예정 전표 DAO입니다.
@@ -20,7 +24,46 @@ import com.shinlogis.wms.inoutbound.model.IOReceipt;
  */
 public class ReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
+	
+	/**
+	 * 폼에 작성한 내용으로 입고예정을 등록하는 메서드
+	 * @param inboundForm
+	 * @return
+	 */
+	public Map<String, Object> insertReceipt(InboundForm form, HeadquartersUser user) {
+	    Map<String, Object> resultMap = new HashMap<>();
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    int result = 0;
+	    int id = 0; // 초기화 필요
+	    
+	    StringBuffer sql = new StringBuffer();
+	    sql.append("insert into io_receipt (io_type, user_id, created_at, scheduled_date) values(?, ?, now(), ?)");
+	    
+	    try {
+	        conn = dbManager.getConnection();
+	        pstmt = conn.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+	        pstmt.setString(1, "IN");
+	        pstmt.setInt(2, user.getHeadquartersUserId());
+	        pstmt.setDate(3, form.getPlannedDate());
+	        
+	        result = pstmt.executeUpdate();
+	        resultMap.put("result", result);
+	        
+	        ResultSet rs = pstmt.getGeneratedKeys();
+	        if (rs.next()) {
+	            id = rs.getInt(1);
+	            resultMap.put("id", id);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        dbManager.release(pstmt);
+	    }
+	    return resultMap;
+	}
 
+	
 	/**
 	 * 입고 전표, 전표에 맞는 상품 정보를 가져오는 메서드
 	 *

@@ -24,6 +24,8 @@ import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
+import com.shinlogis.wms.inoutbound.inbound.view.detail.EditDetailDialog;
+import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.toedter.calendar.JDateChooser;
 
@@ -157,6 +159,12 @@ public class ReceiptPage extends Page {
 		pTableNorth.add(laPlanCount);
 
 		btnRegister = new JButton("입고예정 등록");
+		btnRegister.addActionListener(e -> {
+			AddRecieptDialog dialog = new AddRecieptDialog(appMain, appMain);
+			dialog.setVisible(true);
+		});
+		
+		
 		pTableNorth.add(btnRegister);
 
 		/* ==== 테이블 영역 ==== */
