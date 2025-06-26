@@ -19,7 +19,7 @@ public class Config {
 	public static final int OUTBOUNT_PROCESS_PAGE = 5;
 	public static final int PRODUCT_PAGE   = 6; //상품페이지  
 	public static final int INVENTORY_PAGE = 7; //재고관리페이지 
-	public static final int STOCK_PAGE = 8; //창고관리페이지
+	public static final int WAREHOUSE_PAGE = 8; //창고관리페이지
 	public static final int LOCATION_PAGE = 9;
 	public static final int SUPPLIER_PAGE = 10;
 	public static final int CHATTING_PAGE = 11;
