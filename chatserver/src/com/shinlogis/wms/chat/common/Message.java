@@ -2,9 +2,9 @@ package com.shinlogis.wms.chat.common;
 
 public class Message {
 	private String requestType;
-	private String from;
-	private String to;
-	private String content;
+	private String me;
+	private Location target;
+	private String msg;
 	
 	
 	public String getRequestType() {
@@ -13,24 +13,22 @@ public class Message {
 	public void setRequestType(String requestType) {
 		this.requestType = requestType;
 	}
-	public String getFrom() {
-		return from;
+	public String getMe() {
+		return me;
 	}
-	public void setFrom(String from) {
-		this.from = from;
+	public void setMe(String me) {
+		this.me = me;
 	}
-	public String getTo() {
-		return to;
+	public Location getTarget() {
+		return target;
 	}
-	public void setTo(String to) {
-		this.to = to;
+	public void setTarget(Location target) {
+		this.target = target;
 	}
-	public String getContent() {
-		return content;
+	public String getMsg() {
+		return msg;
 	}
-	public void setContent(String content) {
-		this.content = content;
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
-	
-
 }

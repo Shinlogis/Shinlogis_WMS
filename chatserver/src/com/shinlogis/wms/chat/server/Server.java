@@ -12,13 +12,13 @@ public class Server implements Runnable{
 	int port = 9999;
 	Thread thread; //메인 실행부가 대기상태에 빠지지 않도록 (프로그램 멈추는 거 방지)
 	
-	HashMap locationMap; //지점들 중 현재 접속한 지점들을 담게될 배열
-	HashMap headMap; //지점들의 채팅 쓰레드를 담게될 맵(key값은 지점 db의 pk값으로 지정)
+	Vector<ServerThread> locationList; //지점들 중 현재 접속한 지점들을 담게될 배열
+	Vector<ServerThread> headList; //지점들의 채팅 쓰레드를 담게될 맵(key값은 지점 db의 pk값으로 지정)
 	
 	public Server() {
-		locationMap = new HashMap();
-		headMap = new HashMap();
-		
+		locationList= new Vector<>();
+		headList = new Vector<>(); 
+				
 		renServer();
 	}
 	
@@ -51,5 +51,6 @@ public class Server implements Runnable{
 	public static void main(String[] args) {
 		new Server();
 	}
+
 
 }
