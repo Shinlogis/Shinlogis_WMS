@@ -41,13 +41,6 @@ public class DBManager {
 	}
 
 	public Connection getConnection() {
-		try {
-			if (conn == null || conn.isClosed()) {
-				conn = DriverManager.getConnection(Config.url, Config.id, Config.password);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		return conn;
 	}
 	
