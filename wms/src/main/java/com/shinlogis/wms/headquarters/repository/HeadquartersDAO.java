@@ -243,8 +243,6 @@ public class HeadquartersDAO {
 		}finally {
 			dbManager.release(pstmt, rs);
 		}
-		
-		
 		return pwd;
 	}
 	
@@ -257,7 +255,7 @@ public class HeadquartersDAO {
 		
 		con = dbManager.getConnection();
 		StringBuffer sql = new StringBuffer();
-		sql.append("select * from headquarters_user where id = ? and pw = ?");
+		sql.append("select * from headquarters_user where id = ? and pw = ? and status = '활성'");
 		
 		
 		try {
@@ -297,13 +295,10 @@ public class HeadquartersDAO {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select * from headquarters_user where headquarters_user_id = ?");
 		
-		
 		try {
-			
 			pstmt = con.prepareStatement(sql.toString());
 			pstmt.setInt(1, pk);
 			rs = pstmt.executeQuery();
-			
 			
 			if(rs.next()) {
 				headquartersUser = new HeadquartersUser();
@@ -316,12 +311,10 @@ public class HeadquartersDAO {
 				headquartersUser.setPw(rs.getString("pw"));
 				headquartersUser.setEmail(emailParts[0], emailParts[1]);
 				
-				System.out.println("PK FROM DB: " + rs.getInt("headquarters_user_id"));
+				System.out.println("PK : " + rs.getInt("headquarters_user_id"));
 			}else {
-			    System.out.println("❗해당 ID로 사용자 정보 없음");
+			    System.out.println("해당 ID로 사용자 정보 없음");
 			}
-			
-				
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -367,6 +360,37 @@ public class HeadquartersDAO {
 		} finally {
 			dbManager.release(pstmt);
 		}
+		
+	}
+	
+	
+	//탈퇴하기 
+	public void delete(HeadquartersUser headquartersUser) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		int result = 0;
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("update headquarters_user set status = '탈퇴' where headquarters_user_id = ?");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setInt(1, headquartersUser.getHeadquartersUserId());
+			result = pstmt.executeUpdate();
+			
+			if(result <1) {
+				throw new HeadquartersException("회원탈퇴에 실패했습니다.");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new HeadquartersException("회원 탈퇴 시 문제 발생", e);
+		}finally {
+			dbManager.release(pstmt);
+		}
+		
+		
 		
 	}
 	

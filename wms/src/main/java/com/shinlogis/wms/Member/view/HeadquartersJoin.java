@@ -173,7 +173,7 @@ public class HeadquartersJoin extends JFrame{
 	
 	
 	//회원가입
-	public void regist() throws HeadquartersException{
+	public void regist(){
 		try {
 			HeadquartersUser headquartersUser = new HeadquartersUser();
 			headquartersUser.setId(t_id.getText());

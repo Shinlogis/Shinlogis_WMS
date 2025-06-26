@@ -26,6 +26,7 @@ import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.locationuser.orderList.view.OrderListPage;
 import com.shinlogis.wms.Member.view.HeadquartersJoin;
 import com.shinlogis.wms.Member.view.MemberLogin;
+import com.shinlogis.wms.chat.client.location.LocationChat;
 import com.shinlogis.wms.chat.view.ChattingPage;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
@@ -43,6 +44,7 @@ import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
 import com.shinlogis.wms.product.view.ProductPage;
+import com.shinlogis.wms.supplier.view.SupplierPage;
 import com.shinlogis.wms.warehouse.view.WarehousePage;
 
 public class AppMain extends JFrame {
@@ -219,10 +221,27 @@ public class AppMain extends JFrame {
 					showPage(Config.WAREHOUSE_PAGE);
 				}
 			});
+			
+			//공급사 페이지
+			la_supplier.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.SUPPLIER_PAGE);
+				}
+			});
+			
+			//채팅 페이지
 			la_chat.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					showPage(Config.CHATTING_PAGE);
+					if(headquartersUser.getId().equals("yujin")) {
+						showPage(Config.CHATTING_PAGE);
+						ChattingPage chattingPage = (ChattingPage)pages[Config.CHATTING_PAGE];
+						chattingPage.createConnection();
+						System.out.println("접속 시도 중");
+					}else {
+						JOptionPane.showMessageDialog(AppMain.this, "권한이 없습니다.");
+					}
 				}
 			});
 
@@ -243,6 +262,15 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(1);
+				}
+			});
+			
+			//채팅 페이지
+			la_location_chat.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					new LocationChat(AppMain.this, locationUser.getLocation());
+					
 				}
 			});
 		}
@@ -390,17 +418,18 @@ public class AppMain extends JFrame {
 			pages[7] = new InventoryPage(this);
 			pages[8] = new WarehousePage(this);
 			pages[9] = null;
-			pages[10] = null;
+			pages[10] = new SupplierPage(this);
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 			pages[13] = new OutboundRegiterPage(this);
 
 		} else if ("locationUser".equals(role)) {
-			pages = new Page[3];
+			pages = new Page[4];
 
 			pages[0] = new OrderPage(this);
 			pages[1] = new OrderListPage(this);
-			pages[2] = new LocatoinMyPage(this);
+			pages[2] = new LocatoinMyPage(this, locationUser.getLocationUserId());
+			pages[3] = null;
 		}
 
 		for (int i = 0; i < pages.length; i++) {

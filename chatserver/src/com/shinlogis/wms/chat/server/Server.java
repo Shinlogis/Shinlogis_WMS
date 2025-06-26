@@ -1,4 +1,4 @@
-package com.shinlogis.wms.chat;
+package com.shinlogis.wms.chat.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,10 +12,13 @@ public class Server implements Runnable{
 	int port = 9999;
 	Thread thread; //메인 실행부가 대기상태에 빠지지 않도록 (프로그램 멈추는 거 방지)
 	
-	Vector vec; //지점들 중 현재 접속한 지점들을 담게될 배열
-	HashMap map; //지점들의 채팅 쓰레드를 담게될 맵(key값은 지점 db의 pk값으로 지정)
+	Vector<ServerThread> locationList; //지점들 중 현재 접속한 지점들을 담게될 배열
+	Vector<ServerThread> headList; //지점들의 채팅 쓰레드를 담게될 맵(key값은 지점 db의 pk값으로 지정)
 	
 	public Server() {
+		locationList= new Vector<>();
+		headList = new Vector<>(); 
+				
 		renServer();
 	}
 	
@@ -32,7 +35,11 @@ public class Server implements Runnable{
 				Socket socket = server.accept(); //접속전 까지 대기
 				
 				//생성된 소켓을 이용하여 쓰레드를 생성
+				String ip = socket.getInetAddress().getHostAddress();
+				System.out.println(ip + " 님 접속"); //지점 수 만큼 접속
 				
+				ServerThread chatThread = new ServerThread(this, socket);
+				chatThread.start();
 				
 			}
 			
@@ -44,5 +51,6 @@ public class Server implements Runnable{
 	public static void main(String[] args) {
 		new Server();
 	}
+
 
 }
