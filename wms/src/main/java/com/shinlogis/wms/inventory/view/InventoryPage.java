@@ -1,5 +1,6 @@
 package com.shinlogis.wms.inventory.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -8,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -34,7 +36,10 @@ public class InventoryPage extends Page {
 
 	private JPanel pSearch;
 	public JTextField warehouseCode;
-	private JTextField productCode, supplierName, warehouseName, productName;
+	public JTextField productCode;
+	private JTextField supplierName;
+	private JTextField warehouseName;
+	private JTextField productName;
 	private JDateChooser chooser;
 	public JButton btnSearch;
 
@@ -117,11 +122,12 @@ public class InventoryPage extends Page {
 		pPageName.add(laPageName);
 
 		// 검색 결과 카운트 영역
-		pTableNorth = new JPanel(new FlowLayout());
+		pTableNorth = new JPanel(new BorderLayout());
 		pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-		laPlanCount = new JLabel("총 n개의 재고 검색");
-		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
-		pTableNorth.add(laPlanCount);
+		laPlanCount = new JLabel("총 0개의 상품 검색");
+		laPlanCount.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); // 여백 제거
+
+		pTableNorth.add(laPlanCount, BorderLayout.WEST);
 
 		// 테이블 영역 (모델 생성)
 		model = new DefaultTableModel(columnNames, 0) {
@@ -195,28 +201,27 @@ public class InventoryPage extends Page {
 		tblPlan.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ButtonRenderer());
 		// 삭제 버튼 클릭 시
 		tblPlan.getColumnModel().getColumn(deleteColumnIndex)
-	    .setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-	        int modelRow = tblPlan.convertRowIndexToModel(row);
-	        InventoryDTO dto = fullList.get((currentPage - 1) * rowsPerPage + modelRow);
+				.setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+					int modelRow = tblPlan.convertRowIndexToModel(row);
+					InventoryDTO dto = fullList.get((currentPage - 1) * rowsPerPage + modelRow);
 
-	        System.out.println("삭제 시도 - warehouseCode: " + dto.getWarehouseCode()
-	            + ", productCode: " + dto.getProductCode()
-	            + ", expiryDate: " + dto.getExpiryDate());
+					System.out.println("삭제 시도 - warehouseCode: " + dto.getWarehouseCode() + ", productCode: "
+							+ dto.getProductCode() + ", expiryDate: " + dto.getExpiryDate());
 
-	        int confirm = JOptionPane.showConfirmDialog(this, "재고를 삭제하시겠습니까?", "삭제 확인",
-	                JOptionPane.YES_NO_OPTION);
-	        if (confirm == JOptionPane.YES_OPTION) {
-	            InventoryDAO dao = new InventoryDAO();
-	            boolean success = dao.deleteInventoryByExpiry(dto); // 여기 호출
+					int confirm = JOptionPane.showConfirmDialog(this, "재고를 삭제하시겠습니까?", "삭제 확인",
+							JOptionPane.YES_NO_OPTION);
+					if (confirm == JOptionPane.YES_OPTION) {
+						InventoryDAO dao = new InventoryDAO();
+						boolean success = dao.deleteInventoryByExpiry(dto); // 여기 호출
 
-	            if (success) {
-	                JOptionPane.showMessageDialog(this, "삭제 완료");
-	                loadInventoryData();
-	            } else {
-	                JOptionPane.showMessageDialog(this, "삭제 실패");
-	            }
-	        }
-	    }));
+						if (success) {
+							JOptionPane.showMessageDialog(this, "삭제 완료");
+							loadInventoryData();
+						} else {
+							JOptionPane.showMessageDialog(this, "삭제 실패");
+						}
+					}
+				}));
 
 		// 초기 데이터 로딩
 		loadInventoryData();
@@ -292,14 +297,14 @@ public class InventoryPage extends Page {
 		}
 		return -1;
 	}
-	
+
 	public void resetFields() {
-	    warehouseCode.setText("");
-	    productCode.setText("");
-	    supplierName.setText("");
-	    warehouseName.setText("");
-	    productName.setText("");
-	    chooser.setDate(null);  // 날짜 초기화
+		warehouseCode.setText("");
+		productCode.setText("");
+		supplierName.setText("");
+		warehouseName.setText("");
+		productName.setText("");
+		chooser.setDate(null); // 날짜 초기화
 	}
 
 }

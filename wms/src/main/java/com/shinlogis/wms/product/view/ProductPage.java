@@ -1,5 +1,6 @@
 package com.shinlogis.wms.product.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -8,7 +9,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,8 +21,11 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.common.config.ButtonEditor;
+import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.product.model.ProductDTO;
 import com.shinlogis.wms.product.repository.ProductDAO;
 
@@ -43,15 +49,17 @@ public class ProductPage extends Page {
     private JButton btnPrevPage, btnNextPage;
     private JLabel laPageInfo;
 
-    private String[] columnNames = { "상품코드", "상품명", "공급사명", "보관타입", "가격" };
+    private String[] columnNames = { "상품코드", "상품명", "공급사명", "보관타입", "가격", "재고보기" };
 
     private int currentPage = 1;
     private final int rowsPerPage = 10;
     private List<ProductDTO> fullList;
 
+    private AppMain appMain;
+    
     public ProductPage(AppMain appMain) {
         super(appMain);
-
+        this.appMain = appMain;
         /* ==== 검색 영역 ==== */
         pSearch = new JPanel(new GridBagLayout());
         pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.SEARCH_BAR_HEIGHT));
@@ -110,23 +118,29 @@ public class ProductPage extends Page {
         pPageName.add(laPageName);
 
         /* ==== 검색 결과 카운트 영역 ==== */
-        pTableNorth = new JPanel(new FlowLayout());
+        pTableNorth = new JPanel(new BorderLayout());
         pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
         laPlanCount = new JLabel("총 0개의 상품 검색");
-        laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
-        pTableNorth.add(laPlanCount);
+        laPlanCount.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); // 여백 제거
 
+        pTableNorth.add(laPlanCount, BorderLayout.WEST);
         /* ==== 테이블 영역 ==== */
         model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+            	int invenCol = getColumnIndex("재고보기");
+				return column == invenCol;
             }
         };
 
         tblPlan = new JTable(model);
         tblPlan.setRowHeight(45);
         tblPlan.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 45));
+        tblPlan.getColumn("재고보기").setCellRenderer(new ButtonRenderer());
+        tblPlan.getColumn("재고보기").setCellEditor(new ButtonEditor(new JCheckBox(), (JTable tbl, int Row, int column) -> {
+            String productCode = (String) tbl.getValueAt(Row, 0);
+            showInventoryPage(productCode);
+        }));
         tblPlan.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
         scTable = new JScrollPane(tblPlan);
@@ -221,16 +235,33 @@ public class ProductPage extends Page {
                 dto.getProductName(),
                 dto.getSupplierName(),
                 dto.getStorageTypeName(),
-                dto.getPrice()
+                dto.getPrice(),
+                "보기"
             };
             model.addRow(row);
         }
-
+        
         laPlanCount.setText("총 " + totalRows + "개의 상품 검색");
         laPageInfo.setText(currentPage + " / " + totalPages);
         btnPrevPage.setEnabled(currentPage > 1);
         btnNextPage.setEnabled(currentPage < totalPages);
     }
+    
+	public void showInventoryPage(String productCode) {
+		InventoryPage inventoryPage = (InventoryPage) appMain.pages[Config.INVENTORY_PAGE];
+
+		inventoryPage.productCode.setText(productCode); // 값을 전달
+		inventoryPage.btnSearch.doClick(); // 검색 이벤트 실행
+		appMain.showPage(Config.INVENTORY_PAGE);
+	}
+    
+	private int getColumnIndex(String colName) {
+		for (int i = 0; i < columnNames.length; i++) {
+			if (columnNames[i].equals(colName))
+				return i;
+		}
+		return -1;
+	}
     
     public void resetFields() {
         productCode.setText("");
