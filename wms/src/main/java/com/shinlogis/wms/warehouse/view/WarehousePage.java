@@ -149,7 +149,6 @@ public class WarehousePage extends Page {
 		table.getColumn("재고보기").setCellRenderer(new ButtonRenderer());
 		table.getColumn("재고보기").setCellEditor(new ButtonEditor(new JCheckBox(), (tbl, row, column) -> {
 			String warehouseCode = (String) tbl.getValueAt(row, 1); // 첫 번째 열이 창고코드
-			System.out.println("선택된 창고코드: " + warehouseCode);
 			showInventoryPage(warehouseCode);
 		}));
 
