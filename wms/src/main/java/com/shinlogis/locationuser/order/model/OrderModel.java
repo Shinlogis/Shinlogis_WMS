@@ -116,7 +116,7 @@ public class OrderModel extends AbstractTableModel{
 		for (Product product : selectedList) {
 			StoreOrderItem storeOrderItem=new StoreOrderItem();
 			
-			storeOrderItem.setProductId(product.getProductId());
+			storeOrderItem.setProduct(product);
 			storeOrderItem.setQuantity(product.getQuantity());
 			totalPrice+=(product.getQuantity()* product.getPrice());
 			

@@ -25,6 +25,7 @@ import javax.swing.table.TableColumnModel;
 
 import com.shinlogis.locationuser.order.model.OrderModel;
 import com.shinlogis.locationuser.order.model.StoreOrder;
+import com.shinlogis.locationuser.order.model.StoreOrderItem;
 import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
 import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 import com.shinlogis.wms.AppMain;
@@ -210,15 +211,25 @@ public class OrderPage extends Page{
 					storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
 					
 					try {
-						storeOrderDao.insertStoreOrder(storeOrder);
+						storeOrderDao.insert(storeOrder);
 						int pk=storeOrderDao.getRecentId();
 						storeOrder.setStoreOrderId(pk);
-						storeItemDao.insertStoreOrderItem(storeOrder);
+						
+						
+						
+						for (StoreOrderItem item : storeOrder.getItems()) {
+						    item.setStoreOrderId(pk);  
+						    storeItemDao.insert(item);
+						    item.setStoreOrderId(pk); 
+						}
+						
 						con.commit();
+						
 					} catch (OrderInsertException e1) {
 						e1.printStackTrace();
-						throw new OrderInsertException(e1.getMessage());
-					}
+						con.rollback();
+						JOptionPane.showMessageDialog(this, e1.getMessage());
+					} 
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -240,9 +251,9 @@ public class OrderPage extends Page{
 				
 			}
 			
-			List<Product> p=productDao.selectOrderProduct();
-			model.setList(p);
-			pTable.updateUI();
+			//List<Product> p=productDao.selectOrderProduct();
+		
+			pTable.updateUI();    
 			tfProduct.setText("");
 		});			
 	}

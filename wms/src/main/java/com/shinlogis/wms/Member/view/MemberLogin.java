@@ -246,8 +246,8 @@ public class MemberLogin extends JFrame{
 	public void locationUserLogin() {
 		
 		LocationUser user = new LocationUser();
-		user.setId("admin");
-		user.setPw("1234");
+		user.setId(t_id.getText());
+		user.setPw(new String(t_pwd.getPassword()));
 		
 		locationUser = locationUserDAO.Login(user);
 		
