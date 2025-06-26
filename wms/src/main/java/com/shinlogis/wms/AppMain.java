@@ -157,7 +157,6 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.INBOUND_PLAN_PAGE);
-					System.out.println("click");
 				}
 			});
 			
@@ -166,7 +165,6 @@ public class AppMain extends JFrame {
 	      		@Override
 	      		public void mouseClicked(MouseEvent e) {
 	      			showPage(Config.INBOUND_ITEM_PAGE);
-	      			System.out.println("click");
 	      		}
 	      	});
 	        
@@ -175,7 +173,6 @@ public class AppMain extends JFrame {
 	      		@Override
 	      		public void mouseClicked(MouseEvent e) {
 	      			showPage(Config.INBOUND_PROCESS_PAGE);
-	      			System.out.println("click");
 	      		}
 	      	});
 
@@ -184,7 +181,6 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.INVENTORY_PAGE);
-					System.out.println("click");
 				}
 			});
 			
@@ -205,7 +201,6 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(0);
-					System.out.println("click");
 				}
 			});
 			// 이벤트 연결
@@ -213,7 +208,6 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(1);
-					System.out.println("click");
 				}
 			});
 		}

@@ -169,11 +169,11 @@ public class EditDetailDialog extends JDialog {
             }
             // 상품수량이 변경되었을 경우
             if (Integer.parseInt(tfQuantity.getText().trim()) != beforeQuantity) {
-                inboundDetailDAO.updatePlanQuantity(detail.getIoItemId(), Integer.parseInt(tfQuantity.getText().trim()));
+                inboundDetailDAO.updatePlanQuantity(detail.getIoDetailId(), Integer.parseInt(tfQuantity.getText().trim()));
             }
             // 상태가 변경되었을 경우
             if (!cbStatus.getSelectedItem().equals(beforeStatus)) {
-            	inboundDetailDAO.updateStatus(detail.getIoItemId(), (String)cbStatus.getSelectedItem());
+            	inboundDetailDAO.updateStatus(detail.getIoDetailId(), (String)cbStatus.getSelectedItem());
             }
 
             JOptionPane.showMessageDialog(this, "수정 완료");
