@@ -2,6 +2,7 @@ package com.shinlogis.locationuser.orderList.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -30,6 +31,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 import com.shinlogis.locationuser.order.model.StoreOrder;
@@ -115,7 +117,6 @@ public class OrderListPage extends Page{
         cbStatus = new JComboBox<>(new String[] { "전체", "예정", "처리 중", "완료" });
         gbc.gridx = 7;
         pSearch.add(cbStatus, gbc);
-		
 
         // 상품명
         gbc.gridx = 8;
@@ -136,8 +137,6 @@ public class OrderListPage extends Page{
         pPageName.add(laPageName);
         pPageName.setBackground(new Color(0xF1F1F1));
         
-        
-        
         //1.pTable 영역 
         pTable = new JPanel(); // 전체 
         pTable_Content = new JPanel(); //전체 > 내용 
@@ -149,10 +148,10 @@ public class OrderListPage extends Page{
         
         //1.1 pTable 스타일영역 
         pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-        pTable_Content.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 550));
-        pTable_Content_title.setPreferredSize(new Dimension(800, Config.TABLE_NORTH_HEIGHT));
-        laContentTitle.setPreferredSize(new Dimension(800, 30));
-        scrollPane.setPreferredSize(new Dimension(800, 480));  
+        pTable_Content.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 580));
+        pTable_Content_title.setPreferredSize(new Dimension(800, Config.TABLE_NORTH_HEIGHT-10));
+        laContentTitle.setPreferredSize(new Dimension(800, 20));
+        scrollPane.setPreferredSize(new Dimension(800, 240));  
         
         pTable_Content_title.setBackground(Color.white);
         pTable_Content.setBackground(Color.WHITE);
@@ -171,13 +170,35 @@ public class OrderListPage extends Page{
         DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         
+        JTableHeader header = table.getTableHeader();
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 25));
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+
+                JLabel label = (JLabel) super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+
+                label.setBackground(new Color(0xFF7F50)); // 배경 색상
+                label.setForeground(Color.WHITE);     // 글자 색상
+                label.setHorizontalAlignment(SwingConstants.CENTER); // 가운데 정렬
+                label.setFont(label.getFont().deriveFont(Font.BOLD, 14f)); // 글자 크기 키우기
+                return label;
+            }
+        });
+        table.setShowGrid(true); // 격자선 보이기
+        table.setShowVerticalLines(true); // 세로선 보이기
+        table.setGridColor(Color.LIGHT_GRAY); // 선 색상 설정
+        table.setBorder(null); // JTable 자체 테두리 제거
+
+
+
+   
         // 첫 번째 열(Column 0 = 체크박스)
         table.getColumnModel().getColumn(0).setMinWidth(60);     // 최소 너비
         table.getColumnModel().getColumn(0).setMaxWidth(60);     // 최대 너비
         table.getColumnModel().getColumn(0).setPreferredWidth(60); // 선호 너비
-        table.getColumnModel().getColumn(4).setMinWidth(100);     // 최소 너비
-        table.getColumnModel().getColumn(4).setMaxWidth(100);     // 최대 너비
-        table.getColumnModel().getColumn(4).setPreferredWidth(100); // 선호 너비
  
         //1.2 pTable 부착 영역  
         pTable_Content_title.add(laContentTitle);
@@ -194,9 +215,10 @@ public class OrderListPage extends Page{
 		
 		//검색 이벤트 
 		btnSearch.addActionListener(e->{
-			List<Product> p=productDao.selectSearchProduct(tfProduct.getText());
-			model.setList(p);
-			pTable.updateUI();
+			//List<Product> p=productDao.selectSearchProduct(tfProduct.getText());
+		//	model.setList(p);
+			//pTable.updateUI();
 		});
+		//pTable.updateUI();
 	}
 }

@@ -21,9 +21,7 @@ public class StoreOrderItemDAO {
 	DBManager dbManager = DBManager.getInstance();
 	
 	//주문상세 insert하기 
-	public void insertStoreOrderItem(StoreOrder storeOrder) throws  OrderInsertException{
-		List<StoreOrderItem> itemList = new ArrayList<>();
-		itemList=storeOrder.getItems();
+	public void insert(StoreOrderItem storeOrderItem) throws  OrderInsertException{
 		
 		StringBuffer sql = new StringBuffer("insert store_order_item(store_order_id,product_id,quantity) values(?,?,?)");
 
@@ -36,19 +34,17 @@ public class StoreOrderItemDAO {
 			try {
 				pstmt = connection.prepareStatement(sql.toString());
 				int result=0;
-				for (StoreOrderItem item : itemList) {
-					pstmt.setInt(1, storeOrder.getStoreOrderId()); 
-		        	pstmt.setInt(2, item.getProductId());
-		        	pstmt.setInt(3, item.getQuantity());
-		        	result+=pstmt.executeUpdate();
-				}
+				
+				pstmt.setInt(1, storeOrderItem.getStoreOrderId()); 
+	        	pstmt.setInt(2, storeOrderItem.getProduct().getProductId());
+	        	pstmt.setInt(3, storeOrderItem.getQuantity());
+	        	pstmt.executeUpdate();
+				
 			        
-		        if(result<1 || result!=itemList.size()) {
-		        	throw new OrderInsertException("주문 실패했습니다");
-		        }
+		       
 			} catch (SQLException e) {
 				e.printStackTrace();
-				throw new OrderInsertException("주문 실패했습니다",e);
+				throw new OrderInsertException("주문 상세 등록 실패했습니다",e);
 			}
 		}finally {
 			dbManager.release(pstmt,rs);

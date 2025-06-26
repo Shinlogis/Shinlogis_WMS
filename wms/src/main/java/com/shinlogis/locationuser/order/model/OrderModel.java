@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
 import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
@@ -117,7 +116,7 @@ public class OrderModel extends AbstractTableModel{
 		for (Product product : selectedList) {
 			StoreOrderItem storeOrderItem=new StoreOrderItem();
 			
-			storeOrderItem.setProductId(product.getProductId());
+			storeOrderItem.setProduct(product);
 			storeOrderItem.setQuantity(product.getQuantity());
 			totalPrice+=(product.getQuantity()* product.getPrice());
 			
