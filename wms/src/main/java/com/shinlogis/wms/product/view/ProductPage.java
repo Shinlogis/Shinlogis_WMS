@@ -1,5 +1,6 @@
 package com.shinlogis.wms.product.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -8,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -110,12 +112,12 @@ public class ProductPage extends Page {
         pPageName.add(laPageName);
 
         /* ==== 검색 결과 카운트 영역 ==== */
-        pTableNorth = new JPanel(new FlowLayout());
+        pTableNorth = new JPanel(new BorderLayout());
         pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
         laPlanCount = new JLabel("총 0개의 상품 검색");
-        laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
-        pTableNorth.add(laPlanCount);
+        laPlanCount.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); // 여백 제거
 
+        pTableNorth.add(laPlanCount, BorderLayout.WEST);
         /* ==== 테이블 영역 ==== */
         model = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -225,7 +227,7 @@ public class ProductPage extends Page {
             };
             model.addRow(row);
         }
-
+        
         laPlanCount.setText("총 " + totalRows + "개의 상품 검색");
         laPageInfo.setText(currentPage + " / " + totalPages);
         btnPrevPage.setEnabled(currentPage > 1);
