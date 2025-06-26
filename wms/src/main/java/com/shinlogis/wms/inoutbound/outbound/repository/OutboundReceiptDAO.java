@@ -14,7 +14,7 @@ import com.shinlogis.wms.location.model.Location;
 
 /**
  * <h2> 출고예정 전표DAO
- * <li> 이건 oUT bound receadsf조회하는 함수에요 
+ * <li> outboundReceipt 관련 DAO
  * @author 이세형
  */
 public class OutboundReceiptDAO {
@@ -22,6 +22,10 @@ public class OutboundReceiptDAO {
 
 //	public OutBoundReceiptDAO(){}
 
+	/**
+	 * <h2> 총 데이터 테이블에 출력
+	 * @author 이세형
+	 * */
 	public List selectAllOutbounds() {// IoReceipt의 모든 레코드 가져오는 메서드
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -72,6 +76,14 @@ public class OutboundReceiptDAO {
 		return list;
 	}
 
+	public void insertOutbound() {
+		
+	}
+	
+	/**
+	 * <h2> 총 데이터 수 표헌
+	 * @author 이세형
+	 * */
 	public int countTotal() {
 		Connection con = null;
 		PreparedStatement pstmt = null;
