@@ -141,6 +141,7 @@ public class OutboundReceiptPage extends Page {
 		// 검색버튼
 		bt_search = new JButton("검색");
 		bt_search.addActionListener(e -> {
+			//1. 검색 조건 수집 
 		    String id = tf_outboundPlanId.getText().trim();
 		    String product = tf_outboundProduct.getText().trim();
 		    String store = tf_targetStore.getText().trim();
@@ -152,6 +153,19 @@ public class OutboundReceiptPage extends Page {
 		    model = new OutboundReceiptModel(id, product, store, schedDate, regDate, selectedStatus);
 		    tb_plan.setModel(model);
 
+			tb_plan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
+			tb_plan.getColumn("상세보기").setCellEditor(
+			    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+			        // 상세보기 클릭 시 동작 정의
+			        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
+			        JOptionPane.showMessageDialog(null, "출고예정 상세보기: ID = " + ioReceiptId);
+			    })
+			);
+			
+		    
+		    
+		    
+		    
 		    // 검색결과 수 갱신
 		    int searchCount = outboundReceiptDAO.countByCondition(id, product, store, schedDate, regDate, selectedStatus);
 		    la_counter.setText("총 " + searchCount + "개의 출고예정 검색");

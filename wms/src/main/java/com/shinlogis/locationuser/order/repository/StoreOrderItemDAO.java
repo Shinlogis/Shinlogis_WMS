@@ -19,8 +19,18 @@ import com.shinlogis.wms.product.model.Product;
 
 public class StoreOrderItemDAO {
 	DBManager dbManager = DBManager.getInstance();
+		/**
+	 * <h2>주문상세 셀렉트 메서드 입니다.
+	 *  @author 세형
+	 * */
+	public void selectAll() {
+		
+	}
 	
-	//주문상세 insert하기 
+	/**
+	 * <h2>주문 상세 인서트 메서드입니다.
+	 * @author 예닮
+	 * */
 	public void insert(StoreOrderItem storeOrderItem) throws  OrderInsertException{
 		
 		StringBuffer sql = new StringBuffer("insert store_order_item(store_order_id,product_id,quantity) values(?,?,?)");
@@ -50,4 +60,9 @@ public class StoreOrderItemDAO {
 			dbManager.release(pstmt,rs);
 		}
 	}
+
+	
+	
+	
+	
 }
