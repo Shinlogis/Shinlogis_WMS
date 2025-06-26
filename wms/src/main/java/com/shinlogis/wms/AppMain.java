@@ -64,6 +64,8 @@ public class AppMain extends JFrame {
 	public HeadquartersUser headquartersUser;
 	public LocationUser locationUser;
 	private String role; // 내부적으로 사용할 역할(관리자,지점)
+	
+	OrderListPage orderListPage;
 
 	public AppMain(HeadquartersUser headquartersUser, LocationUser locationUser) {
 		this.headquartersUser = headquartersUser;
@@ -83,6 +85,7 @@ public class AppMain extends JFrame {
 			role = "headquartersUser";
 		} else if (locationUser != null) {
 			role = "locationUser";
+			orderListPage= new OrderListPage(this);
 		} else {
 			JOptionPane.showMessageDialog(this, "사용자 정보가 없습니다.");
 			return;
@@ -261,6 +264,7 @@ public class AppMain extends JFrame {
 			la_orderList.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					orderListPage.refresh();
 					showPage(1);
 				}
 			});
@@ -427,7 +431,7 @@ public class AppMain extends JFrame {
 			pages = new Page[4];
 
 			pages[0] = new OrderPage(this);
-			pages[1] = new OrderListPage(this);
+			pages[1] = orderListPage;
 			pages[2] = new LocatoinMyPage(this, locationUser.getLocationUserId());
 			pages[3] = null;
 		}
@@ -451,6 +455,4 @@ public class AppMain extends JFrame {
 		}
 	}
 }
-//    public static void main(String[] args) {
-//        new AppMain();
-//    }
+

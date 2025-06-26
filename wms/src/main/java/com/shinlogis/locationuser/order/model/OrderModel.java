@@ -130,4 +130,9 @@ public class OrderModel extends AbstractTableModel{
 		
 		return storeOrder;
 	}
+	
+	public void tableChanged() {
+		list=productDAO.selectOrderProduct();
+		fireTableDataChanged();
+	}
 }
