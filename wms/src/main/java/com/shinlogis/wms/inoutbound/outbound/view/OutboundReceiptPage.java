@@ -6,20 +6,21 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.common.config.ButtonEditor;
+import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
@@ -187,6 +188,15 @@ public class OutboundReceiptPage extends Page {
 		tb_plan = new JTable(model = new OutboundReceiptModel());
 		tb_plan.setRowHeight(45);
 		 
+		tb_plan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
+		tb_plan.getColumn("상세보기").setCellEditor(
+		    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+		        // 상세보기 클릭 시 동작 정의
+		        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
+		        JOptionPane.showMessageDialog(null, "출고예정 상세보기: ID = " + ioReceiptId);
+		    })
+		);
+		
 		sc_table= new JScrollPane(tb_plan);
 		sc_table.setPreferredSize(new Dimension(1150,660));
 		
