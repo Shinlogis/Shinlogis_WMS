@@ -1,6 +1,7 @@
 package com.shinlogis.locationuser.order.repository;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -60,9 +61,51 @@ public class StoreOrderItemDAO {
 			dbManager.release(pstmt,rs);
 		}
 	}
-
 	
-	
-	
-	
+	//주문상세가져오기 
+	public List<StoreOrderItem> select(int pk) {
+		Connection connection = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs =null;
+		
+		List<StoreOrderItem> list= new ArrayList();
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("select * from ");
+		sql.append("store_order_item soi  join product p ");
+		sql.append("on soi.product_id = p.product_id ");
+		sql.append("where soi.store_order_id =?");
+		
+		
+		try {
+			connection = dbManager.getConnection();
+			try {
+				pstmt = connection.prepareStatement(sql.toString());
+				
+				pstmt.setInt(1,pk); 
+	        	rs=pstmt.executeQuery();
+	        	
+	        	while(rs.next()) {
+	        		StoreOrderItem item= new StoreOrderItem();
+	        		Product p = new Product();
+	        		
+	        		p.setPrice(rs.getInt("price"));
+	        		p.setProductName(rs.getString("product_name"));
+	        		
+	        		item.setProduct(p);
+	        		item.setStatus(rs.getString("status"));
+	        		item.setQuantity(rs.getInt("quantity"));
+	        		item.setStoreOrderId(rs.getInt("store_order_id"));
+	        		item.setItemId(rs.getInt("item_id"));
+	        		
+	        		list.add(item);
+	        	}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}finally {
+			dbManager.release(pstmt,rs);
+		}
+		return list;
+	}
 }
