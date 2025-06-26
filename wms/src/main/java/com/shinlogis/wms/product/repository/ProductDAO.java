@@ -4,16 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
-import com.shinlogis.locationuser.order.model.StoreOrderItem;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.product.model.ProductDTO;
 import com.shinlogis.wms.storageType.model.StorageType;
 import com.shinlogis.wms.supplier.model.Supplier;
 
@@ -143,5 +139,82 @@ public class ProductDAO {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * 상품코드, 상품명, 공급사명, 보관타입, 가격범위 등 다양한 조건을 select하는 메서드
+	 * 
+	 * @param productCode
+	 * @return
+	 * @author 김지민
+	 * @since 2025-06-25
+	 */
+	
+	public List<ProductDTO> selectProductList(String productCode, String productName, String supplierName, String storageTypeName, int minPrice, int maxPrice) {
+	    List<ProductDTO> list = new ArrayList<>();
+
+	    StringBuffer sql = new StringBuffer();
+	    sql.append("SELECT p.*, s.name AS supplier_name, s.address, st.type_name ");
+	    sql.append("FROM product p ");
+	    sql.append("JOIN supplier s ON p.supplier_id = s.supplier_id ");
+	    sql.append("JOIN storage_type st ON p.storage_type_id = st.storage_type_id ");
+	    sql.append("WHERE 1=1 ");
+
+	    if (productCode != null && !productCode.isEmpty()) {
+	        sql.append("AND p.product_code LIKE CONCAT('%', ?, '%') ");
+	    }
+	    if (productName != null && !productName.isEmpty()) {
+	        sql.append("AND p.product_name LIKE CONCAT('%', ?, '%') ");
+	    }
+	    if (supplierName != null && !supplierName.isEmpty()) {
+	        sql.append("AND s.name LIKE CONCAT('%', ?, '%') ");
+	    }
+	    if (storageTypeName != null && !storageTypeName.isEmpty()) {
+	        sql.append("AND st.type_name = ? ");
+	    }
+	    sql.append("AND p.price BETWEEN ? AND ?");
+
+	    Connection connection = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        connection = dbManager.getConnection();
+	        pstmt = connection.prepareStatement(sql.toString());
+
+	        int paramIndex = 1;
+	        if (productCode != null && !productCode.isEmpty()) {
+	            pstmt.setString(paramIndex++, productCode);
+	        }
+	        if (productName != null && !productName.isEmpty()) {
+	            pstmt.setString(paramIndex++, productName);
+	        }
+	        if (supplierName != null && !supplierName.isEmpty()) {
+	            pstmt.setString(paramIndex++, supplierName);
+	        }
+	        if (storageTypeName != null && !storageTypeName.isEmpty()) {
+	            pstmt.setString(paramIndex++, storageTypeName);
+	        }
+	        pstmt.setInt(paramIndex++, minPrice);
+	        pstmt.setInt(paramIndex++, maxPrice);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            ProductDTO dto = new ProductDTO();
+	            dto.setProductCode(rs.getString("product_code"));
+	            dto.setProductName(rs.getString("product_name"));
+	            dto.setPrice(rs.getInt("price"));
+	            dto.setSupplierName(rs.getString("supplier_name"));
+	            dto.setStorageTypeName(rs.getString("type_name"));
+	            list.add(dto);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        dbManager.release(pstmt, rs);
+	    }
+
+	    return list;
 	}
 }

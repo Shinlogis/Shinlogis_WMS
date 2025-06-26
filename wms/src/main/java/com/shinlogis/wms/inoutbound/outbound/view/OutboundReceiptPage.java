@@ -48,16 +48,16 @@ public class OutboundReceiptPage extends Page {
 
 	/* ================= 목록 영역 ================ */
 	private JPanel p_tableNorth;//데이터 수 라벨, 조회, 등록버튼 패널
-	private JPanel p_tableSouth;//데이터 수 라벨, 조회, 등록버튼 패널
 	private JPanel buttonPanel;//버튼 두개 붙일 패널
 
 	private JLabel la_counter;
 	private JButton bt_regist;// 출고예정 등록버튼
-	private JButton bt_confirm;// 출고신청 조회
+	private JButton bt_checkOrder;// 출고신청 조회
 	private JTable tb_plan; // 출고예정 목록 테이블
 	private JScrollPane sc_table;
 	private AbstractTableModel model;
 //	private InboundPlanItemModel inboundPlanItemModel;
+	private int count;
 	OutboundReceiptDAO outboundReceiptDAO;
 	
 	public OutboundReceiptPage(AppMain appMain) {
@@ -123,7 +123,7 @@ public class OutboundReceiptPage extends Page {
 		gbcSearch.gridx = 0;// (0,1)
 		p_search.add(new JLabel("상태"), gbcSearch);
 
-		cb_status = new JComboBox<>(new String[] { "전체", "예정", "처리 중", "완료", "보류" });
+		cb_status = new JComboBox<>(new String[] { "전체", "예정", "진행 중", "완료", "보류" });
 		gbcSearch.gridx = 1;// (1,1)
 		p_search.add(cb_status, gbcSearch);
 
@@ -140,8 +140,23 @@ public class OutboundReceiptPage extends Page {
 		// 검색버튼
 		bt_search = new JButton("검색");
 		bt_search.addActionListener(e -> {
-			System.out.println("출고예정페이지 검색버튼을 눌렀습니다. 예정을 검색하는 쿼리문이 실행될 것입니다.");
+		    String id = tf_outboundPlanId.getText().trim();
+		    String product = tf_outboundProduct.getText().trim();
+		    String store = tf_targetStore.getText().trim();
+		    java.util.Date schedDate = ch_reservatedDate.getDate();
+		    java.util.Date regDate = ch_registeredDate.getDate();
+		    String selectedStatus = (String) cb_status.getSelectedItem();
+
+		    // 테이블 모델 갱신
+		    model = new OutboundReceiptModel(id, product, store, schedDate, regDate, selectedStatus);
+		    tb_plan.setModel(model);
+
+		    // 검색결과 수 갱신
+		    int searchCount = outboundReceiptDAO.countByCondition(id, product, store, schedDate, regDate, selectedStatus);
+		    la_counter.setText("총 " + searchCount + "개의 출고예정 검색");
 		});
+
+
 		gbcSearch.gridx = 8;// (7,1)
 		p_search.add(bt_search, gbcSearch);
 		
@@ -154,8 +169,10 @@ public class OutboundReceiptPage extends Page {
 		GridBagConstraints gbcTableNorth = new GridBagConstraints();
 		p_tableNorth = new JPanel(new GridBagLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-
-		la_counter = new JLabel("총 0개의 출고예정 검색");
+		
+		//count 변수에 출고예정을 담아줌
+		count = outboundReceiptDAO.countTotal();
+		la_counter = new JLabel("총 "+count+"개의 출고예정 검색");
 		gbcTableNorth.gridx = 0;
 		gbcTableNorth.gridy = 0;
 		gbcTableNorth.weightx = 1.0; // 남는 공간 차지
@@ -163,35 +180,10 @@ public class OutboundReceiptPage extends Page {
 		gbcTableNorth.insets = new Insets(0, 10, 0, 10); // 좌우 여백
 		p_tableNorth.add(la_counter, gbcTableNorth);
 		
-		// 버튼을 묶어서 하나의 panel에 담고 그 panel에 FlowLayout적용
-		buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0)); // 버튼
-		bt_confirm = new JButton("지점 주문 조회");
-		bt_regist = new JButton("출고 예정 등록");
-		buttonPanel.add(bt_confirm);
-		buttonPanel.add(bt_regist);
-
-		gbcTableNorth.gridx = 1;
-		gbcTableNorth.weightx = 0; // 공간 차지 X
-		gbcTableNorth.anchor = GridBagConstraints.EAST;
-		p_tableNorth.add(buttonPanel, gbcTableNorth);
-
-
-		
-		//등록버튼에 다이얼로그 불러오는 이벤트연결
-		bt_regist.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				new OutboundRegisterDialog();
-			}
-		});
 		
 		/* ===================테이블 영역================= */
-		p_tableSouth = new JPanel();		
-		p_tableSouth.setBackground(Color.GREEN);
-		p_tableSouth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH,Config.TABLE_HEIGHT ));
 		
 		//테이블 디자인
-				
 		tb_plan = new JTable(model = new OutboundReceiptModel());
 		tb_plan.setRowHeight(45);
 		 

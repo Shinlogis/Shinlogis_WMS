@@ -137,7 +137,7 @@ public class FindPwd extends JFrame {
 	}
 
 	// 비밀번호 찾기
-	public void findPwdByIdEmail() throws HeadquartersException{
+	public void findPwdByIdEmail(){
 		try {
 			String headquartersPwd = headquartersDAO.findPwd(t_id.getText(), t_email.getText() + "@" + (String) cb_email.getSelectedItem());
 			String locationUserPwd =  locationUserDAO.findPwd(t_id.getText(), t_email.getText() + "@" + (String) cb_email.getSelectedItem());

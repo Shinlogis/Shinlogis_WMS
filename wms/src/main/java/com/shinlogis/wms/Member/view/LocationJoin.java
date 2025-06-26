@@ -209,7 +209,7 @@ public class LocationJoin extends JFrame{
 	
 	
 	//회원가입
-	public void regist() throws HeadquartersException{
+	public void regist(){
 		try {
 			Location location = new Location();
 			Location selectLocation = (Location)cb_location.getSelectedItem();

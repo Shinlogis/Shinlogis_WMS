@@ -9,7 +9,9 @@ import java.awt.Insets;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,6 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.common.config.ButtonEditor;
+import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inventory.model.InventoryDTO;
@@ -29,23 +33,23 @@ public class InventoryPage extends Page {
 	private JLabel laPageName;
 
 	private JPanel pSearch;
-	private JTextField warehouseCode, productCode, supplierName, warehouseName, productName;
+	public JTextField warehouseCode;
+	private JTextField productCode, supplierName, warehouseName, productName;
 	private JDateChooser chooser;
-	private JButton btnSearch;
+	public JButton btnSearch;
 
-	public JPanel pTable;
+	private JPanel pTable;
 	private JLabel laPlanCount;
 	private JTable tblPlan;
 	private JScrollPane scTable;
 	private DefaultTableModel model;
 	private JPanel pTableNorth;
-	private JButton btnRegister;
 
 	private JPanel pPaging;
 	private JButton btnPrevPage, btnNextPage;
 	private JLabel laPageInfo;
 
-	private String[] columnNames = { "창고코드", "창고명", "상품코드", "상품명", "공급사명", "유통기한", "총재고수량" };
+	private String[] columnNames = { "창고코드", "창고명", "상품코드", "상품명", "공급사명", "유통기한", "총재고수량", "수정", "삭제" };
 
 	private int currentPage = 1;
 	private final int rowsPerPage = 10;
@@ -54,7 +58,7 @@ public class InventoryPage extends Page {
 	public InventoryPage(AppMain appMain) {
 		super(appMain);
 
-		/* ==== 검색 영역 ==== */
+		// 검색 영역 구성
 		pSearch = new JPanel(new GridBagLayout());
 		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.SEARCH_BAR_HEIGHT));
 		pSearch.setBackground(Color.WHITE);
@@ -88,13 +92,13 @@ public class InventoryPage extends Page {
 		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height));
 		gbc.gridx = 7;
 		pSearch.add(chooser, gbc);
-		
+
 		gbc.gridx = 8;
 		pSearch.add(new JLabel("창고명"), gbc);
 		warehouseName = new JTextField(10);
 		gbc.gridx = 9;
 		pSearch.add(warehouseName, gbc);
-		
+
 		btnSearch = new JButton("검색");
 		gbc.gridx = 10;
 		pSearch.add(btnSearch, gbc);
@@ -106,24 +110,26 @@ public class InventoryPage extends Page {
 		gbc.gridx = 1;
 		pSearch.add(productName, gbc);
 
-		/* ==== 페이지명 영역 ==== */
+		// 페이지명 영역
 		pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
 		laPageName = new JLabel("재고관리 > 상품관리");
 		pPageName.add(laPageName);
 
-		/* ==== 검색 결과 카운트 영역 ==== */
+		// 검색 결과 카운트 영역
 		pTableNorth = new JPanel(new FlowLayout());
 		pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
 		laPlanCount = new JLabel("총 n개의 재고 검색");
 		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
 		pTableNorth.add(laPlanCount);
 
-		/* ==== 테이블 영역 ==== */
+		// 테이블 영역 (모델 생성)
 		model = new DefaultTableModel(columnNames, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false; // 현재 상태 수정 불가
+				int editCol = getColumnIndex("수정");
+				int deleteCol = getColumnIndex("삭제");
+				return column == editCol || column == deleteCol;
 			}
 		};
 
@@ -132,16 +138,17 @@ public class InventoryPage extends Page {
 		tblPlan.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 45));
 		tblPlan.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
+		// 컬럼 너비 조정
 		for (int i = 0; i < tblPlan.getColumnCount(); i++) {
 			tblPlan.getColumnModel().getColumn(i).setPreferredWidth(60);
 		}
 
 		scTable = new JScrollPane(tblPlan);
 		scTable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); //세로 스크롤 비활성화
+		scTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
-		/* ==== 페이징 컨트롤 ==== */
+		// 페이징 컨트롤
 		pPaging = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		pPaging.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 40));
 		btnPrevPage = new JButton("이전");
@@ -153,25 +160,72 @@ public class InventoryPage extends Page {
 		pPaging.add(laPageInfo);
 		pPaging.add(btnNextPage);
 
+		// 테이블 포함 패널 구성
 		pTable = new JPanel(new FlowLayout());
-		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT)); // 785
+		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
 		pTable.setBackground(Color.WHITE);
-		pTable.add(pTableNorth); // 40
-		pTable.add(scTable); // 660
-		pTable.add(pPaging); // 40
+		pTable.add(pTableNorth);
+		pTable.add(scTable);
+		pTable.add(pPaging);
 
-		/* ==== 최종 배치 ==== */
+		// 전체 레이아웃
 		setLayout(new FlowLayout());
 		add(pPageName);
 		add(pSearch);
 		add(pTable);
 		setBackground(Color.LIGHT_GRAY);
-		
-		// 로딩 및 이벤트
+
+		// 버튼 렌더러 및 에디터 설정
+		int editColumnIndex = getColumnIndex("수정");
+		int deleteColumnIndex = getColumnIndex("삭제");
+
+		tblPlan.getColumnModel().getColumn(editColumnIndex).setCellRenderer(new ButtonRenderer());
+		tblPlan.getColumnModel().getColumn(editColumnIndex)
+				.setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+					int modelRow = tblPlan.convertRowIndexToModel(row);
+					InventoryDTO dto = fullList.get((currentPage - 1) * rowsPerPage + modelRow);
+
+					EditInventoryDialog dialog = new EditInventoryDialog(appMain, dto);
+					dialog.setVisible(true);
+
+					// 수정 후 테이블 새로고침
+					loadInventoryData();
+				}));
+
+		tblPlan.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ButtonRenderer());
+		// 삭제 버튼 클릭 시
+		tblPlan.getColumnModel().getColumn(deleteColumnIndex)
+	    .setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+	        int modelRow = tblPlan.convertRowIndexToModel(row);
+	        InventoryDTO dto = fullList.get((currentPage - 1) * rowsPerPage + modelRow);
+
+	        System.out.println("삭제 시도 - warehouseCode: " + dto.getWarehouseCode()
+	            + ", productCode: " + dto.getProductCode()
+	            + ", expiryDate: " + dto.getExpiryDate());
+
+	        int confirm = JOptionPane.showConfirmDialog(this, "재고를 삭제하시겠습니까?", "삭제 확인",
+	                JOptionPane.YES_NO_OPTION);
+	        if (confirm == JOptionPane.YES_OPTION) {
+	            InventoryDAO dao = new InventoryDAO();
+	            boolean success = dao.deleteInventoryByExpiry(dto); // 여기 호출
+
+	            if (success) {
+	                JOptionPane.showMessageDialog(this, "삭제 완료");
+	                loadInventoryData();
+	            } else {
+	                JOptionPane.showMessageDialog(this, "삭제 실패");
+	            }
+	        }
+	    }));
+
+		// 초기 데이터 로딩
 		loadInventoryData();
 
+		// 이벤트 리스너 등록
 		btnSearch.addActionListener(e -> {
 			currentPage = 1;
+			// exWarehouseCode를 null로 했으니 warehouseCode 텍스트필드도 직접 초기화하거나 유지하기
+			System.out.println("검색 버튼 클릭 - warehouseCode: " + warehouseCode.getText().trim());
 			loadInventoryData();
 		});
 
@@ -194,8 +248,21 @@ public class InventoryPage extends Page {
 	private void loadInventoryData() {
 		model.setRowCount(0);
 
+		InventoryDTO inventoryDTO = new InventoryDTO();
+
+		inventoryDTO.setWarehouseCode(warehouseCode.getText().trim());
+		inventoryDTO.setProductCode(productCode.getText().trim());
+		inventoryDTO.setSupplierName(supplierName.getText().trim());
+		inventoryDTO.setWarehouseName(warehouseName.getText().trim());
+		inventoryDTO.setProductName(productName.getText().trim());
+
+		if (chooser.getDate() != null) {
+			java.util.Date utilDate = chooser.getDate();
+			inventoryDTO.setExpiryDate(new java.sql.Date(utilDate.getTime()));
+		}
+
 		InventoryDAO dao = new InventoryDAO();
-		fullList = dao.selectInventoryDetails();
+		fullList = dao.selectInventoryDetails(inventoryDTO);
 
 		int totalRows = fullList.size();
 		int totalPages = (int) Math.ceil(totalRows / (double) rowsPerPage);
@@ -208,9 +275,7 @@ public class InventoryPage extends Page {
 		for (int i = start; i < end; i++) {
 			InventoryDTO dto = fullList.get(i);
 			Object[] row = { dto.getWarehouseCode(), dto.getWarehouseName(), dto.getProductCode(), dto.getProductName(),
-					dto.getSupplierName(), dto.getExpiryDate(),
-
-					dto.getTotalQuantity() };
+					dto.getSupplierName(), dto.getExpiryDate(), dto.getTotalQuantity(), "수정", "삭제" };
 			model.addRow(row);
 		}
 
@@ -219,4 +284,22 @@ public class InventoryPage extends Page {
 		btnPrevPage.setEnabled(currentPage > 1);
 		btnNextPage.setEnabled(currentPage < totalPages);
 	}
+
+	private int getColumnIndex(String colName) {
+		for (int i = 0; i < columnNames.length; i++) {
+			if (columnNames[i].equals(colName))
+				return i;
+		}
+		return -1;
+	}
+	
+	public void resetFields() {
+	    warehouseCode.setText("");
+	    productCode.setText("");
+	    supplierName.setText("");
+	    warehouseName.setText("");
+	    productName.setText("");
+	    chooser.setDate(null);  // 날짜 초기화
+	}
+
 }
