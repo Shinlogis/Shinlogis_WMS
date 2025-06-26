@@ -35,7 +35,7 @@ public class OutboundDetailDAO {
 					+ " inner join io_receipt ir on id.io_receipt_id = ir.io_receipt_id"
 					+ " inner join snapshot s on id.snapshot_id = s.snapshot_id"	
 					+ " inner join damaged_code dc on id.damage_code_id = dc.damage_code_id"
-					+ " inner join headquarters_user hu on id.headquarters_user_id = hu.headquarters_user_id"
+					+ " inner join headquarters_user hu on ir.user_id = hu.headquarters_user_id"
 					+ " inner join warehouse w on id.warehouse_id = w.warehouse_id"
 					+ " inner join location l on ir.location_id = l.location_id"
 					+ " order by id.io_detail_id desc");
@@ -73,7 +73,7 @@ public class OutboundDetailDAO {
 				outboundDetail.setActualQuantity(rs.getInt("id.actual_quantity"));
 				
 				HeadquartersUser user = new HeadquartersUser();
-				user.setHeadquartersUserId(rs.getInt("id.headquarters_user_id"));
+				user.setHeadquartersUserId(rs.getInt("ir.user_id"));
 				outboundDetail.setUser(user);
 				
 				outboundDetail.setProccessedDate(rs.getDate("id.processed_date"));
