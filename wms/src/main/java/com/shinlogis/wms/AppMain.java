@@ -37,6 +37,7 @@ import com.shinlogis.wms.inoutbound.inbound.view.process.ProcessPage;
 import com.shinlogis.wms.inoutbound.inbound.view.receipt.ReceiptPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundDetailPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundReceiptPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundRegiterPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
@@ -45,7 +46,7 @@ import com.shinlogis.wms.main.view.MainPage;
 public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
-	JLabel la_outboundPlan, la_outboundDetail;
+	JLabel la_outboundPlan, la_outboundDetail, la_outboundRegister;
 	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat;
 	JLabel la_user, la_logout;
 	Page[] pages;
@@ -129,6 +130,7 @@ public class AppMain extends JFrame {
 			la_inboundProcess = createMenuItem("입고 처리", Config.INBOUND_PLAN_PAGE);
 			la_outboundPlan = createMenuItem("출고 예정", Config.INBOUND_ITEM_PAGE);
 			la_outboundDetail = createMenuItem("출고 상세", Config.INBOUND_ITEM_PAGE);
+			la_outboundRegister = createMenuItem("주문 조회 및 등록", Config.INBOUND_ITEM_PAGE);
 			la_product = createMenuItem("상품 관리", Config.PRODUCT_PAGE);
 			la_inventory = createMenuItem("재고 관리", Config.INVENTORY_PAGE);
 			la_stock = createMenuItem("창고 관리", Config.STOCK_PAGE);
@@ -136,11 +138,19 @@ public class AppMain extends JFrame {
 			la_supplier = createMenuItem("공급사 관리", Config.SUPPLIER_PAGE);
 			la_chat = createMenuItem("지점과 채팅하기", Config.CHATTING_PAGE);
 
+			//주문 조회 및 등록 연결 추가
+			la_outboundRegister.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.OUTBOUND_REGISTER_PAGE);
+				}
+			});
+			
 			//출고상세 이벤트 연결 추가
 			la_outboundDetail.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					showPage(Config.OUTBOUNT_PROCESS_PAGE);
+					showPage(Config.OUTBOUND_PROCESS_PAGE);
 				}
 			});
 			
@@ -192,7 +202,7 @@ public class AppMain extends JFrame {
 			});
 
 		} else if ("locationUser".equals(role)) {
-			la_order = createMenuItem("물품 신청", Config.OUTBOUNT_PROCESS_PAGE);
+			la_order = createMenuItem("물품 신청", Config.OUTBOUND_PROCESS_PAGE);
 			la_orderList = createMenuItem("발주내역 조회", Config.OUTBOUND_PLAN_PAGE);
 			la_location_chat = createMenuItem("본사와 채팅하기", Config.CHATTING_PAGE);
 			
@@ -268,7 +278,7 @@ public class AppMain extends JFrame {
 	private void addMenuGroups() {
 		if ("headquartersUser".equals(role)) {
 			p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
-			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail));
+			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail, la_outboundRegister));
 			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_stock));
 			p_west.add(createMenuGroup("지점관리", false, la_branch));
 			p_west.add(createMenuGroup("공급사관리", false, la_supplier));
@@ -344,7 +354,7 @@ public class AppMain extends JFrame {
 	public void createPage() {
 
 		if ("headquartersUser".equals(role)) {
-			pages = new Page[13];
+			pages = new Page[14];
 
 			pages[0] = new MainPage(this);
 			pages[1] = new ReceiptPage(this);
@@ -359,6 +369,7 @@ public class AppMain extends JFrame {
 			pages[10] = null;
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
+			pages[13] = new OutboundRegiterPage(this);
 
 		} else if ("locationUser".equals(role)) {
 			pages = new Page[3];
