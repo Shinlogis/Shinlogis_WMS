@@ -43,15 +43,16 @@ import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
 import com.shinlogis.wms.product.view.ProductPage;
+import com.shinlogis.wms.warehouse.view.WarehousePage;
 
 public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
-	JLabel la_outboundPlan, la_outboundDetail, la_outboundRegister;
-	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat;
-
+	JLabel la_outboundPlan, la_outboundDetail;
+	JLabel la_inventory, la_warehouse, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product,
+			la_location_chat;
 	JLabel la_user, la_logout;
-	Page[] pages;
+	public Page[] pages;
 
 	HeadquartersJoin memberJoin;
 	boolean login = false;
@@ -132,21 +133,13 @@ public class AppMain extends JFrame {
 			la_inboundProcess = createMenuItem("입고 처리", Config.INBOUND_PLAN_PAGE);
 			la_outboundPlan = createMenuItem("출고 예정", Config.INBOUND_ITEM_PAGE);
 			la_outboundDetail = createMenuItem("출고 상세", Config.INBOUND_ITEM_PAGE);
-			la_outboundRegister = createMenuItem("주문 조회 및 등록", Config.INBOUND_ITEM_PAGE);
 			la_product = createMenuItem("상품 관리", Config.PRODUCT_PAGE);
 			la_inventory = createMenuItem("재고 관리", Config.INVENTORY_PAGE);
-			la_stock = createMenuItem("창고 관리", Config.STOCK_PAGE);
+			la_warehouse = createMenuItem("창고 관리", Config.WAREHOUSE_PAGE);
 			la_branch = createMenuItem("지점 관리", Config.LOCATION_PAGE);
 			la_supplier = createMenuItem("공급사 관리", Config.SUPPLIER_PAGE);
 			la_chat = createMenuItem("지점과 채팅하기", Config.CHATTING_PAGE);
 
-			//주문 조회 및 등록 연결 추가
-			la_outboundRegister.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					showPage(Config.OUTBOUND_REGISTER_PAGE);
-				}
-			});
 			
 			la_outboundDetail.addMouseListener(new MouseAdapter() {
 				@Override
@@ -191,15 +184,32 @@ public class AppMain extends JFrame {
 			la_product.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					ProductPage proPage = (ProductPage) pages[Config.PRODUCT_PAGE];
+					proPage.resetFields(); // 여기서 초기화
+					proPage.btnSearch.doClick();
 					showPage(Config.PRODUCT_PAGE);
 				}
 			});
 
-			// 재고 페이지 연결
 			la_inventory.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					showPage(Config.INVENTORY_PAGE);
+					// pages 배열에서 InventoryPage 꺼내서 초기화
+					InventoryPage invPage = (InventoryPage) pages[Config.INVENTORY_PAGE];
+					invPage.resetFields(); // 여기서 초기화
+					invPage.btnSearch.doClick();
+					showPage(Config.INVENTORY_PAGE); // 그리고 화면 전환
+				}
+			});
+
+			// 창고 페이지 연결
+			la_warehouse.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					WarehousePage warePage = (WarehousePage) pages[Config.WAREHOUSE_PAGE];
+					warePage.resetFields(); // 여기서 초기화
+					warePage.btnSearch.doClick();
+					showPage(Config.WAREHOUSE_PAGE);
 				}
 			});
 
@@ -286,8 +296,9 @@ public class AppMain extends JFrame {
 	private void addMenuGroups() {
 		if ("headquartersUser".equals(role)) {
 			p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
-			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail, la_outboundRegister));
-			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_stock));
+			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail));
+			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_warehouse));
+
 			p_west.add(createMenuGroup("지점관리", false, la_branch));
 			p_west.add(createMenuGroup("공급사관리", false, la_supplier));
 			p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거
@@ -372,8 +383,8 @@ public class AppMain extends JFrame {
 			pages[5] = new OutboundDetailPage(this);
 			pages[6] = new ProductPage(this);
 			pages[7] = new InventoryPage(this);
-			pages[8] = null;
-			pages[8] = null;
+			pages[8] = new WarehousePage(this);
+			pages[9] = null;
 			pages[10] = null;
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
@@ -405,6 +416,7 @@ public class AppMain extends JFrame {
 			}
 		}
 	}
+
 }
 //    public static void main(String[] args) {
 //        new AppMain();
