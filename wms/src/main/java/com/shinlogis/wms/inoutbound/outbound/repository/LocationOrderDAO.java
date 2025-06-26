@@ -34,7 +34,7 @@ public class LocationOrderDAO {
 			while(rs.next()) {
 				StoreOrder order = new StoreOrder();
 				order.setStoreOrderId(rs.getInt("store_order_id"));
-				order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
+				//order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
 				order.setLocationId(rs.getInt("l.location_id"));
 				order.setTotalPrice(rs.getInt("total_price"));
 				

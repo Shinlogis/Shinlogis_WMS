@@ -192,9 +192,6 @@ public class OrderListPage extends Page{
         table.setGridColor(Color.LIGHT_GRAY); // 선 색상 설정
         table.setBorder(null); // JTable 자체 테두리 제거
 
-
-
-   
         // 첫 번째 열(Column 0 = 체크박스)
         table.getColumnModel().getColumn(0).setMinWidth(60);     // 최소 너비
         table.getColumnModel().getColumn(0).setMaxWidth(60);     // 최대 너비
