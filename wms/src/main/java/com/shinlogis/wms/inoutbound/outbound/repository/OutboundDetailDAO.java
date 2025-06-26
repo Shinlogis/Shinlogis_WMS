@@ -286,8 +286,11 @@ public class OutboundDetailDAO {
 		}
 		return totalCount;
 	}
-
-	// ResultSet에서 IODetail 객체 생성하는 공통 메서드
+	
+/**
+ * <h2>ResultSet에서 IODetail 객체 생성하는 공통 메서드
+ * @author 이세형
+ * */
 	private IODetail createIODetailFromResultSet(ResultSet rs) throws SQLException {
 		IODetail outboundDetail = new IODetail();
 		outboundDetail.setIoDetailId(rs.getInt("io_detail_id"));

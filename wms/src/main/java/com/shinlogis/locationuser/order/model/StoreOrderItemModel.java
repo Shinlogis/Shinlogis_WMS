@@ -1,9 +1,11 @@
-package com.shinlogis.wms.inoutbound.outbound.view;
+package com.shinlogis.locationuser.order.model;
 
 import javax.swing.table.AbstractTableModel;
 
-public class LocationOrderModel extends AbstractTableModel{
+import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 
+public class StoreOrderItemModel extends AbstractTableModel{
+	StoreOrderItemDAO storeOrderItemDAO;
 	
 	@Override
 	public int getRowCount() {
@@ -22,5 +24,5 @@ public class LocationOrderModel extends AbstractTableModel{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

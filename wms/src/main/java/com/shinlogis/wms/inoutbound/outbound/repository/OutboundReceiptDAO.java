@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
+import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.location.model.Location;
 
@@ -21,7 +22,8 @@ import com.shinlogis.wms.location.model.Location;
  */
 public class OutboundReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
-
+	//iodetail먹어서 안에 컬럼을 가져다가 인서트 할 무언가가 생기나,,?
+	IODetail outboundDetail;
 //	public OutBoundReceiptDAO(){}
 
 	/**
@@ -84,6 +86,7 @@ public class OutboundReceiptDAO {
 		return list;
 	}
 
+	
 	public void insertOutbound() {
 
 	}

@@ -8,6 +8,7 @@ public class StoreOrderItem {
 	
 	private int quantity;
 	private Product product;
+	
 	public int getItemId() {
 		return itemId;
 	}

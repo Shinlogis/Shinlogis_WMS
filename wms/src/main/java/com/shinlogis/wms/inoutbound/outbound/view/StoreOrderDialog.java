@@ -15,7 +15,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.shinlogis.locationuser.order.model.StoreOrderModel;
 
-public class LocationOrderDialog extends JDialog{
+public class StoreOrderDialog extends JDialog{
 	JPanel p_title;
 	JTable tb_regist;
 	JLabel la_title;
@@ -27,7 +27,7 @@ public class LocationOrderDialog extends JDialog{
 	//임시버튼임.**********
 	JButton bt_tempo;
 	
-	public LocationOrderDialog() {
+	public StoreOrderDialog() {
 		setLayout(new FlowLayout());
 		// 제목 서식.
 		la_title = new JLabel("지점 주문 조회");
@@ -55,7 +55,7 @@ public class LocationOrderDialog extends JDialog{
 		/*======나중에 상세보기 버튼이랑 교체할거임=========*/
 		bt_tempo = new JButton("상세조회 하기(추가필요)");
 		bt_tempo.addActionListener(e->{
-			new LocationOrderItemDialog();
+			new StoreOrderItemDialog();
 		});
 		bt_tempo.setPreferredSize(new Dimension(200, 40));
 		
