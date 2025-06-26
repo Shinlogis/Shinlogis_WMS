@@ -23,7 +23,7 @@ public class DetailModel extends AbstractTableModel {
 	
 	List<IODetail> inblundPlanItemList;
 	String[] column = { "입고예정ID", "입고예정상세ID", "상품코드", "상품명", "상태", "공급사명",
-			"수량", "입고예정일", "처리일", "입고처리", "수정"};
+			"수량", "입고예정일", "처리일", "입고", "수정"};
 
 	public DetailModel() {
 		// 전체 목록 로드
@@ -58,9 +58,14 @@ public class DetailModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// 편집 가능 컬럼들 반환 
-		return column == 10 || column == 9;
+		if (column == 9) { // "입고처리" 버튼 컬럼으로 변경
+			IODetail detail = inblundPlanItemList.get(row);
+			return detail != null && detail.isProcessable();
+		}
+		return column == 10; // 수정 컬럼
 	}
+
+
 
 	@Override
 	public int getRowCount() {
@@ -80,9 +85,7 @@ public class DetailModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		String value = null;
-		IODetail ioDetail = inblundPlanItemList.get(rowIndex); // 레코드 값 불러오기
-		
-		
+		IODetail ioDetail = inblundPlanItemList.get(rowIndex); // 레코드 값 불러오기		
 		switch (columnIndex) {
 			case 0:
 				return ioDetail.getIoReceipt().getIoReceiptId();
@@ -103,7 +106,11 @@ public class DetailModel extends AbstractTableModel {
 			case 8:
 				return ioDetail.getProccessedDate(); 
 			case 9:
-				return "입고처리";
+				if (ioDetail != null && ioDetail.isProcessable()) {
+					return "검수";
+				} else {
+					return "완료"; // 버튼 아닌 텍스트로 표시
+				}
 			case 10:
 				return "수정";
 

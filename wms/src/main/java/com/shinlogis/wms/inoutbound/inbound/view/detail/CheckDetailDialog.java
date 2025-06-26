@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,33 +17,33 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.shinlogis.wms.common.util.NumericTextFieldUtil;
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
+import com.shinlogis.wms.snapshot.model.Snapshot;
 import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 import com.shinlogis.wms.warehouse.model.Warehouse;
 import com.shinlogis.wms.warehouse.repository.WarehouseDAO;
 import com.toedter.calendar.JDateChooser;
 
 public class CheckDetailDialog extends JDialog {
-	private IODetail ioDetail;
-	private ProductDAO productDAO = new ProductDAO();
-	private SnapshotDAO snapshotDAO = new SnapshotDAO();
 	private DamagedCodeDAO damagedCodeDAO = new DamagedCodeDAO();
 	private WarehouseDAO warehouseDAO = new WarehouseDAO();
-
-	private String beforeProductCode;
-	private int beforeQuantity;
-	private String beforeStatus;
+	private DetailDAO detailDAO = new DetailDAO();
 
 	private JLabel laIOReceipt;
 	private JLabel laIODetail;
 	private JLabel laProductCode;
 	private JLabel laProductName;
+	private JLabel laProductType;
 	private JLabel laSupplierName;
 	private JLabel laPlannedQuantity;
 	private JComboBox<String> cbDamagedTypeCode;
 	private JTextField tfDamagedTypeCode;
+	private JTextField tfDamagedQuantity;
 	private JLabel laActualQuantity;
 	private JTextField tfWarehouseCode;
 	private JLabel laWarehouseName;
@@ -55,20 +56,22 @@ public class CheckDetailDialog extends JDialog {
 	private JButton btnSave;
 	private JButton btnCancel;
 
-	private List<Warehouse> warehouses; // 창고 검색 결과
+	private Warehouse warehouse; // 창고 검색 결과
 
 	public CheckDetailDialog(Frame owner, IODetail detail, DetailModel model) {
 		super(owner, "입고 검수", true);
+		Snapshot snapshot = detail.getProductSnapshot();
 
-		this.ioDetail = detail;
 		laIOReceipt = new JLabel(String.valueOf(detail.getIoReceipt().getIoReceiptId()));
 		laIODetail = new JLabel(String.valueOf(detail.getIoDetailId()));
 		laProductCode = new JLabel(detail.getProductSnapshot().getProductCode());
 		laProductName = new JLabel(detail.getProductSnapshot().getProductName());
+		laProductType = new JLabel(detail.getProductSnapshot().getStorageType().getTypeName());
 		laSupplierName = new JLabel(detail.getProductSnapshot().getSupplierName());
 		laPlannedQuantity = new JLabel(String.valueOf(detail.getPlannedQuantity()));
+		tfDamagedQuantity = new JTextField(10); 
 		tfDamagedTypeCode = new JTextField(10);
-
+		
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(10, 10, 10, 10);
@@ -93,6 +96,8 @@ public class CheckDetailDialog extends JDialog {
 		add(laProductCode, gbc);
 		gbc.gridx = 2;
 		add(laProductName, gbc);
+		gbc.gridx = 3;
+		add(laProductType, gbc);
 
 		gbc.gridy = 3;
 		gbc.gridx = 0;
@@ -109,18 +114,41 @@ public class CheckDetailDialog extends JDialog {
 		gbc.gridy = 5;
 		gbc.gridx = 0;
 		add(new JLabel("파손코드"), gbc);
-
-		List<String> names = damagedCodeDAO.selectAllNames();
+		gbc.gridx = 1;
 		cbDamagedTypeCode = new JComboBox<>();
+		// db 내 파손코드 종류 검색
+		List<String> names = damagedCodeDAO.selectAllNames();
 		for (String name : names) {
+			// db 내 파손코드 이름으로 콤보박스의 아이템을 추가
 			cbDamagedTypeCode.addItem(name);
 		}
-		gbc.gridx = 1;
 		add(cbDamagedTypeCode, gbc);
+		
 		gbc.gridx = 2;
 		add(new JLabel("파손수량"), gbc);
 		gbc.gridx = 3;
-		add(tfDamagedTypeCode, gbc);
+		add(tfDamagedQuantity, gbc);
+		NumericTextFieldUtil.applyNumericFilter(tfDamagedQuantity); // 숫자만 입력 가능한 텍스트필드로 설정
+		// "정상"을 선택하면 파손수량 컬럼은 0으로 수정 불가하게 고정
+		cbDamagedTypeCode.addItemListener(e -> {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				String selected = (String) cbDamagedTypeCode.getSelectedItem();
+				if ("정상".equals(selected)) {
+					tfDamagedQuantity.setEnabled(false);
+					tfDamagedQuantity.setText("0"); // 선택 시 값도 0으로 초기화 (선택)
+				} else {
+					tfDamagedQuantity.setEnabled(true);
+				}
+			}
+		});
+		// 파손코드의 초기값이 "정상"이므로, 파손수량 컬럼의 초기값을 0으로 수정 불가하게 고정
+		String initSelected = (String) cbDamagedTypeCode.getSelectedItem();
+		if ("정상".equals(initSelected)) {
+		    tfDamagedQuantity.setEnabled(false);
+		    tfDamagedQuantity.setText("0");
+		} else {
+		    tfDamagedQuantity.setEnabled(true);
+		}
 
 		// 저장창고 필드와 검색 버튼
 		gbc.gridy = 6;
@@ -132,6 +160,23 @@ public class CheckDetailDialog extends JDialog {
 		btnSearch = new JButton("검색");
 		gbc.gridx = 2;
 		add(btnSearch, gbc);
+		btnSearch.addActionListener(e -> {
+			// 검색한 저장창고
+			List<Warehouse> result = warehouseDAO.selectByCode(tfWarehouseCode.getText().trim());
+			if (!result.isEmpty()) {
+				// 상품과 저장창고의 보관타입이 동일한지 확인
+				warehouse = warehouseDAO.selectByCode(tfWarehouseCode.getText().trim().toString()).get(0);
+				if (snapshot.isStorageTypeMatched(snapshot, warehouse)) {
+					JOptionPane.showMessageDialog(this, "사용 가능한 창고입니다.");
+					laWarehouseName.setText(warehouse.getWarehouseName());
+					laWarehouseType.setText(warehouse.getStorageType().getTypeName());
+				} else {
+					JOptionPane.showMessageDialog(this, snapshot.getStorageType().getTypeName()+" 상품은 "+warehouse.getStorageType().getTypeName()+" 창고에 보관할 수 없습니다.");
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "존재하지 않는 창고입니다.");
+			}
+		});
 
 		gbc.gridy = 7;
 		gbc.gridx = 1;
@@ -140,17 +185,6 @@ public class CheckDetailDialog extends JDialog {
 		gbc.gridx = 2;
 		laWarehouseType = new JLabel();
 		add(laWarehouseType, gbc);
-
-		btnSearch.addActionListener(e -> {
-			warehouses = warehouseDAO.selectByCode(tfWarehouseCode.getText().trim().toString());
-			if (warehouses.size() > 0) {
-				JOptionPane.showMessageDialog(this, "사용 가능한 창고입니다.");
-				laWarehouseName.setText(warehouses.get(0).getWarehouseName());
-				laWarehouseType.setText(warehouses.get(0).getStorageType().getTypeName());
-			} else {
-				JOptionPane.showMessageDialog(this, "존재하지 않는 창고입니다.");
-			}
-		});
 
 		// 버튼
 		btnSave = new JButton("저장");
@@ -166,8 +200,12 @@ public class CheckDetailDialog extends JDialog {
 
 		// 저장 버튼
 		btnSave.addActionListener(e -> {
-
-			JOptionPane.showMessageDialog(this, "수정 완료");
+			int result = detailDAO.processInboundDetail(detail.getIoDetailId(), cbDamagedTypeCode.getSelectedIndex()+1, Integer.parseInt(tfDamagedQuantity.getText().trim()), Integer.parseInt(laPlannedQuantity.getText().toString()), warehouse.getWarehouseId());
+			if (result > 0) {
+				JOptionPane.showMessageDialog(this, "검수 완료");				
+			} else {
+				JOptionPane.showMessageDialog(this, "오류가 발생했습니다.");
+			}
 			dispose();
 			model.setData(Collections.emptyMap());
 		});
@@ -176,6 +214,7 @@ public class CheckDetailDialog extends JDialog {
 
 		setSize(530, 420);
 		setLocationRelativeTo(owner);
-
 	}
+	
+	
 }

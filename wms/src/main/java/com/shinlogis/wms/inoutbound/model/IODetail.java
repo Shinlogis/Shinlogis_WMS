@@ -25,7 +25,6 @@ public class IODetail {
 	private Date proccessedDate;
 	private String status;
 	private HeadquartersUser user;
-	
 	public int getIoDetailId() {
 		return ioDetailId;
 	}
@@ -92,5 +91,13 @@ public class IODetail {
 	public void setUser(HeadquartersUser user) {
 		this.user = user;
 	}
-	
+
+	/**
+	 * 입고처리가 가능한지를 반환
+	 * @return
+	 */
+	public boolean isProcessable() {
+	    return this.getIoReceipt() != null && this.getProccessedDate() == null;
+	}
+
 }

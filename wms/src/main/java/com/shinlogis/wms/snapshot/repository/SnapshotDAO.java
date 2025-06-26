@@ -45,7 +45,11 @@ public class SnapshotDAO {
 				snapshot.setSnapshotId(rs.getInt("snapshot_id"));
 				snapshot.setProductCode(rs.getString("product_code"));
 				snapshot.setProductName(rs.getString("product_name"));
-				snapshot.setStorageTypeCode(rs.getString("storage_type_code"));
+				
+				StorageType storageType = new StorageType();
+				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				snapshot.setStorageType(storageType);
+				
 				snapshot.setSupplierName(rs.getString("supplier_name"));
 				snapshot.setExpiryDate(rs.getDate("expiry_date"));
 				
@@ -83,7 +87,11 @@ public class SnapshotDAO {
 				snapshot.setSnapshotId(rs.getInt("snapshot_id"));
 				snapshot.setProductCode(rs.getString("product_code"));
 				snapshot.setProductName(rs.getString("product_name"));
-				snapshot.setStorageTypeCode(rs.getString("storage_type_code"));
+
+				StorageType storageType = new StorageType();
+				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				snapshot.setStorageType(storageType);
+				
 				snapshot.setSupplierName(rs.getString("supplier_name"));
 				snapshot.setExpiryDate(rs.getDate("expiry_date"));
 				}
