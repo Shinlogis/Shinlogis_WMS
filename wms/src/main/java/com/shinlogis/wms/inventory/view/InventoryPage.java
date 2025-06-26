@@ -36,7 +36,10 @@ public class InventoryPage extends Page {
 
 	private JPanel pSearch;
 	public JTextField warehouseCode;
-	private JTextField productCode, supplierName, warehouseName, productName;
+	public JTextField productCode;
+	private JTextField supplierName;
+	private JTextField warehouseName;
+	private JTextField productName;
 	private JDateChooser chooser;
 	public JButton btnSearch;
 
