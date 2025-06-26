@@ -1,11 +1,13 @@
 package com.shinlogis.locationuser.order.model;
 
+import com.shinlogis.wms.product.model.Product;
+
 public class StoreOrderItem {
 	private int itemId;
 	private int storeOrderId;
-	private int productId;
-	private int quantity;
 	
+	private int quantity;
+	private Product product;
 	public int getItemId() {
 		return itemId;
 	}
@@ -18,16 +20,19 @@ public class StoreOrderItem {
 	public void setStoreOrderId(int storeOrderId) {
 		this.storeOrderId = storeOrderId;
 	}
-	public int getProductId() {
-		return productId;
-	}
-	public void setProductId(int productId) {
-		this.productId = productId;
-	}
+	
 	public int getQuantity() {
 		return quantity;
 	}
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
+	public Product getProduct() {
+		return product;
+	}
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+	
+	
 }
