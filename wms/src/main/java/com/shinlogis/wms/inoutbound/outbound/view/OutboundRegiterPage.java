@@ -17,20 +17,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
-/**
- * 출고예정 페이지
- * 
- * @author 이세형
- */
-public class OutboundReceiptPage extends Page {
+public class OutboundRegiterPage extends Page {
 	/* ================= 페이지 목록 영역 ================ */
 	private JPanel p_pageTitle; // 페이지명 패널
 	private JLabel la_pageTitle; // 페이지명 담을 라벨
@@ -38,7 +31,7 @@ public class OutboundReceiptPage extends Page {
 	/* ================= 검색 영역 ================ */
 	private JPanel p_search; // 검색 Bar
 
-	private JTextField tf_outboundPlanId; // 출고예정ID
+	private JTextField tf_productId; // 상품ID
 	private JTextField tf_outboundProduct; // 출고품목
 	private JTextField tf_targetStore;// 출고지점
 	private JDateChooser ch_reservatedDate; // 출고예정일
@@ -49,24 +42,23 @@ public class OutboundReceiptPage extends Page {
 	/* ================= 목록 영역 ================ */
 	private JPanel p_tableNorth;//데이터 수 라벨, 조회, 등록버튼 패널
 	private JPanel buttonPanel;//버튼 두개 붙일 패널
-
+	private JPanel p_detail;
+	private JLabel la_detail;
+	
 	private JLabel la_counter;
-	private JButton bt_regist;// 출고예정 등록버튼
-	private JButton bt_checkOrder;// 출고신청 조회
-	private JTable tb_plan; // 출고예정 목록 테이블
+	private JTable tb_order; // 출고예정 목록 테이블
+	private JTable tb_detail; // 출고예정 목록 테이블
 	private JScrollPane sc_table;
+	private JScrollPane sc_detailTable;
 	private AbstractTableModel model;
 //	private InboundPlanItemModel inboundPlanItemModel;
 	private int count;
-	OutboundReceiptDAO outboundReceiptDAO;
 	
-	public OutboundReceiptPage(AppMain appMain) {
-		
-		super(appMain);
-		outboundReceiptDAO = new OutboundReceiptDAO();
+	public OutboundRegiterPage(AppMain app) {
+		super(app);
 		/* ===================제목 영역================= */
 		p_pageTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		la_pageTitle = new JLabel("출고관리 > 출고예정");
+		la_pageTitle = new JLabel("출고관리 > 주문 조회 및 등록");
 
 		// 제목영역 디자인
 		p_pageTitle.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
@@ -85,15 +77,15 @@ public class OutboundReceiptPage extends Page {
 		// 출고예정ID
 		gbcSearch.gridx = 0; // (0,0)
 		gbcSearch.gridy = 0; // (0,0)
-		p_search.add(new JLabel("출고예정ID"), gbcSearch);
+		p_search.add(new JLabel("상품ID"), gbcSearch);
 
-		tf_outboundPlanId = new JTextField(10);
+		tf_productId = new JTextField(10);
 		gbcSearch.gridx = 1; // (1,0)
-		p_search.add(tf_outboundPlanId, gbcSearch);
+		p_search.add(tf_productId, gbcSearch);
 
 		// 출고품목
 		gbcSearch.gridx = 2;// (2,0)
-		p_search.add(new JLabel("출고품목"), gbcSearch);
+		p_search.add(new JLabel("상품명"), gbcSearch);
 
 		tf_outboundProduct = new JTextField(10);
 		gbcSearch.gridx = 3; // (3,0)
@@ -123,7 +115,7 @@ public class OutboundReceiptPage extends Page {
 		gbcSearch.gridx = 0;// (0,1)
 		p_search.add(new JLabel("상태"), gbcSearch);
 
-		cb_status = new JComboBox<>(new String[] { "전체", "예정", "진행 중", "완료", "보류" });
+		cb_status = new JComboBox<>(new String[] {"전체", "예정", "완료"});
 		gbcSearch.gridx = 1;// (1,1)
 		p_search.add(cb_status, gbcSearch);
 
@@ -140,23 +132,8 @@ public class OutboundReceiptPage extends Page {
 		// 검색버튼
 		bt_search = new JButton("검색");
 		bt_search.addActionListener(e -> {
-		    String id = tf_outboundPlanId.getText().trim();
-		    String product = tf_outboundProduct.getText().trim();
-		    String store = tf_targetStore.getText().trim();
-		    java.util.Date schedDate = ch_reservatedDate.getDate();
-		    java.util.Date regDate = ch_registeredDate.getDate();
-		    String selectedStatus = (String) cb_status.getSelectedItem();
-
-		    // 테이블 모델 갱신
-		    model = new OutboundReceiptModel(id, product, store, schedDate, regDate, selectedStatus);
-		    tb_plan.setModel(model);
-
-		    // 검색결과 수 갱신
-		    int searchCount = outboundReceiptDAO.countByCondition(id, product, store, schedDate, regDate, selectedStatus);
-		    la_counter.setText("총 " + searchCount + "개의 출고예정 검색");
+			System.out.println("주문내역 검색버튼을 눌렀습니다. 예정을 검색하는 쿼리문이 실행될 것입니다.");
 		});
-
-
 		gbcSearch.gridx = 8;// (7,1)
 		p_search.add(bt_search, gbcSearch);
 		
@@ -171,7 +148,7 @@ public class OutboundReceiptPage extends Page {
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
 		
 		//count 변수에 출고예정을 담아줌
-		count = outboundReceiptDAO.countTotal();
+//		count = outboundReceiptDAO.countTotal();
 		la_counter = new JLabel("총 "+count+"개의 출고예정 검색");
 		gbcTableNorth.gridx = 0;
 		gbcTableNorth.gridy = 0;
@@ -180,16 +157,38 @@ public class OutboundReceiptPage extends Page {
 		gbcTableNorth.insets = new Insets(0, 10, 0, 10); // 좌우 여백
 		p_tableNorth.add(la_counter, gbcTableNorth);
 		
+
 		
 		/* ===================테이블 영역================= */
 		
 		//테이블 디자인
-		tb_plan = new JTable(model = new OutboundReceiptModel());
-		tb_plan.setRowHeight(45);
+		tb_order = new JTable(model = new OutboundReceiptModel());
+		tb_order.setRowHeight(30);
 		 
-		sc_table= new JScrollPane(tb_plan);
-		sc_table.setPreferredSize(new Dimension(1150,660));
+		sc_table= new JScrollPane(tb_order);
+		sc_table.setPreferredSize(new Dimension(1150,300));
 		
+		GridBagConstraints gbcDetailTable = new GridBagConstraints();
+		
+		p_detail = new JPanel(new GridBagLayout());
+		p_detail.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
+		
+		la_detail = new JLabel("상세보기");
+		gbcDetailTable.gridx = 0;
+		gbcDetailTable.gridy = 0;
+		gbcDetailTable.weightx = 1.0; // 남는 공간 차지
+		gbcDetailTable.anchor = GridBagConstraints.WEST;
+		gbcDetailTable.insets = new Insets(0, 10, 0, 10); // 좌우 여백
+		p_detail.add(la_detail, gbcDetailTable);
+		
+		
+		
+		//상세보기 페이지
+		tb_detail = new JTable(model = new OutboundDetailModel());
+		tb_detail.setRowHeight(30);
+		
+		sc_detailTable= new JScrollPane(tb_order);
+		sc_detailTable.setPreferredSize(new Dimension(1150,300));
 		// 테이블(컨텐트영역) 디자인
 
 //		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
@@ -204,8 +203,11 @@ public class OutboundReceiptPage extends Page {
 		add(p_tableNorth);
 //		add(tb_plan);
 		add(sc_table);
+		add(p_detail);
+		add(sc_detailTable);
 //		add(p_table);
 
+		
 	}
 
 }

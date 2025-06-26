@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.product.model.Product;

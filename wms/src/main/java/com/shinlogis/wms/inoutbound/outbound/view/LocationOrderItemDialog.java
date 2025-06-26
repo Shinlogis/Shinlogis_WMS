@@ -1,10 +1,8 @@
 package com.shinlogis.wms.inoutbound.outbound.view;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -14,9 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import com.shinlogis.locationuser.order.model.StoreOrderModel;
-
-public class OutboundRegisterDialog extends JDialog {
+public class LocationOrderItemDialog extends JDialog{
 	JPanel p_title;
 	JTable tb_regist;
 	JLabel la_title;
@@ -25,18 +21,21 @@ public class OutboundRegisterDialog extends JDialog {
 	AbstractTableModel model;
 	JButton bt_close;
 	
+	//임시버튼임.**********
+	JButton bt_tempo;
 	
-	public OutboundRegisterDialog() {
+	public LocationOrderItemDialog() {
 		setLayout(new FlowLayout());
 		// 제목 서식.
-		la_title = new JLabel("출고등록");
+		la_title = new JLabel("지점 주문 상세 조회");
 		p_title = new JPanel();
 		p_title.add(la_title);
 		p_title.setPreferredSize(new Dimension(700,100));
 		p_title.setBackground(new Color(0xFF7F50));
 		
+		
 		//본문서식
-		model = new StoreOrderModel();
+		model = new LocationOrderItemModel();
 		tb_table= new JTable(model);
 		tb_table.setRowHeight(45);
 		sc_table = new JScrollPane(tb_table);
@@ -49,13 +48,13 @@ public class OutboundRegisterDialog extends JDialog {
 		});
 		bt_close.setPreferredSize(new Dimension(100, 40));
 		
+		
 		add(p_title);
 		add(sc_table);
 		add(bt_close);
-		setTitle("출고 등록 하기");		
-		setBounds(300, 200, 0, 0);
+		setTitle("지점 주문 상세 조회");		
+		setBounds(1000, 200, 0, 0);
 		setSize(new Dimension(700, 800));
 		setVisible(true);
 	}
-
 }
