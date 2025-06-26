@@ -48,7 +48,7 @@ public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
 	JLabel la_inboundPlan, la_inboundDetail, la_inboundProcess;
 	JLabel la_outboundPlan, la_outboundDetail, la_outboundRegister;
-	JLabel la_inventory, la_stock, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat;
+	JLabel la_inventory, la_warehouse, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat;
 
 	JLabel la_user, la_logout;
 	Page[] pages;
@@ -287,7 +287,7 @@ public class AppMain extends JFrame {
 		if ("headquartersUser".equals(role)) {
 			p_west.add(createMenuGroup("입고관리", false, la_inboundPlan, la_inboundDetail, la_inboundProcess));
 			p_west.add(createMenuGroup("출고관리", false, la_outboundPlan, la_outboundDetail, la_outboundRegister));
-			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_stock));
+			p_west.add(createMenuGroup("재고관리", false, la_product, la_inventory, la_warehouse))
 			p_west.add(createMenuGroup("지점관리", false, la_branch));
 			p_west.add(createMenuGroup("공급사관리", false, la_supplier));
 			p_west.add(createMenuGroup("채팅", true, la_chat)); // 마지막만 하단 흰 줄 제거
