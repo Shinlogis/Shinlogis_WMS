@@ -59,7 +59,12 @@ public class ButtonEditor extends DefaultCellEditor {
     @Override
     public Object getCellEditorValue() {
         if (clicked && listener != null) {
-            listener.onClick(table, row, table.getEditingColumn());
+            // 유효한 행(row)인지 검사
+            if (table != null && row >= 0 && row < table.getRowCount()) {
+                listener.onClick(table, row, table.getEditingColumn());
+            } else {
+                System.out.println("ButtonEditor: Invalid row index - " + row);
+            }
         }
         clicked = false;
         return label;
