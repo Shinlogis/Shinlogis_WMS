@@ -41,12 +41,19 @@ public class DBManager {
 	}
 
 	public Connection getConnection() {
+		try {
+			if (conn == null || conn.isClosed()) {
+				conn = DriverManager.getConnection(Config.url, Config.id, Config.password);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return conn;
 	}
-	
-	//데이터베이스 관련된 자원을 해체하는 메서드
+
+	// 데이터베이스 관련된 자원을 해체하는 메서드
 	public void release(Connection conn) {
-		if(conn != null) {
+		if (conn != null) {
 			try {
 				conn.close();
 			} catch (SQLException e1) {
