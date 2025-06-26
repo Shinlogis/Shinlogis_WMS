@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import javax.swing.SwingUtilities;
+
+import com.google.gson.Gson;
 import com.shinlogis.wms.chat.view.ChattingPage;
 
 public class HeadClientThread extends Thread{
@@ -15,10 +18,13 @@ public class HeadClientThread extends Thread{
 	Socket socket;
 	BufferedReader buffr;
 	BufferedWriter buffw;
+	public Message message;
+	public HeadChat headChat;
 	
-	public HeadClientThread(ChattingPage chattingPage, Socket socket) {
+	public HeadClientThread(ChattingPage chattingPage, Socket socket, Message message) {
 		this.chattingPage = chattingPage;
 		this.socket = socket;
+		this.message = message;
 		
 		try {
 			buffr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -35,6 +41,24 @@ public class HeadClientThread extends Thread{
 		
 		try {
 			msg = buffr.readLine();
+			//headChat.area.append(msg + "\n");
+			//프로토콜 분석 
+			//내가 지점인 걸 알리기
+			Gson gson = new Gson();
+			Message obj = gson.fromJson(msg, Message.class);
+			
+			if(obj.getRequestType().equals("chat")) {
+				if(obj.getMe().equals("head")) {
+					SwingUtilities.invokeLater(() -> {
+						headChat.addOtherMessage(obj.getMsg()); //우측 정렬 
+						//headChat.addMyMessage(obj.getMsg()); //우측 정렬 
+					});	
+				}else {
+					SwingUtilities.invokeLater(() -> {
+						headChat.addOtherMessage(obj.getMsg()); // 💬 왼쪽 정렬
+					});						
+				}
+			}
 			
 		} catch (IOException e) {
 			e.printStackTrace();

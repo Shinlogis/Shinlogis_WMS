@@ -27,7 +27,10 @@ CREATE TABLE headquarters_user (
     headquarters_user_id INT AUTO_INCREMENT PRIMARY KEY,
     id VARCHAR(100) NOT NULL UNIQUE,
     pw VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE
+    email VARCHAR(100) NOT NULL UNIQUE, 
+    status VARCHAR(10) NOT NULL DEFAULT '활성',
+    CHECK (status IN ('활성', '탈퇴'))
+    
 );
 
 -- [지점 소속 사용자 테이블]
@@ -37,14 +40,18 @@ CREATE TABLE location_user (
     pw VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     location_id INT NOT NULL,
-    FOREIGN KEY (location_id) REFERENCES location(location_id)
+    FOREIGN KEY (location_id) REFERENCES location(location_id),
+    status VARCHAR(10) NOT NULL DEFAULT '활성',
+    CHECK (status IN ('활성', '탈퇴'))
 );
 
 -- [공급사 정보 테이블]
 CREATE TABLE supplier (
     supplier_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
-    address VARCHAR(100)
+    address VARCHAR(100),
+    status VARCHAR(10) NOT NULL DEFAULT '활성',
+    CHECK (status IN ('활성', '비활성'))
 );
 
 -- [보관 유형 테이블]

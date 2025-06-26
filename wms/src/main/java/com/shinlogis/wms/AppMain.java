@@ -42,6 +42,7 @@ import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
+import com.shinlogis.wms.supplier.view.SupplierPage;
 
 public class AppMain extends JFrame {
 	JPanel p_west, p_center, p_north, p_content;
@@ -189,11 +190,19 @@ public class AppMain extends JFrame {
 				}
 			});
 			
+			//공급사 페이지
+			la_supplier.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.SUPPLIER_PAGE);
+				}
+			});
 			
+			//채팅 페이지
 			la_chat.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if(headquartersUser.getId().equals("a")) {
+					if(headquartersUser.getId().equals("yujin")) {
 						showPage(Config.CHATTING_PAGE);
 						ChattingPage chattingPage = (ChattingPage)pages[Config.CHATTING_PAGE];
 						chattingPage.createConnection();
@@ -226,10 +235,11 @@ public class AppMain extends JFrame {
 				}
 			});
 			
+			//채팅 페이지
 			la_location_chat.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					new LocationChat(AppMain.this);
+					new LocationChat(AppMain.this, locationUser.getLocation());
 					
 				}
 			});
@@ -379,7 +389,7 @@ public class AppMain extends JFrame {
 			pages[7] = new InventoryPage(this);
 			pages[8] = null;
 			pages[8] = null;
-			pages[10] = null;
+			pages[10] = new SupplierPage(this);
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 

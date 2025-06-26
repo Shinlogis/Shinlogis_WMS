@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.HeadlessException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,7 +19,9 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.Member.view.MemberLogin;
 import com.shinlogis.wms.common.Exception.HeadquartersException;
+import com.shinlogis.wms.common.Exception.LocationException;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
@@ -49,6 +52,7 @@ public class LocatoinMyPage extends Page {
 	JComboBox cb_email;
 
 	JButton bt_update;
+	JButton bt_delete;
 
 	DBManager dbManager = DBManager.getInstance();
 	private LocationUser locationUser;
@@ -85,6 +89,7 @@ public class LocatoinMyPage extends Page {
 		cb_email = new JComboBox();
 
 		bt_update = new JButton("수정");
+		bt_delete = new JButton("탈퇴");
 
 		locationUserDAO = new LocationUserDAO();
 
@@ -96,6 +101,7 @@ public class LocatoinMyPage extends Page {
 		la_update.setHorizontalAlignment(JLabel.CENTER);
 		la_update.setFont(new Font("맑은고딕", Font.BOLD, 24));
 		bt_update.setPreferredSize(new Dimension(80, 50));
+		bt_delete.setPreferredSize(new Dimension(80, 50));
 
 		// 조립
 		pPageName.add(laPageName);
@@ -107,7 +113,7 @@ public class LocatoinMyPage extends Page {
 		p_center.add(createLine(la_pwd, t_pwd));
 		p_center.add(createLine(la_pwdCheck, t_pwdCheck));
 		p_center.add(createEmailLine(la_email, t_email, la_at, cb_email));
-		p_center.add(createCenterLine(bt_update));
+		p_center.add(createButtonLine(bt_update, bt_delete));
 		add(p_center);
 
 		// 이벤트
@@ -115,6 +121,11 @@ public class LocatoinMyPage extends Page {
 		bt_update.addActionListener(e -> {
 			updateMyInfo();
 
+		});
+		
+		//탈퇴 버튼
+		bt_delete.addActionListener(e -> {
+			deleteMyInfo();
 		});
 
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
@@ -170,6 +181,18 @@ public class LocatoinMyPage extends Page {
 		return panel;
 	}
 
+	// 버튼 수정, 탈퇴
+	public JPanel createButtonLine(JButton bt1, JButton bt2) {
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 1));
+		panel.setPreferredSize(new Dimension(400, 40)); // 높이 약간 더 확보
+		panel.setOpaque(false);
+		panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // 위쪽 여백
+
+		panel.add(bt1);
+		panel.add(bt2);
+		return panel;
+	}
+
 	// 마이페이지 정보 보기
 	public void showMyInfo() {
 		locationUser = locationUserDAO.selectById(pk);
@@ -214,5 +237,24 @@ public class LocatoinMyPage extends Page {
 		}
 
 	}
+	
+	
+	//탈퇴
+	public void deleteMyInfo() {
+		try {
+			locationUserDAO.delete(locationUser);
+			JOptionPane.showMessageDialog(this, "회원 탈퇴 완료");
+			
+			locationUser = null;
+			new MemberLogin();
+		} catch (HeadlessException e) {
+			e.printStackTrace();
+			throw new LocationException(e.getMessage());
+		}
+	}
+	
+	
+	
+	
 
 }

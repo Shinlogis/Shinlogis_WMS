@@ -5,9 +5,17 @@ public class LocationUser {
     private String id;
     private String pw;
     private String email;
+    private String status;
     private Location location;
     
+    
 	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public int getLocationUserId() {
 		return locationUserId;
 	}

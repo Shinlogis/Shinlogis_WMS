@@ -3,6 +3,10 @@ package com.shinlogis.wms.chat.client.location;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -13,12 +17,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 import com.google.gson.Gson;
 import com.shinlogis.wms.AppMain;
-import com.shinlogis.wms.common.util.Message;
-import com.shinlogis.wms.headquarters.model.HeadquartersUser;
-import com.shinlogis.wms.location.model.LocationUser;
+import com.shinlogis.wms.chat.client.head.Message;
+import com.shinlogis.wms.location.model.Location;
 
 public class LocationChat extends JFrame{
 
@@ -27,22 +33,31 @@ public class LocationChat extends JFrame{
 	JTextField t_port;
 	JButton bt;
 
-	JTextArea area;
+	JTextPane area;
+	//JTextArea area;
 	JScrollPane scroll;
 	JTextField t_input;
 
 	JPanel p_south;
 	AppMain appMain;
+	
+	Location location;
+	LocationClientThread locationClientThread;
 
-	public LocationChat(AppMain appMain) {
+	public LocationChat(AppMain appMain, Location location) {
 		this.appMain = appMain;
+		this.location = location;
 		
 		p_north = new JPanel();
-		t_ip = new JTextField("192.168.60.12");
+		t_ip = new JTextField("192.168.60.18");
 		t_port = new JTextField("9999");
-		bt = new JButton("채팅하기");
+		bt = new JButton("접속하기");
 		
-		area = new JTextArea();
+		area = new JTextPane(); // 💡 여기 변경됨
+		area.setEditable(false);
+		area.setContentType("text/html"); // HTML 사용 가능하게 설정
+		area.setText("<html><body></body></html>"); // 초기화
+		//area = new JTextArea();
 		scroll = new JScrollPane(area);
 		t_input = new JTextField();
 		
@@ -71,11 +86,54 @@ public class LocationChat extends JFrame{
 		
 		bt.addActionListener(e->{
 			createConnection();
+			
+		});
+		
+		t_input.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String text = t_input.getText().trim();
+					if (!text.isEmpty()) {
+						addMyMessage(text); // 오른쪽 정렬로 추가
+						t_input.setText("");
+						
+					Message message = new Message();
+					//메세지 만들기
+					message.setRequestType("chat");
+					message.setMe("location");
+					message.setTarget(location);
+					message.setMsg(t_input.getText());
+					t_input.setText("");
+					
+					Gson gson = new Gson();
+					String result = gson.toJson(message);
+					
+					locationClientThread.send(result);
+					t_input.setText("");
+					}
+				}
+			}
+		});
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				Message message = new Message();
+				//메세지 만들기
+				message.setRequestType("eixt");
+				message.setMe("location");
+				message.setTarget(location);
+				
+				Gson gson = new Gson();
+				String result = gson.toJson(message);
+				
+				locationClientThread.send(result);
+			}
 		});
 		
 		setBounds(600,200,400,500);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
 		
 		
 	}
@@ -84,15 +142,14 @@ public class LocationChat extends JFrame{
 	public void createConnection() {
 		try {
 			Socket socket = new Socket(t_ip.getText(), Integer.parseInt(t_port.getText()));
-			LocationClientThread locationClientThread = new LocationClientThread(this, socket);
+			locationClientThread = new LocationClientThread(this, socket);
 			locationClientThread.start();
 			
 			//내가 지점인 걸 알리기
 			Message message = new Message();
-			message.setRequestType("user");
-			message.setFrom("location");
-			message.setTo("head");
-			message.setContent(Integer.toString(appMain.locationUser.getLocationUserId()));
+			message.setRequestType("init");
+			message.setMe("location");
+			message.setTarget(appMain.locationUser.getLocation());
 			
 			Gson gson = new Gson();
 			String result = gson.toJson(message);
@@ -112,10 +169,33 @@ public class LocationChat extends JFrame{
 		
 	}
 	
+	// 오른쪽 정렬로 내가 보낸 메시지 출력
+    public void addMyMessage(String msg) {
+        appendMessage("<div style='text-align: right; color: black;'>" + escapeHtml(msg) + "</div>");
+    }
 
-//	public static void main(String[] args) {
-//		new Client();
-//
-//	}
+    // 왼쪽 정렬로 상대방 메시지 출력
+    public void addOtherMessage(String msg) {
+        appendMessage("<div style='text-align: left; color: black;'>" + escapeHtml(msg) + "</div>");
+    }
+    
+ // HTML 메시지를 area에 추가
+    private void appendMessage(String html) {
+        try {
+            HTMLEditorKit kit = (HTMLEditorKit) area.getEditorKit();
+            HTMLDocument doc = (HTMLDocument) area.getDocument();
+            kit.insertHTML(doc, doc.getLength(), html, 0, 0, null);
+            area.setCaretPosition(doc.getLength()); // 스크롤 아래로
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 특수문자 이스케이프 처리
+    private String escapeHtml(String text) {
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+	
+
 
 }

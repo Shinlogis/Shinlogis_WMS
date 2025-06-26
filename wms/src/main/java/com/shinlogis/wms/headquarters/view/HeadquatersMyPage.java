@@ -106,6 +106,7 @@ public class HeadquatersMyPage extends Page {
 		la_update.setHorizontalAlignment(JLabel.CENTER);
 		la_update.setFont(new Font("맑은고딕", Font.BOLD, 24));
 		bt_update.setPreferredSize(new Dimension(80, 50));
+		bt_delete.setPreferredSize(new Dimension(80, 50));
 
 		// 조립
 		pPageName.add(laPageName);
@@ -125,6 +126,11 @@ public class HeadquatersMyPage extends Page {
 		bt_update.addActionListener(e -> {
 			updateMyInfo();
 
+		});
+		
+		//탈퇴 버튼 
+		bt_delete.addActionListener(e ->{
+			deleteMyInfo();
 		});
 
 		setBounds(200, 100, Config.ADMINMAIN_WIDTH, Config.ADMINMAIN_HEIGHT);
@@ -205,7 +211,7 @@ public class HeadquatersMyPage extends Page {
 	}
 
 	// 수정
-	public void updateMyInfo() throws HeadquartersException {
+	public void updateMyInfo(){
 		String pw = new String(t_pwd.getPassword());
 		String pwCheck = new String(t_pwdCheck.getPassword());
 		String email = t_email.getText().trim() + "@" + ((String) cb_email.getSelectedItem()).trim();
@@ -237,5 +243,22 @@ public class HeadquatersMyPage extends Page {
 		}
 
 	}
+	
+	
+	//탈퇴 
+	public void deleteMyInfo() {
+		try {
+			headquartersDAO.delete(headquartersUser);
+			JOptionPane.showMessageDialog(this, "회원 탈퇴 완료");
+			
+			headquartersUser = null;
+			new MemberLogin();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new HeadquartersException(e.getMessage());
+		}
+	}
 
+	
+	
 }

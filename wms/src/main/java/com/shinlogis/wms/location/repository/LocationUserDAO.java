@@ -252,7 +252,7 @@ public class LocationUserDAO {
 		con = dbManager.getConnection();
 		StringBuffer sql = new StringBuffer();
 		sql.append("select * from location_user lu inner join location l");
-		sql.append(" on lu.location_id = l.location_id where id = ? and pw = ? and lu.field = '활성'");
+		sql.append(" on lu.location_id = l.location_id where id = ? and pw = ? and lu.status = '활성'");
 
 		try {
 			String securedPass = StringUtil.getSecuredPass(locationUser.getPw()); // 암호화된 비밀번호 꺼내기
@@ -285,7 +285,7 @@ public class LocationUserDAO {
 			dbManager.release(pstmt, rs);
 		}
 		return user;
- 
+
 	}
 
 	// 회원 1명 정보
@@ -354,6 +354,34 @@ public class LocationUserDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new LocationException("비밀번호 변경 시 문제 발생", e);
+		} finally {
+			dbManager.release(pstmt);
+		}
+
+	}
+
+	// 탈퇴하기
+	public void delete(LocationUser locationUser) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		int result = 0;
+
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("update location_user set status = '탈퇴' where location_user_id = ?");
+
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setInt(1, locationUser.getLocationUserId());
+			result = pstmt.executeUpdate();
+
+			if (result < 1) {
+				throw new HeadquartersException("회원탈퇴에 실패했습니다.");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new HeadquartersException("회원 탈퇴 시 문제 발생", e);
 		} finally {
 			dbManager.release(pstmt);
 		}
