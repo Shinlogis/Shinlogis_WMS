@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
 import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
