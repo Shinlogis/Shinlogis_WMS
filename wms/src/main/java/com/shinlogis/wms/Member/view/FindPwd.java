@@ -162,13 +162,13 @@ public class FindPwd extends JFrame {
 
 		} catch (HeadquartersException e) {
 			e.printStackTrace();
-			throw new HeadquartersException(e.getMessage(), e);
+			JOptionPane.showInternalMessageDialog(this, e.getMessage());
 		} catch (EmailException e) {
 			e.printStackTrace();
-			throw new EmailException(e.getMessage(), e);
+			JOptionPane.showInternalMessageDialog(this, e.getMessage());
 		} catch (LocationException e) {
 			e.printStackTrace();
-			throw new LocationException(e.getMessage(), e);
+			JOptionPane.showInternalMessageDialog(this, e.getMessage());
 		}
 
 	}

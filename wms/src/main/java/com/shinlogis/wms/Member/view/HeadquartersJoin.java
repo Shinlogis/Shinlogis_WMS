@@ -184,7 +184,7 @@ public class HeadquartersJoin extends JFrame{
 			
 		} catch (HeadquartersException e) {
 			e.printStackTrace();
-			throw new HeadquartersException(e.getMessage(), e);
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 		
 	}

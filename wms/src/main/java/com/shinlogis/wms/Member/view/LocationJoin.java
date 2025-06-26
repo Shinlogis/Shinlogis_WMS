@@ -227,7 +227,7 @@ public class LocationJoin extends JFrame{
 			
 		} catch (HeadquartersException e) {
 			e.printStackTrace();
-			throw new LocationException(e.getMessage(), e);
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 		
 	}

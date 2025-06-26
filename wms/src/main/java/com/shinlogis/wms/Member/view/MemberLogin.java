@@ -175,7 +175,8 @@ public class MemberLogin extends JFrame{
 	public JPanel createLine(JLabel label, JTextField field) {
 		JPanel panel = new JPanel();
 		panel.setOpaque(false);
-		label.setPreferredSize(new Dimension(80, 30));  // 라벨 고정 폭			field.setPreferredSize(new Dimension(180, 30)); // 필드 고정 폭
+		label.setPreferredSize(new Dimension(80, 30));  // 라벨 고정 폭			
+		field.setPreferredSize(new Dimension(180, 30)); // 필드 고정 폭
 		panel.add(label);	
 		panel.add(field);
 		return panel;
@@ -246,8 +247,8 @@ public class MemberLogin extends JFrame{
 	public void locationUserLogin() {
 		
 		LocationUser user = new LocationUser();
-		user.setId("admin");
-		user.setPw("1234");
+		user.setId(t_id.getText());
+		user.setPw(new String(t_pwd.getPassword()));
 		
 		locationUser = locationUserDAO.Login(user);
 		

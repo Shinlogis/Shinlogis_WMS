@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
@@ -41,7 +43,6 @@ public class SupplierPage extends Page{
 	private JButton bt_add;
 	private JButton bt_delete;
 	
-	private String[] columnNames = { "번호", "지점명", "주소"};
 
 	public SupplierPage(AppMain appMain) {
 		super(appMain);
@@ -87,8 +88,19 @@ public class SupplierPage extends Page{
 		
 		table = new JTable(model);
 		table.setRowHeight(45);
+		// 컬럼 너비 조정
+		table.getColumnModel().getColumn(0).setPreferredWidth(40);  // 체크박스 (선택)
+		table.getColumnModel().getColumn(1).setPreferredWidth(60);  // 번호
+		table.getColumnModel().getColumn(2).setPreferredWidth(200); // 공급사명
+		table.getColumnModel().getColumn(3).setPreferredWidth(400); // 주소
+
 		table.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 45));
 		table.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
+		
+		//번호 왼쪽 정렬(이거 안하면 오른쪽 정렬 됨)
+		DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+		leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+		table.getColumnModel().getColumn(1).setCellRenderer(leftRenderer); // 번호 열 = 인덱스 1
 
 		
 		scroll = new JScrollPane(table);
@@ -111,9 +123,6 @@ public class SupplierPage extends Page{
 		p_table.add(scroll); // 660
 		//pTable.add(pPaging); // 40
 
-
-
-		
 		//스타일
 		setBackground(Color.LIGHT_GRAY);
 
@@ -123,5 +132,16 @@ public class SupplierPage extends Page{
 		add(p_search); 
 		add(p_table);
 		
+		//이벤트
+		//공급사 추가 
+		bt_add.addActionListener(e->{
+			new AddSupplierDialog(appMain, model);
+		});
+		
 	}
+	
+	
+	
+	
+	
 }

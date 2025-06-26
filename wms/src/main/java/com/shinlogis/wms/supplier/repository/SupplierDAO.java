@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shinlogis.wms.common.Exception.SupplierException;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.supplier.model.Supplier;
 
@@ -45,6 +46,35 @@ public class SupplierDAO {
 		}
 		
 		return list;
+	}
+	
+	//공급사 추가
+	public void insert(Supplier supplier) throws SupplierException{
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("insert into supplier (name, address)values(?,?)");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, supplier.getName());
+			pstmt.setString(2, supplier.getAddress());
+			
+			int result = pstmt.executeUpdate();
+			
+			if(result <1) {
+				throw new SupplierException("공급사 추가에 실패했습니다.");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SupplierException("공급사 추가 중 문제 발생", e);
+		}finally {
+			dbManager.release(pstmt);
+		}
+		
 	}
 
 }

@@ -126,10 +126,10 @@ public class FindId extends JFrame{
 			String locationUsersId = locationUserDAO.findIdByEmail(t_email.getText() + "@" + (String)cb_email.getSelectedItem());
 			
 			if(headquartersId != null) {
-				new UploadDialog(this, headquartersId);
+				new FindIdDialog(this, headquartersId);
 				
 			}else if(locationUsersId != null) {
-				new UploadDialog(this, locationUsersId);
+				new FindIdDialog(this, locationUsersId);
 			} else {
 				JOptionPane.showMessageDialog(this, "해당 이메일로 등록된 아이디가 없습니다.");
 			}
