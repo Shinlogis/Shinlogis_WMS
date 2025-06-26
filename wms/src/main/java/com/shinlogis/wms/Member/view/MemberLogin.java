@@ -222,8 +222,10 @@ public class MemberLogin extends JFrame{
 	//본사 로그인
 	public void headquartersUserLogin() {
 		HeadquartersUser user = new HeadquartersUser();
-		user.setId(t_id.getText());
-		user.setPw(new String(t_pwd.getPassword()));
+		user.setId("admin");
+		user.setPw("1234");
+		//		user.setId(t_id.getText());
+		//		user.setPw(new String(t_pwd.getPassword()));
 		
 		headquartersUser = headquartersDAO.Login(user);
 	

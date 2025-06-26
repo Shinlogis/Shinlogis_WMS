@@ -2,7 +2,6 @@ package com.shinlogis.wms.product.model;
 
 import com.shinlogis.wms.storageType.model.StorageType;
 import com.shinlogis.wms.supplier.model.Supplier;
-import com.shinlogis.wms.warehouse.model.Warehouse;
 
 public class Product {
 	private int productId;
@@ -38,6 +37,7 @@ public class Product {
 		this.productName = productName;
 	}
 
+	
 	public Supplier getSupplier() {
 		return supplier;
 	}
@@ -65,6 +65,4 @@ public class Product {
 	public void setQuantity(int quantity) {
 	    this.quantity = quantity;
 	}
-
-
 }
