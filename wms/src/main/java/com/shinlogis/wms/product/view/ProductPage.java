@@ -31,8 +31,7 @@ public class ProductPage extends Page {
     private JPanel pSearch;
     private JTextField productCode, productName, supplierName, priceMin, priceMax;
     private JComboBox<String> comboStorageType;
-    private JButton btnSearch;
-
+    public JButton btnSearch;
     private JPanel pTable;
     private JLabel laPlanCount;
     private JTable tblPlan;
@@ -126,16 +125,16 @@ public class ProductPage extends Page {
         };
 
         tblPlan = new JTable(model);
-        tblPlan.setRowHeight(60);
-        tblPlan.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 60));
-        tblPlan.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 660));
+        tblPlan.setRowHeight(45);
+        tblPlan.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 45));
+        tblPlan.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
         scTable = new JScrollPane(tblPlan);
-        scTable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scTable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         scTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 700));
+        scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
-        /* ==== 페이징 컨트롤 ==== */
+        /* ==== 페이징 컨트롤 ==== */  
         pPaging = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pPaging.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 40));
         btnPrevPage = new JButton("이전");
@@ -231,5 +230,14 @@ public class ProductPage extends Page {
         laPageInfo.setText(currentPage + " / " + totalPages);
         btnPrevPage.setEnabled(currentPage > 1);
         btnNextPage.setEnabled(currentPage < totalPages);
+    }
+    
+    public void resetFields() {
+        productCode.setText("");
+        productName.setText("");
+        supplierName.setText("");
+        comboStorageType.setSelectedIndex(0); // "전체"로 초기화
+        priceMin.setText("");
+        priceMax.setText("");
     }
 }
