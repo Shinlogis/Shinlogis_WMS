@@ -1,8 +1,10 @@
 package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -18,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.ButtonEditor;
@@ -25,6 +28,7 @@ import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.snapshot.model.Snapshot;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -86,7 +90,7 @@ public class DetailPage extends Page {
 
 		// 입고예정 상세ID
 		gbc.gridx = 2;
-		pSearch.add(new JLabel("입고예정상세ID"), gbc);
+		pSearch.add(new JLabel("입고상세ID"), gbc);
 		tfPlanItemId = new JTextField(10);
 		gbc.gridx = 3;
 		pSearch.add(tfPlanItemId, gbc);
@@ -193,9 +197,26 @@ public class DetailPage extends Page {
 			dialog.setVisible(true);
 		}));
 
-		// 입고처리 검수 버튼
-		tblPlan.getColumn("입고처리").setCellRenderer(new ButtonRenderer());
-		tblPlan.getColumn("입고처리").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+		// 입고처리 검수 버튼 생성
+		tblPlan.getColumn("입고").setCellRenderer(new TableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				IODetail detail = inboundDetailModel.getIODetailAt(row);
+
+				// 아직 처리되지 않은 항목은 검수버튼 생성
+				if (detail != null && detail.isProcessable()) {
+					return new JButton("검수"); // 버튼 생성
+				} else {
+					JLabel label = new JLabel("완료"); // 텍스트만 생성
+					label.setFont(label.getFont().deriveFont(Font.PLAIN));
+					return label;
+				}
+			}
+		});
+
+		// 검수 버튼에 기능 추가
+		tblPlan.getColumn("입고").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 			IODetail detail = inboundDetailModel.getIODetailAt(row);
 			CheckDetailDialog dialog = new CheckDetailDialog(appMain, detail, inboundDetailModel);
 			dialog.setVisible(true);

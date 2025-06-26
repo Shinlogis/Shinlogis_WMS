@@ -15,11 +15,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inoutbound.outbound.repository.OutboundDetailDAO;
 import com.toedter.calendar.JDateChooser;
 
 public class OutboundDetailPage extends Page {
@@ -47,11 +49,15 @@ public class OutboundDetailPage extends Page {
 
 	private JLabel la_counter;
 	private JTable tb_plan; // 출고예정 목록 테이블
-//	private JScrollPane sc_table;
-//	private DefaultTableModel model;
-
+	private JScrollPane sc_table;
+	private AbstractTableModel model;
+	private int count;
+	
+	OutboundDetailDAO outboundDetailDAO;
+	
 	public OutboundDetailPage(AppMain app) {
 		super(app);
+		outboundDetailDAO = new OutboundDetailDAO();
 		// 제목영역
 		p_pageTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		la_pageTitle = new JLabel("출고관리 > 출고상세");
@@ -171,7 +177,18 @@ public class OutboundDetailPage extends Page {
 		p_tableNorth = new JPanel(new GridBagLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
 
-		la_counter = new JLabel("총 0개의 출고예정 검색");
+		
+		
+		
+		
+		tb_plan = new JTable(model = new OutboundDetailModel());
+		tb_plan.setRowHeight(45);
+		 
+		sc_table= new JScrollPane(tb_plan);
+		sc_table.setPreferredSize(new Dimension(1150,660));
+		
+		count = outboundDetailDAO.countTotal();
+		la_counter = new JLabel("총 "+ count + "개의 출고상세 검색");
 		gbcTableNorth.gridx = 0;
 		gbcTableNorth.gridy = 0;
 		gbcTableNorth.weightx = 1.0; // 남는 공간 차지
@@ -182,16 +199,13 @@ public class OutboundDetailPage extends Page {
 
 		// 테이블(컨텐트영역) 디자인
 
-		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-		p_table.add(p_tableNorth);
-		p_table.add(tb_plan);
-		p_table.setBackground(Color.GRAY);
 
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);
 		add(p_search);
-		add(p_table);
+		add(p_tableNorth);
+		add(sc_table);
 
 	}
 

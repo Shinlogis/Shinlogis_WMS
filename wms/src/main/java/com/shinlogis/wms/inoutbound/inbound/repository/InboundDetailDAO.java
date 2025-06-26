@@ -14,6 +14,7 @@ import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.snapshot.model.Snapshot;
+import com.shinlogis.wms.storageType.model.StorageType;
 
 /**
  * 입고 상세 DAO입니다
@@ -42,7 +43,7 @@ public class InboundDetailDAO {
 			connection = dbManager.getConnection();
 			try {
 				pstmt = connection.prepareStatement(sql);
-				pstmt.setInt(1, item.getIoItemId());
+				pstmt.setInt(1, item.getIoDetailId());
 				pstmt.setInt(2, item.getPlannedQuantity());
 				pstmt.setInt(3, item.getProductSnapshot().getSnapshotId());
 				pstmt.setInt(4, item.getDamagedCode().getDamageCodeId());
@@ -130,7 +131,7 @@ public class InboundDetailDAO {
 
 			while (rs.next()) {
 				IODetail detail = new IODetail();
-				detail.setIoItemId(rs.getInt("io_detail_id"));
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
 
 				IOReceipt receipt = new IOReceipt();
 				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));
@@ -147,7 +148,12 @@ public class InboundDetailDAO {
 				snapshot.setSnapshotId(rs.getInt("snapshot_id"));
 				snapshot.setProductCode(rs.getString("product_code"));
 				snapshot.setProductName(rs.getString("product_name"));
-				snapshot.setStorageTypeCode(rs.getString("storage_type_code"));
+				
+				StorageType storageType = new StorageType();
+	            storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+	            storageType.setTypeCode(rs.getString("type_code"));
+	            storageType.setTypeName(rs.getString("type_name"));
+	            
 				snapshot.setSupplierName(rs.getString("supplier_name"));
 				snapshot.setPrice(rs.getInt("price"));
 				snapshot.setExpiryDate(rs.getDate("expiry_date"));

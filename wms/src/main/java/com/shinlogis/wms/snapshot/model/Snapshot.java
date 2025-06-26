@@ -2,6 +2,10 @@ package com.shinlogis.wms.snapshot.model;
 
 import java.util.Date;
 
+import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.storageType.model.StorageType;
+import com.shinlogis.wms.warehouse.model.Warehouse;
+
 /**
  * 스냅샷 모델입니다.
  * @author 김예진
@@ -13,13 +17,14 @@ public class Snapshot {
     private String supplierName;
     private int price;
     private Date expiryDate;
-	private String storageTypeCode;
+    private StorageType storageType;
 	
-	public String getStorageTypeCode() {
-		return storageTypeCode;
+	
+	public StorageType getStorageType() {
+		return storageType;
 	}
-	public void setStorageTypeCode(String storageTypeCode) {
-		this.storageTypeCode = storageTypeCode;
+	public void setStorageType(StorageType storageType) {
+		this.storageType = storageType;
 	}
 	public String getSupplierName() {
 		return supplierName;
@@ -56,5 +61,19 @@ public class Snapshot {
 	}
 	public void setExpiryDate(Date expiryDate) {
 		this.expiryDate = expiryDate;
+	}
+	
+	/**
+	 * 스냅샷의 상품과 저장창고의 보관타입이 일치하는지를 반환
+	 * @author 김예진
+	 * @since 2025-06-25
+	 * @param product
+	 * @param warehouse
+	 * @return
+	 */
+	public boolean isStorageTypeMatched(Snapshot snapshot, Warehouse warehouse) {
+	    return snapshot.getStorageType() != null &&
+	           warehouse.getStorageType() != null &&
+	           snapshot.getStorageType().getTypeCode().equals(warehouse.getStorageType().getTypeCode());
 	}
 }

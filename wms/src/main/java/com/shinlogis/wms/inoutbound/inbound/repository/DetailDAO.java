@@ -44,7 +44,7 @@ public class DetailDAO {
 			connection = dbManager.getConnection();
 			try {
 				pstmt = connection.prepareStatement(sql);
-				pstmt.setInt(1, item.getIoItemId());
+				pstmt.setInt(1, item.getIoDetailId());
 				pstmt.setInt(2, item.getPlannedQuantity());
 				pstmt.setInt(3, item.getProductSnapshot().getSnapshotId());
 				pstmt.setInt(4, item.getDamagedCode().getDamageCodeId());
@@ -83,10 +83,11 @@ public class DetailDAO {
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email, ")
 				.append("w.warehouse_id, w.warehouse_name, w.address, w.storage_type_id, w.warehouse_code, ")
 				.append("st.storage_type_id, st.type_code, st.type_name ")
-				.append("FROM io_detail ip ").append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
+				.append("FROM io_detail ip ")
+				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("LEFT JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
 				.append("LEFT JOIN damaged_code dc  ON ip.damage_code_id = dc.damage_code_id ")
-				.append("LEFT JOIN headquarters_user hu ON ip.headquarters_user_id = hu.headquarters_user_id ")
+				.append("LEFT JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 				.append("LEFT JOIN warehouse w ON ip.warehouse_id = w.warehouse_id ")
 				.append("LEFT JOIN storage_type st ON st.storage_type_id = w.storage_type_id ")
 				.append("WHERE ir.io_type = 'IN'");
@@ -136,7 +137,7 @@ public class DetailDAO {
 
 			while (rs.next()) {
 				IODetail detail = new IODetail();
-				detail.setIoItemId(rs.getInt("io_detail_id"));
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
 
 				IOReceipt receipt = new IOReceipt();
 				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));
@@ -153,7 +154,13 @@ public class DetailDAO {
 				snapshot.setSnapshotId(rs.getInt("snapshot_id"));
 				snapshot.setProductCode(rs.getString("product_code"));
 				snapshot.setProductName(rs.getString("product_name"));
-				snapshot.setStorageTypeCode(rs.getString("storage_type_code"));
+				
+				StorageType storageType = new StorageType();
+				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				storageType.setTypeCode(rs.getString("type_code"));
+				storageType.setTypeName(rs.getString("type_name"));
+				snapshot.setStorageType(storageType);
+				
 				snapshot.setSupplierName(rs.getString("supplier_name"));
 				snapshot.setPrice(rs.getInt("price"));
 				snapshot.setExpiryDate(rs.getDate("expiry_date"));
@@ -169,10 +176,6 @@ public class DetailDAO {
 				warehouse.setWarehouseCode(rs.getString("warehouse_code"));
 				warehouse.setWarehouseName(rs.getString("warehouse_name"));
 				warehouse.setAddress(rs.getString("address"));
-				StorageType storageType = new StorageType();
-				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
-				storageType.setTypeCode(rs.getString("type_code"));
-				storageType.setTypeName(rs.getString("type_name"));
 				warehouse.setStorageType(storageType);
 				
 				detail.setWarehouse(warehouse);
@@ -279,10 +282,11 @@ public class DetailDAO {
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email, ")
 				.append("w.warehouse_id, w.warehouse_name, w.address, w.storage_type_id, w.warehouse_code, ")
 				.append("st.storage_type_id, st.type_code, st.type_name ")
-				.append("FROM io_detail ip ").append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
+				.append("FROM io_detail ip ")
+				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("LEFT JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
 				.append("LEFT JOIN damaged_code dc  ON ip.damage_code_id = dc.damage_code_id ")
-				.append("LEFT JOIN headquarters_user hu ON ip.headquarters_user_id = hu.headquarters_user_id ")
+				.append("LEFT JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 				.append("LEFT JOIN warehouse w ON ip.warehouse_id = w.warehouse_id ")
 				.append("LEFT JOIN storage_type st ON st.storage_type_id = w.storage_type_id ")
 				.append("WHERE ir.io_type = 'IN' AND ip.processed_date IS NOT NULL ");
@@ -332,7 +336,7 @@ public class DetailDAO {
 
 			while (rs.next()) {
 				IODetail detail = new IODetail();
-				detail.setIoItemId(rs.getInt("io_detail_id"));
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
 
 				IOReceipt receipt = new IOReceipt();
 				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));
@@ -344,12 +348,17 @@ public class DetailDAO {
 				detail.setActualQuantity(rs.getInt("actual_quantity"));
 				detail.setProccessedDate(rs.getDate("processed_date") != null ? rs.getDate("processed_date") : null);
 				detail.setStatus(rs.getString("status"));
+				
+				StorageType storageType = new StorageType();
+				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				storageType.setTypeCode(rs.getString("type_code"));
+				storageType.setTypeName(rs.getString("type_name"));
 
 				Snapshot snapshot = new Snapshot();
 				snapshot.setSnapshotId(rs.getInt("snapshot_id"));
 				snapshot.setProductCode(rs.getString("product_code"));
 				snapshot.setProductName(rs.getString("product_name"));
-				snapshot.setStorageTypeCode(rs.getString("storage_type_code"));
+				snapshot.setStorageType(storageType);
 				snapshot.setSupplierName(rs.getString("supplier_name"));
 				snapshot.setPrice(rs.getInt("price"));
 				snapshot.setExpiryDate(rs.getDate("expiry_date"));
@@ -366,10 +375,6 @@ public class DetailDAO {
 				warehouse.setWarehouseCode(rs.getString("warehouse_code"));
 				warehouse.setWarehouseName(rs.getString("warehouse_name"));
 				warehouse.setAddress(rs.getString("address"));
-				StorageType storageType = new StorageType();
-				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
-				storageType.setTypeCode(rs.getString("type_code"));
-				storageType.setTypeName(rs.getString("type_name"));
 				warehouse.setStorageType(storageType);
 				
 				detail.setWarehouse(warehouse);
@@ -392,16 +397,38 @@ public class DetailDAO {
 	}
 	
 	/**
-	 * 입고상세의 파손, 저장창고를 입력해서 검수를 update하는 메서드
+	 * 입고상세의 파손, 저장창고를 입력해서 검수 후 입고처리로 update
 	 * @author 김예진
-	 * @param filters
+	 * @since 2025-06-25
+	 * @param detailId
+	 * @param damageCodeId
+	 * @param damageQuantity
+	 * @param warehouseId
 	 * @return
 	 */
-	public int updateInboundProcess(Map<String, Object> filters) {
-		
-		
-		
+	public int processInboundDetail(int detailId, int damageCodeId, int damageQuantity, int plannedQuantity, int warehouseId) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		StringBuffer sql = new StringBuffer();
+		sql.append("update io_detail set damage_code_id = ?, damage_quantity = ?, warehouse_id = ?, processed_date = NOW(), actual_quantity = ? where io_detail_id = ?");
+
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			ps.setInt(1, damageCodeId);
+			ps.setInt(2, damageQuantity);
+			ps.setInt(3, warehouseId);
+			ps.setInt(4, plannedQuantity - damageQuantity);
+			ps.setInt(5, detailId);
+			
+			return ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return 0;
 	}
-
+	
+	
 }
