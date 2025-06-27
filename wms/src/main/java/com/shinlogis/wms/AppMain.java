@@ -130,7 +130,7 @@ public class AppMain extends JFrame {
 		p_west.setLayout(new BoxLayout(p_west, BoxLayout.Y_AXIS));
 		p_west.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
-		p_west.add(Box.createVerticalStrut(40)); // 40픽셀 아래로 내림
+		p_west.add(Box.createVerticalStrut(0)); // 40픽셀 아래로 내림
 
 		if ("headquartersUser".equals(role)) {
 			// 메뉴 항목 생성
@@ -333,9 +333,11 @@ public class AppMain extends JFrame {
 				if (headquartersUser != null) {
 					headquartersUser = null;
 					new MemberLogin();
+					 AppMain.this.dispose();  // 현재 AppMain 창 닫기
 				} else if (locationUser != null) {
 					locationUser = null;
 					new MemberLogin();
+					 AppMain.this.dispose();  // 현재 AppMain 창 닫기
 				}
 			}
 		});

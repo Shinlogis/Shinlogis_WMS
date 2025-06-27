@@ -156,6 +156,7 @@ public class FindPwd extends JFrame {
 				sender.sendHtml(targetMail, title, content); // HTML 메일 전송
 
 				JOptionPane.showMessageDialog(this, "임시 비밀번호가 메일로 전송되었습니다.");
+				 this.dispose();
 			} else {
 				JOptionPane.showMessageDialog(this, "일치하는 계정이 없습니다.");
 			}

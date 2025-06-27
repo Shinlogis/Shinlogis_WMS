@@ -127,9 +127,11 @@ public class FindId extends JFrame{
 			
 			if(headquartersId != null) {
 				new FindIdDialog(this, headquartersId);
+				 this.dispose();
 				
 			}else if(locationUsersId != null) {
 				new FindIdDialog(this, locationUsersId);
+				 this.dispose();
 			} else {
 				JOptionPane.showMessageDialog(this, "해당 이메일로 등록된 아이디가 없습니다.");
 			}

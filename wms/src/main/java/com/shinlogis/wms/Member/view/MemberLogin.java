@@ -234,6 +234,7 @@ public class MemberLogin extends JFrame{
 
 			AppMain appMain=new AppMain(headquartersUser, null);
 			appMain.initUI();
+			this.dispose();
 		}else {
 			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
 			return;
@@ -257,6 +258,7 @@ public class MemberLogin extends JFrame{
 			
 			AppMain appMain=new AppMain(null, locationUser);
 			appMain.initUI();
+			this.dispose();
 		}else {
 			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
 			return;
