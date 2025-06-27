@@ -171,9 +171,9 @@ CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
-	status varchar(10) not null default '대기' check(status in ('대기', '완료')),
+	status varchar(10) not null default '대기' check(status in ('대기', '반려', '출고예정', '완료')),
 
-    quantity INT CHECK(quantity > 0),                           -- 수량
+    quantity INT NOT NULL CHECK(quantity > 0),                           -- 수량
 
 
 

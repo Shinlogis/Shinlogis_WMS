@@ -38,7 +38,7 @@ import com.shinlogis.wms.inoutbound.inbound.view.process.ProcessPage;
 import com.shinlogis.wms.inoutbound.inbound.view.receipt.ReceiptPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundDetailPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundReceiptPage;
-import com.shinlogis.wms.inoutbound.outbound.view.OutboundRegiterPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundRegisterPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
@@ -425,7 +425,7 @@ public class AppMain extends JFrame {
 			pages[10] = new SupplierPage(this);
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
-			pages[13] = new OutboundRegiterPage(this);
+			pages[13] = new OutboundRegisterPage(this);
 
 		} else if ("locationUser".equals(role)) {
 			pages = new Page[4];
