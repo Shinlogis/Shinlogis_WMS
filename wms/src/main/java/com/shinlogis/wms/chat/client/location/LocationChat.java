@@ -18,6 +18,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -27,14 +31,19 @@ import com.shinlogis.wms.chat.client.head.Message;
 import com.shinlogis.wms.location.model.Location;
 
 public class LocationChat extends JFrame{
+	
+	JTextPane chatPane;
+    JScrollPane scrollPane;
+
+    StyledDocument doc;
+    
 
 	JPanel p_north;
 	JTextField t_ip;
 	JTextField t_port;
 	JButton bt;
 
-	JTextPane area;
-	//JTextArea area;
+	JTextArea area;
 	JScrollPane scroll;
 	JTextField t_input;
 
@@ -48,16 +57,17 @@ public class LocationChat extends JFrame{
 		this.appMain = appMain;
 		this.location = location;
 		
+		chatPane = new JTextPane();
+        chatPane.setEditable(false);
+        doc = chatPane.getStyledDocument();
+        scrollPane = new JScrollPane(chatPane);
+		
 		p_north = new JPanel();
 		t_ip = new JTextField("192.168.60.18");
 		t_port = new JTextField("9999");
 		bt = new JButton("접속하기");
 		
-		area = new JTextPane(); // 💡 여기 변경됨
-		area.setEditable(false);
-		area.setContentType("text/html"); // HTML 사용 가능하게 설정
-		area.setText("<html><body></body></html>"); // 초기화
-		//area = new JTextArea();
+		area = new JTextArea();
 		scroll = new JScrollPane(area);
 		t_input = new JTextField();
 		
@@ -70,34 +80,31 @@ public class LocationChat extends JFrame{
 		scroll.setPreferredSize(new Dimension(300,400));
 		area.setBackground(Color.PINK);
 		
-		t_input.setPreferredSize(new Dimension(300,30));
+		t_input.setPreferredSize(new Dimension(350, 40));
 		
 		
-		
+		//조립
 		p_north.add(t_ip);
 		p_north.add(t_port);
 		p_north.add(bt);
-		
 		p_south.add(t_input);
 		
 		add(p_north,BorderLayout.NORTH);
 		add(scroll);
 		add(p_south, BorderLayout.SOUTH);
+		add(scrollPane, BorderLayout.CENTER);
 		
+		
+		//이벤트(버튼 누르면 접속되게)
 		bt.addActionListener(e->{
 			createConnection();
-			
 		});
 		
 		t_input.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-					String text = t_input.getText().trim();
-					if (!text.isEmpty()) {
-						addMyMessage(text); // 오른쪽 정렬로 추가
-						t_input.setText("");
-						
+					
 					Message message = new Message();
 					//메세지 만들기
 					message.setRequestType("chat");
@@ -113,7 +120,6 @@ public class LocationChat extends JFrame{
 					t_input.setText("");
 					}
 				}
-			}
 		});
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -169,32 +175,28 @@ public class LocationChat extends JFrame{
 		
 	}
 	
-	// 오른쪽 정렬로 내가 보낸 메시지 출력
-    public void addMyMessage(String msg) {
-        appendMessage("<div style='text-align: right; color: black;'>" + escapeHtml(msg) + "</div>");
-    }
+	 //채팅 정렬 스타일
+    public void appendMessage(String message, boolean isMine) {
+        // 스타일 생성
+        SimpleAttributeSet attrSet = new SimpleAttributeSet();
+        StyleConstants.setAlignment(attrSet, isMine ? StyleConstants.ALIGN_RIGHT : StyleConstants.ALIGN_LEFT);
+        StyleConstants.setForeground(attrSet, isMine ? Color.BLUE : Color.BLACK);
+        StyleConstants.setFontSize(attrSet, 14);
+        StyleConstants.setSpaceAbove(attrSet, 4);
+        StyleConstants.setSpaceBelow(attrSet, 4);
 
-    // 왼쪽 정렬로 상대방 메시지 출력
-    public void addOtherMessage(String msg) {
-        appendMessage("<div style='text-align: left; color: black;'>" + escapeHtml(msg) + "</div>");
-    }
-    
- // HTML 메시지를 area에 추가
-    private void appendMessage(String html) {
         try {
-            HTMLEditorKit kit = (HTMLEditorKit) area.getEditorKit();
-            HTMLDocument doc = (HTMLDocument) area.getDocument();
-            kit.insertHTML(doc, doc.getLength(), html, 0, 0, null);
-            area.setCaretPosition(doc.getLength()); // 스크롤 아래로
-        } catch (Exception e) {
+
+            // 새 단락 삽입
+            int length = doc.getLength();
+            doc.insertString(length, message + "\n", attrSet);
+            doc.setParagraphAttributes(length, message.length(), attrSet, false);
+
+        } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
-
-    // 특수문자 이스케이프 처리
-    private String escapeHtml(String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-    }
+	
 	
 
 

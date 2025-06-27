@@ -175,7 +175,8 @@ public class MemberLogin extends JFrame{
 	public JPanel createLine(JLabel label, JTextField field) {
 		JPanel panel = new JPanel();
 		panel.setOpaque(false);
-		label.setPreferredSize(new Dimension(80, 30));  // 라벨 고정 폭			field.setPreferredSize(new Dimension(180, 30)); // 필드 고정 폭
+		label.setPreferredSize(new Dimension(80, 30));  // 라벨 고정 폭			
+		field.setPreferredSize(new Dimension(180, 30)); // 필드 고정 폭
 		panel.add(label);	
 		panel.add(field);
 		return panel;
@@ -233,6 +234,7 @@ public class MemberLogin extends JFrame{
 
 			AppMain appMain=new AppMain(headquartersUser, null);
 			appMain.initUI();
+			this.dispose();
 		}else {
 			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
 			return;
@@ -256,6 +258,7 @@ public class MemberLogin extends JFrame{
 			
 			AppMain appMain=new AppMain(null, locationUser);
 			appMain.initUI();
+			this.dispose();
 		}else {
 			JOptionPane.showMessageDialog(this, "입력 정보를 다시 확인해 주세요");
 			return;

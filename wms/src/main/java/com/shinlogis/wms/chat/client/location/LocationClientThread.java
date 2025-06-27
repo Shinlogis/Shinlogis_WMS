@@ -39,23 +39,27 @@ public class LocationClientThread extends Thread{
 		
 		try {
 			msg = buffr.readLine();
-			//client.area.append(msg + "\n");
+			//System.out.println("지점의 listen 메세지 " + msg);
+
 			//프로토콜 분석 
-			//내가 지점인 걸 알리기
 			Gson gson = new Gson();
 			Message obj = gson.fromJson(msg, Message.class);
-			
 			if(obj.getRequestType().equals("chat")) {
-				if(obj.getMe().equals("head")) {
-					SwingUtilities.invokeLater(() -> {
-						client.addMyMessage(obj.getMsg()); //우측 정렬 
-					});	
+				if(obj.getMe().equals("location")) {
+					
+					SwingUtilities.invokeLater(()->{
+						client.appendMessage(obj.getMsg(), true);
+					});					
 				}else {
-					SwingUtilities.invokeLater(() -> {
-						client.addOtherMessage(obj.getMsg()); // 💬 왼쪽 정렬
-					});						
+					
+					SwingUtilities.invokeLater(()->{
+						client.appendMessage(obj.getMsg(), false);
+						
+					});										
 				}
-			}
+			}			
+			
+		
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -64,6 +68,7 @@ public class LocationClientThread extends Thread{
 	
 	public void send(String msg) {
 		try {
+			//System.out.println("지사의 sendmsg is" + msg);
 			buffw.write(msg + "\n");
 			buffw.flush();
 		} catch (IOException e) {
