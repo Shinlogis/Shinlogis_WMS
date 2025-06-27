@@ -1,24 +1,17 @@
 package com.shinlogis.wms.common.util;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.PasswordAuthentication;
 import java.util.Properties;
 
 import com.shinlogis.wms.common.Exception.EmailException;
 
-import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.Message;
+import sun.jvm.hotspot.debugger.AddressException;
 
 public class MailSender {
 	
