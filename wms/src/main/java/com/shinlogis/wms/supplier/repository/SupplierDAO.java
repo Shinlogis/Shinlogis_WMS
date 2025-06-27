@@ -103,5 +103,70 @@ public class SupplierDAO {
 		}
 		
 	}
+	
+	
+	//공급사 수정
+	public void editSupplier(Supplier supplier) throws SupplierException{
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("update supplier set name = ?, address = ? where supplier_id = ?");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, supplier.getName());
+			pstmt.setString(2, supplier.getAddress());
+			pstmt.setInt(3, supplier.getSupplierId());
+			
+			int result = pstmt.executeUpdate();
+			
+			if(result <1) {
+				throw new SupplierException("수정에 실패했습니다.");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SupplierException("수정시 문제 발생",  e);
+		}finally {
+			dbManager.release(pstmt);
+		}
+	}
+	
+	//이름 통해 검색
+	public List searchSupplier(Supplier supplier) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Supplier> list = new ArrayList<>();
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select * from supplier where name like ? and status = '활성' order by supplier_id desc");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1,"%" +supplier.getName() +"%");
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				Supplier sp = new Supplier();
+				sp.setSupplierId(rs.getInt("supplier_id"));
+				sp.setName(rs.getString("name"));
+				sp.setAddress(rs.getString("address"));
+				
+				list.add(sp);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			dbManager.release(pstmt, rs);
+		}
+		
+		
+		return list;
+	}
 
 }

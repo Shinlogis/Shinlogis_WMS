@@ -1,7 +1,15 @@
 package com.shinlogis.wms.common.config;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 
 /**
  * JTable의 셀의 버튼 클릭 시의 기능을 추가하는 셀 편집자 클래스입니다. 사용 예:
@@ -37,11 +45,20 @@ public class ButtonEditor extends DefaultCellEditor {
 		this.listener = listener;
 		button = new JButton();
 		button.setOpaque(true);
+		button.setBackground(new Color(255, 255, 255)); // 검색 버튼 색상과 동일하게
+		button.setForeground(new Color(0x537BFB));
+		button.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+		button.setFocusPainted(false);
+		button.setBorderPainted(false);
+
+
 
 		// 버튼 클릭 시 편집 종료 → getCellEditorValue() 호출 유도
 		button.addActionListener(e -> {
 			fireEditingStopped(); // 이거 호출해야 getCellEditorValue가 실행됨
 		});
+
+
 	}
 
 	@Override
