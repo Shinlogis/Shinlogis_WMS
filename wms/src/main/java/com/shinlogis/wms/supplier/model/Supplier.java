@@ -5,7 +5,15 @@ public class Supplier {
     private String name;
     private String address;
     private String status;
+    private boolean isChecked;
     
+    
+	public boolean isChecked() {
+		return isChecked;
+	}
+	public void setChecked(boolean isChecked) {
+		this.isChecked = isChecked;
+	}
 	public int getSupplierId() {
 		return supplierId;
 	}

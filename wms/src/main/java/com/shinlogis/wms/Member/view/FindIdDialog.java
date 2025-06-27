@@ -8,13 +8,13 @@ import java.awt.Font;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
-public class UploadDialog extends JDialog{
+public class FindIdDialog extends JDialog{
 	
 	FindId findId;
 	JLabel la_id;
 	String id;
 	
-	public UploadDialog(FindId findId, String id) {
+	public FindIdDialog(FindId findId, String id) {
 		super(findId, "아이디 찾기", true);
 		
 		this.findId = findId;

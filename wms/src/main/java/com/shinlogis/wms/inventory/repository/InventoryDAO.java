@@ -53,7 +53,6 @@ public class InventoryDAO {
 		}
 		return list;
 	}
-
 	// TODO 입고처리된 새로운 상품을 재고에 저장
 	public int addToInventory() {
 		Connection conn = null;
@@ -77,7 +76,6 @@ public class InventoryDAO {
 		return 0;
 	}
 
-	// TODO 창고에 재고로 존재하는 상품은, 기존의 재고를 업데이트하는 식으로 재고에 저장
 
 	// 조회: 중복 항목 병합 (inventory_id 제외)
 	public List<InventoryDTO> selectInventoryDetails(InventoryDTO inventoryDTO) {
@@ -191,7 +189,9 @@ public class InventoryDAO {
 			deletePstmt.setString(1, warehouseCode);
 			deletePstmt.setString(2, productCode);
 			deletePstmt.setDate(3, oldExpiryDate);
-			deletePstmt.executeUpdate();
+			int deleted = deletePstmt.executeUpdate();
+			System.out.println("삭제된 행 수: " + deleted);
+
 
 			// 2. 새 병합 행 삽입
 			insertPstmt = conn.prepareStatement(insertSql);
@@ -300,4 +300,81 @@ public class InventoryDAO {
 			dbManager.release(pstmt, null);
 		}
 	}
+	
+	/**
+	 * 입고처리할 때 이미 동일한 상품이 재고로 추가되는 경우 수량을 업데이트하고, 없으면 새로 삽입
+	 * @auther 김예진
+	 * @since 2025-06-27
+	 * @param warehouseId
+	 * @param productId
+	 * @param expiryDate
+	 * @param quantityToAdd
+	 * @return
+	 */
+	public boolean addOrUpdateInventory(int warehouseId, int productId, Date expiryDate, int quantityToAdd) {
+	    Connection conn = null;
+	    PreparedStatement checkPstmt = null;
+	    PreparedStatement updatePstmt = null;
+	    PreparedStatement insertPstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        conn = dbManager.getConnection();
+	        conn.setAutoCommit(false); // 트랜잭션
+
+	        // 1) 존재 여부 확인
+	        String checkSql = "SELECT quantity FROM inventory WHERE warehouse_id = ? AND product_id = ? AND expiry_date = ?";
+	        checkPstmt = conn.prepareStatement(checkSql);
+	        checkPstmt.setInt(1, warehouseId);
+	        checkPstmt.setInt(2, productId);
+	        checkPstmt.setDate(3, expiryDate);
+	        rs = checkPstmt.executeQuery();
+	        System.out.println(rs.next());
+
+	        if (rs.next()) {
+	            // 2) 이미 있으면 수량 업데이트
+	            int existingQty = rs.getInt("quantity");
+	            int newQty = existingQty + quantityToAdd;
+
+	            String updateSql = "UPDATE inventory SET quantity = ? WHERE warehouse_id = ? AND product_id = ? AND expiry_date = ?";
+	            updatePstmt = conn.prepareStatement(updateSql);
+	            updatePstmt.setInt(1, newQty);
+	            checkPstmt.setInt(2, warehouseId);
+	            checkPstmt.setInt(3, productId);
+		        checkPstmt.setDate(4, expiryDate);
+	            int result = updatePstmt.executeUpdate();
+	        } else {
+	            // 3) 없으면 새로 삽입
+	            String insertSql = "INSERT INTO inventory (warehouse_id, product_id, expiry_date, quantity) VALUES (?, ?, ?, ?)";
+	            insertPstmt = conn.prepareStatement(insertSql);
+	            insertPstmt.setInt(1, warehouseId);
+	            insertPstmt.setInt(2, productId);
+	            insertPstmt.setDate(3, expiryDate);
+	            insertPstmt.setInt(4, quantityToAdd);
+	            insertPstmt.executeUpdate();
+	        }
+
+	        conn.commit();
+	        return true;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        try {
+	            if (conn != null) conn.rollback();
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	        return false;
+	    } finally {
+	        dbManager.release(checkPstmt, rs);
+	        dbManager.release(updatePstmt);
+	        dbManager.release(insertPstmt);
+	        try {
+	            if (conn != null) conn.setAutoCommit(true);
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
 }

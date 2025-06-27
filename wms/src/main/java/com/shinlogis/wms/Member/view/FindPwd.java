@@ -156,19 +156,20 @@ public class FindPwd extends JFrame {
 				sender.sendHtml(targetMail, title, content); // HTML 메일 전송
 
 				JOptionPane.showMessageDialog(this, "임시 비밀번호가 메일로 전송되었습니다.");
+				 this.dispose();
 			} else {
 				JOptionPane.showMessageDialog(this, "일치하는 계정이 없습니다.");
 			}
 
 		} catch (HeadquartersException e) {
 			e.printStackTrace();
-			throw new HeadquartersException(e.getMessage(), e);
+			JOptionPane.showInternalMessageDialog(this, e.getMessage());
 		} catch (EmailException e) {
 			e.printStackTrace();
-			throw new EmailException(e.getMessage(), e);
+			JOptionPane.showInternalMessageDialog(this, e.getMessage());
 		} catch (LocationException e) {
 			e.printStackTrace();
-			throw new LocationException(e.getMessage(), e);
+			JOptionPane.showInternalMessageDialog(this, e.getMessage());
 		}
 
 	}

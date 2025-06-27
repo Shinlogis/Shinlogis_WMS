@@ -101,6 +101,8 @@ public class ProcessModel extends AbstractTableModel {
 				return ioDetail.getWarehouse().getWarehouseCode();
 			case 8:
 				return ioDetail.getProccessedDate();
+			case 9:
+				return ioDetail.getUser().getId();
 		default:
 			return "";
 		}

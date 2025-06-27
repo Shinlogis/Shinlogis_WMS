@@ -120,6 +120,7 @@ public class ProductDAO {
 				product.setProductCode(resultSet.getString("product_code"));
 				product.setProductName(resultSet.getString("product_name"));
 				product.setThumbnailPath(resultSet.getString("product_img"));
+				product.setPrice(resultSet.getInt("price"));
 				
 				// 보관타입
 				StorageType storageType = new StorageType();
@@ -134,7 +135,7 @@ public class ProductDAO {
 				supplier.setName(resultSet.getString("name"));
 				supplier.setAddress(resultSet.getString("address"));
 				product.setSupplier(supplier);
-				
+
 				return product;	
 			}
 		} catch (Exception e) {

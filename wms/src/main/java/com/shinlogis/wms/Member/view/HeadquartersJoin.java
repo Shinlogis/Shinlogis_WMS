@@ -184,7 +184,7 @@ public class HeadquartersJoin extends JFrame{
 			
 		} catch (HeadquartersException e) {
 			e.printStackTrace();
-			throw new HeadquartersException(e.getMessage(), e);
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 		
 	}
@@ -231,6 +231,7 @@ public class HeadquartersJoin extends JFrame{
 			try {
 				regist();
 				JOptionPane.showMessageDialog(this, "회원가입이 완료되었습니다.");
+				 this.dispose();
 				new MemberLogin();
 			} catch (HeadquartersException e) {
 				e.printStackTrace();

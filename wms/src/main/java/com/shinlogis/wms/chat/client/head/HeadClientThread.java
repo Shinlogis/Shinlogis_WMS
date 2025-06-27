@@ -36,30 +36,25 @@ public class HeadClientThread extends Thread{
 	}
 	
 	
+	//받을 때는 문자열을 객체로
 	public void listen() {
-		String msg = null;
-		
 		try {
-			msg = buffr.readLine();
-			//headChat.area.append(msg + "\n");
-			//프로토콜 분석 
-			//내가 지점인 걸 알리기
+			String msg = buffr.readLine();
+			//System.out.println("본사의 listen is " + msg);
+
 			Gson gson = new Gson();
 			Message obj = gson.fromJson(msg, Message.class);
-			
 			if(obj.getRequestType().equals("chat")) {
 				if(obj.getMe().equals("head")) {
-					SwingUtilities.invokeLater(() -> {
-						headChat.addOtherMessage(obj.getMsg()); //우측 정렬 
-						//headChat.addMyMessage(obj.getMsg()); //우측 정렬 
-					});	
+					SwingUtilities.invokeLater(()->{
+						headChat.appendMessage(obj.getMsg(), true);
+					});					
 				}else {
-					SwingUtilities.invokeLater(() -> {
-						headChat.addOtherMessage(obj.getMsg()); // 💬 왼쪽 정렬
-					});						
+					SwingUtilities.invokeLater(()->{
+						headChat.appendMessage(obj.getMsg(), false);
+					});										
 				}
-			}
-			
+			}			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -67,6 +62,7 @@ public class HeadClientThread extends Thread{
 	
 	public void send(String msg) {
 		try {
+			//System.out.println("본사의 sendmsg is " + msg);
 			buffw.write(msg + "\n");
 			buffw.flush();
 		} catch (IOException e) {

@@ -5,12 +5,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -23,7 +20,6 @@ import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.chat.client.head.HeadChat;
 import com.shinlogis.wms.chat.client.head.HeadClientThread;
 import com.shinlogis.wms.chat.client.head.Message;
-import com.shinlogis.wms.chat.client.location.LocationChat;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.location.model.Location;
@@ -45,7 +41,7 @@ public class ChattingPage extends Page{
 	int port = 9999;
 	Location dummy = null;
 	Vector<HeadClientThread> vector = new Vector<>(); 
-	
+	public HeadChat headChat;
 	
 	public ChattingPage(AppMain appMain) {
 		super(appMain);
@@ -66,12 +62,14 @@ public class ChattingPage extends Page{
 		for(Location loc : locations) {
 			cb_location.addItem(loc);
 		}
+		
+		
 		cb_location.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
 					Location location = (Location)cb_location.getSelectedItem();
-					HeadChat headChat = new HeadChat(location);
+					headChat = new HeadChat(location);
 					
 					//백터에 들어있는 쓰레드를 대상으로 콤보박스에서 선택한 지점과 같은 녀석에게 지금 띄운 headChat을 넘겨주자
 					int index = getIndexOfThreadInList(vector, location.getLocationId()); //채팅을 담당할 쓰레드
