@@ -50,7 +50,36 @@ public class LocationDAO {
 		
 	}
 	
-
+	//업데이트 
+	public void update(int locationId, String status) throws LocationException{
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("update location SET status = ? WHERE location_id = ?");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, status);
+			pstmt.setInt(2, locationId);
+			
+			int result=pstmt.executeUpdate();
+			if(result<1) {
+				throw new  LocationException("지점 업데이트에 실패하였습니다");
+			}
+			
+			
+		} catch (SQLException e) {
+			throw new LocationException("지점 업데이트에 실패하였습니다");
+		}finally {
+			dbManager.release(pstmt,rs);
+		}
+		
+		
+	}
 	
 	
 	

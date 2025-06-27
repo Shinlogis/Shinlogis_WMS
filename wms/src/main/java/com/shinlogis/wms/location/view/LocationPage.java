@@ -205,7 +205,7 @@ public class LocationPage extends Page{
 	}
 	
 	public void refresh() {
-        List<StoreOrder> updatedList = new StoreOrderDAO().selectAll();
+     //   List<location> updatedList = new StoreOrderDAO().selectAll();
       //  model.setList(updatedList);
       //  model.fireTableDataChanged();
     }
