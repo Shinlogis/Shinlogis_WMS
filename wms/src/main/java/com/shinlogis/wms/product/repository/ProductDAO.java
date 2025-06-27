@@ -39,6 +39,7 @@ public class ProductDAO {
 					product.setProductCode(rs.getString("product_code"));
 					product.setProductName(rs.getString("product_name"));
 					product.setPrice(rs.getInt("price"));
+					product.setThumbnailPath(rs.getString("product_img"));
 
 					list.add(product);
 				}
@@ -77,6 +78,7 @@ public class ProductDAO {
 					product.setProductCode(rs.getString("product_code"));
 					product.setProductName(rs.getString("product_name"));
 					product.setPrice(rs.getInt("price"));
+					product.setThumbnailPath(rs.getString("product_img"));
 
 					list.add(product);
 				}
@@ -117,6 +119,7 @@ public class ProductDAO {
 				product.setProductId(resultSet.getInt("product_id"));
 				product.setProductCode(resultSet.getString("product_code"));
 				product.setProductName(resultSet.getString("product_name"));
+				product.setThumbnailPath(resultSet.getString("product_img"));
 				product.setPrice(resultSet.getInt("price"));
 				
 				// 보관타입
@@ -208,6 +211,7 @@ public class ProductDAO {
 	            dto.setPrice(rs.getInt("price"));
 	            dto.setSupplierName(rs.getString("supplier_name"));
 	            dto.setStorageTypeName(rs.getString("type_name"));
+	            dto.setThumbnailPath(rs.getString("product_img"));
 	            list.add(dto);
 	        }
 	    } catch (Exception e) {
