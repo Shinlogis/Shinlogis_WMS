@@ -77,7 +77,8 @@ public class OutboundDetailModel extends AbstractTableModel {
 			value = outboundDetail.getStatus();
 			break;
 		case 9:
-			value = "수량 나올곳";
+			//출고수량 변환하는 기능 구현해야함 다시 와서 봐야 할지도 모름****************
+			value = Integer.toString(outboundDetail.getActualQuantity());
 			break;
 		case 10:
 			if (outboundDetail.getProccessedDate() != null) {
