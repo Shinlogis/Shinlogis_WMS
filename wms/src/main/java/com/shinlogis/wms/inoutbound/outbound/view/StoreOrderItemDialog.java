@@ -37,7 +37,7 @@ public class StoreOrderItemDialog extends JDialog{
 		
 		
 		//본문서식
-		model = new StoreOrderItemModel();
+//		model = new StoreOrderItemModel();
 		tb_table= new JTable(model);
 		tb_table.setRowHeight(45);
 		sc_table = new JScrollPane(tb_table);

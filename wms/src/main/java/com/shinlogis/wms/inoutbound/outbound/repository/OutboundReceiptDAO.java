@@ -24,6 +24,7 @@ public class OutboundReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
 	//iodetail먹어서 안에 컬럼을 가져다가 인서트 할 무언가가 생기나,,?
 	IODetail outboundDetail;
+	
 //	public OutBoundReceiptDAO(){}
 
 	/**
@@ -47,7 +48,9 @@ public class OutboundReceiptDAO {
 					+ " where id.io_receipt_id = ir.io_receipt_id" + " order by id.io_detail_id"
 					+ " limit 1) as first_product_name," + " (select count(*)" + " from io_detail id2"
 					+ " where id2.io_receipt_id = ir.io_receipt_id) as item_count" + " from io_receipt ir"
-					+ " inner join location l on ir.location_id = l.location_id" + " order by ir.io_receipt_id desc");
+					+ " inner join location l on ir.location_id = l.location_id"
+					+ " where ir.io_type =  'out' "
+					+ " order by ir.io_receipt_id desc");
 			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
 
@@ -86,9 +89,13 @@ public class OutboundReceiptDAO {
 		return list;
 	}
 
-	
+	/**
+	 * <h2>출고등록 메서드 영역
+	 * 
+	 * @author 이세형
+	 */
 	public void insertOutbound() {
-
+		
 	}
 
 	/**
@@ -146,6 +153,7 @@ public class OutboundReceiptDAO {
 			sql.append("FROM io_receipt ir ");
 			sql.append("JOIN location l ON ir.location_id = l.location_id ");
 			sql.append("WHERE 1=1 ");
+			sql.append("AND ir.io_type =  'out' ");
 
 			List<Object> params = new ArrayList<>();
 
@@ -175,6 +183,7 @@ public class OutboundReceiptDAO {
 				sql.append("AND ir.status = ? ");
 				params.add(status);
 			}
+			sql.append("ORDER BY ir.io_receipt_id DESC ");
 
 			pstmt = con.prepareStatement(sql.toString());
 			for (int i = 0; i < params.size(); i++) {
@@ -283,31 +292,3 @@ public class OutboundReceiptDAO {
 	}
 
 }
-//			출고예정, 출고예정ID
-//		sql.append("select io_receipt_id");
-//		sql.append(" from io_receipt;");
-
-//			//출고예정, 출고품목
-//			sql.append("select s.product_name");
-//			sql.append(" from snapshot s");
-//			sql.append(" inner join io_detail id");
-//			sql.append(" on s.snapshot_id = id.snapshot_id;");
-//			System.out.println("2번" + rs);
-//			
-//			//출고예정, 출고지점
-//			sql.append("select l.location_name");
-//			sql.append(" from location l");
-//			sql.append(" inner join io_receipt ir");
-//			sql.append(" on l.location_id = ir.location_id;");
-//			
-//			//출고예정, 출고예정일
-//			sql.append("select scheduled_date");
-//			sql.append(" from io_receipt;");
-//			
-//			//출고예정, 상태
-//			sql.append("select status");
-//			sql.append(" from io_receipt");
-//			
-//			//출고예정, 등록일
-//			sql.append("select DATE(created_at) as date_only");
-//			sql.append(" from io_receipt");

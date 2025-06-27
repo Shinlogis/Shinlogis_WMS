@@ -235,7 +235,8 @@ public class OutboundDetailPage extends Page {
 		        new StoreOrderDialog();
 		    })
 		); 
-		
+
+
 		
 		sc_table= new JScrollPane(tb_plan);
 		sc_table.setPreferredSize(new Dimension(1150,660));
@@ -250,8 +251,6 @@ public class OutboundDetailPage extends Page {
 		p_tableNorth.add(la_counter, gbcTableNorth);
 		
 
-		// 테이블(컨텐트영역) 디자인
-
 
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
@@ -260,6 +259,12 @@ public class OutboundDetailPage extends Page {
 		add(p_tableNorth);
 		add(sc_table);
 
+	}
+	
+	//출고예정에서 넘어오면 강제로 값을 입력받아서 출력해주기 위한 메서드
+	public void searchByPlanId(String planId) {
+	    tf_outBoundPlanId.setText(planId); // 텍스트 필드 설정
+	    bt_search.doClick(); // 검색 버튼 강제 클릭 (이벤트 실행됨)
 	}
 
 }
