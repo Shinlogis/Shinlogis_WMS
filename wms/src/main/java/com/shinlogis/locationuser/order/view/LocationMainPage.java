@@ -46,9 +46,9 @@ public class LocationMainPage extends Page{
 		this.appMain=appMain;
 		setLayout(new BorderLayout());
 		
-		image1 = imageUtil.getImage("images/banner.jpg",Config.CONTENT_WIDTH/3, 300);
-		image2 = imageUtil.getImage("images/banner.jpg",Config.CONTENT_WIDTH/3, 300);
-		image3 = imageUtil.getImage("images/cream.png",300, 250);
+		image1 = imageUtil.getImage("images/carrot.jpg",Config.CONTENT_WIDTH/3, 300);
+		image2 = imageUtil.getImage("images/carrot.jpg",Config.CONTENT_WIDTH/3, 300);
+		image3 = imageUtil.getImage("images/carrot.jpg",300, 250);
 		
 		p_visual = new JPanel();
 		la_title=new JLabel("WMS 창고관리 시스템",JLabel.CENTER);

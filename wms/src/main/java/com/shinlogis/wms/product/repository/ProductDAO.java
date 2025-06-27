@@ -292,6 +292,7 @@ public class ProductDAO {
 						product.setProductId(rs.getInt("product_id"));
 						product.setProductName(rs.getString("product_name"));
 						product.setPrice(rs.getInt("price"));
+						product.setThumbnailPath(rs.getString("product_img"));
 
 						list.add(product);
 					}
