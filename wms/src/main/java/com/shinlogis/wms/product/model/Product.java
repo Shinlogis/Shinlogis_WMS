@@ -11,7 +11,14 @@ public class Product {
 	private Supplier supplier;
 	private int price;
 	private boolean isChecked;
-	
+	private String thumbnailPath;
+
+	public String getThumbnailPath() {
+	    return thumbnailPath;
+	}
+	public void setThumbnailPath(String thumbnailPath) {
+	    this.thumbnailPath = thumbnailPath;
+	}
 	public boolean isChecked() {
 		return isChecked;
 	}
