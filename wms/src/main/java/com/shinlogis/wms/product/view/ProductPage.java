@@ -6,11 +6,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -51,10 +54,10 @@ public class ProductPage extends Page {
 	private JButton btnPrevPage, btnNextPage;
 	private JLabel laPageInfo;
 
-	private String[] columnNames = { "선택", "상품코드", "상품명", "공급사명", "보관타입", "가격", "재고보기" };
+	private String[] columnNames = { "선택", "사진", "상품코드", "상품명", "공급사명", "보관타입", "가격", "재고보기" };
 
 	private int currentPage = 1;
-	private final int rowsPerPage = 10;
+	private final int rowsPerPage = 5;
 	private List<ProductDTO> fullList;
 
 	private AppMain appMain;
@@ -143,8 +146,8 @@ public class ProductPage extends Page {
 		model = new DefaultTableModel(columnNames, 0) {
 			@Override
 			public Class<?> getColumnClass(int columnIndex) {
-				if (columnIndex == 0)
-					return Boolean.class; // 체크박스
+				if (columnIndex == 0) return Boolean.class; // 체크박스
+			    if (columnIndex == 1) return ImageIcon.class; // 사진
 				return String.class;
 			}
 
@@ -157,19 +160,19 @@ public class ProductPage extends Page {
 		};
 
 		tblPlan = new JTable(model);
-		tblPlan.setRowHeight(45);
-		tblPlan.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 45));
+		tblPlan.setRowHeight(120);
+		tblPlan.getTableHeader().setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 100));
 		tblPlan.getColumn("재고보기").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("재고보기").setCellEditor(new ButtonEditor(new JCheckBox(), (JTable tbl, int Row, int column) -> {
-			String productCode = (String) tbl.getValueAt(Row, 1);
+			String productCode = (String) tbl.getValueAt(Row, 2);
 			showInventoryPage(productCode);
 		}));
-		tblPlan.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
+		tblPlan.setPreferredScrollableViewportSize(new Dimension(Config.CONTENT_WIDTH - 20, 650));
 
 		scTable = new JScrollPane(tblPlan);
 		scTable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		scTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
+		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 680));
 
 		/* ==== 페이징 컨트롤 ==== */
 		pPaging = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -297,7 +300,7 @@ public class ProductPage extends Page {
 
 		for (int i = start; i < end; i++) {
 			ProductDTO dto = fullList.get(i);
-			Object[] row = { false, dto.getProductCode(), dto.getProductName(), dto.getSupplierName(),
+			Object[] row = { false, resizeImage(dto.getThumbnailPath(), 100, 100), dto.getProductCode(), dto.getProductName(), dto.getSupplierName(),
 					dto.getStorageTypeName(), dto.getPrice(), "보기" };
 			model.addRow(row);
 		}
@@ -323,6 +326,18 @@ public class ProductPage extends Page {
 				return i;
 		}
 		return -1;
+	}
+	
+	private ImageIcon resizeImage(String path, int width, int height) {
+		//path가 null이거나 빈 무자열이면 기본 이미지로 대체
+	    if (path == null || path.isEmpty()) {
+	        System.out.println("이미지 경로가 null 또는 빈 문자열입니다. 기본 이미지로 대체합니다.");
+	        path = "images/default.png";
+	    }
+		URL imgUrl = getClass().getClassLoader().getResource(path);
+	    ImageIcon icon = new ImageIcon(imgUrl);
+	    Image image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+	    return new ImageIcon(image);
 	}
 	
 	public void resetFields() {

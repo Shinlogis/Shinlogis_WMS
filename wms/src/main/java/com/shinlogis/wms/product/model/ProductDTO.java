@@ -7,16 +7,27 @@ public class ProductDTO {
 	private String supplierName;     // supplier.name
 	private String storageTypeName;  // storage_type.type_name
 	private int price;
+	private String thumbnailPath;
 
 	public ProductDTO() {
+	
 	}
-
-	public ProductDTO(String productCode, String productName, String supplierName, String storageTypeName, int price) {
+	
+	public ProductDTO(String productCode, String productName, String supplierName, String storageTypeName, int price, String thumbnailPath) {
 		this.productCode = productCode;
 		this.productName = productName;
 		this.supplierName = supplierName;
 		this.storageTypeName = storageTypeName;
 		this.price = price;
+		this.thumbnailPath = thumbnailPath;
+	}
+
+	public String getThumbnailPath() {
+		return thumbnailPath;
+	}
+
+	public void setThumbnailPath(String thumbnailPath) {
+		this.thumbnailPath = thumbnailPath;
 	}
 
 	public String getProductCode() {
@@ -62,6 +73,6 @@ public class ProductDTO {
 	@Override
 	public String toString() {
 		return "ProductDTO [productCode=" + productCode + ", productName=" + productName +
-		       ", supplierName=" + supplierName + ", storageTypeName=" + storageTypeName + ", price=" + price + "]";
+		       ", supplierName=" + supplierName + ", storageTypeName=" + storageTypeName + ", price=" + price + ", thumbnailPath=" + thumbnailPath + "]";
 	}
 }
