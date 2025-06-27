@@ -92,7 +92,7 @@ public class SnapshotDAO {
 				snapshot.setProductName(rs.getString("product_name"));
 
 				StorageType storageType = new StorageType();
-				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
+				storageType.setTypeCode(rs.getString("storage_type_code"));
 				snapshot.setStorageType(storageType);
 				
 				snapshot.setSupplierName(rs.getString("supplier_name"));
@@ -131,11 +131,12 @@ public class SnapshotDAO {
 			pstmt.setString(3, form.getProduct().getStorageType().getTypeCode());
 			pstmt.setString(4, form.getProduct().getSupplier().getName());
 			pstmt.setInt(5, form.getProduct().getPrice());
-			
+			pstmt.executeUpdate();			
 			rs = pstmt.getGeneratedKeys();
 	        if (rs.next()) {
 	            snapshotId = rs.getInt(1);
 	        }
+	        System.out.println("스냅샷id "+snapshotId);
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    } finally {

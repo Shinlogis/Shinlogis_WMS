@@ -160,7 +160,7 @@ public class ReceiptPage extends Page {
 
 		btnRegister = new JButton("입고예정 등록");
 		btnRegister.addActionListener(e -> {
-			AddRecieptDialog dialog = new AddRecieptDialog(appMain, appMain);
+			AddRecieptDialog dialog = new AddRecieptDialog(appMain, appMain, iModel);
 			dialog.setVisible(true);
 		});
 		

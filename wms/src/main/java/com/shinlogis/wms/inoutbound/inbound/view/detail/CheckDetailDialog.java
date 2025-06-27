@@ -22,10 +22,7 @@ import com.shinlogis.wms.common.util.NumericTextFieldUtil;
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
-import com.shinlogis.wms.product.model.Product;
-import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.model.Snapshot;
-import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 import com.shinlogis.wms.warehouse.model.Warehouse;
 import com.shinlogis.wms.warehouse.repository.WarehouseDAO;
 import com.toedter.calendar.JDateChooser;
@@ -39,7 +36,7 @@ public class CheckDetailDialog extends JDialog {
 	private JLabel laIODetail;
 	private JLabel laProductCode;
 	private JLabel laProductName;
-	private JLabel laProductType;
+	private JLabel laProductStorageType;
 	private JLabel laSupplierName;
 	private JLabel laPlannedQuantity;
 	private JComboBox<String> cbDamagedTypeCode;
@@ -64,7 +61,7 @@ public class CheckDetailDialog extends JDialog {
 		laIODetail = new JLabel(String.valueOf(detail.getIoDetailId()));
 		laProductCode = new JLabel(detail.getProductSnapshot().getProductCode());
 		laProductName = new JLabel(detail.getProductSnapshot().getProductName());
-		laProductType = new JLabel(detail.getProductSnapshot().getStorageType().getTypeName());
+		laProductStorageType = new JLabel(detail.getProductSnapshot().getStorageType().getTypeCode());
 		laSupplierName = new JLabel(detail.getProductSnapshot().getSupplierName());
 		laPlannedQuantity = new JLabel(String.valueOf(detail.getPlannedQuantity()));
 		tfDamagedQuantity = new JTextField(10); 
@@ -94,7 +91,7 @@ public class CheckDetailDialog extends JDialog {
 		gbc.gridx = 2;
 		add(laProductName, gbc);
 		gbc.gridx = 3;
-		add(laProductType, gbc);
+		add(laProductStorageType, gbc);
 
 		gbc.gridy = 3;
 		gbc.gridx = 0;
@@ -168,7 +165,7 @@ public class CheckDetailDialog extends JDialog {
 					laWarehouseName.setText(warehouse.getWarehouseName());
 					laWarehouseType.setText(warehouse.getStorageType().getTypeName());
 				} else {
-					JOptionPane.showMessageDialog(this, snapshot.getStorageType().getTypeName()+" 상품은 "+warehouse.getStorageType().getTypeName()+" 창고에 보관할 수 없습니다.");
+					JOptionPane.showMessageDialog(this, snapshot.getStorageType().getTypeCode()+" 상품은 "+warehouse.getStorageType().getTypeCode()+" 창고에 보관할 수 없습니다.");
 				}
 			} else {
 				JOptionPane.showMessageDialog(this, "존재하지 않는 창고입니다.");

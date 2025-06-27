@@ -50,10 +50,10 @@ public class DBManager {
 		}
 		return conn;
 	}
-	
-	//데이터베이스 관련된 자원을 해체하는 메서드
+
+	// 데이터베이스 관련된 자원을 해체하는 메서드
 	public void release(Connection conn) {
-		if(conn != null) {
+		if (conn != null) {
 			try {
 				conn.close();
 			} catch (SQLException e1) {

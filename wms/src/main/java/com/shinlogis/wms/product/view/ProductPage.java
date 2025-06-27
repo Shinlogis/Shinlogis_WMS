@@ -32,7 +32,6 @@ public class ProductPage extends Page {
     private JTextField productCode, productName, supplierName, priceMin, priceMax;
     private JComboBox<String> comboStorageType;
     public JButton btnSearch;
-
     private JPanel pTable;
     private JLabel laPlanCount;
     private JTable tblPlan;
@@ -135,7 +134,7 @@ public class ProductPage extends Page {
         scTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
-        /* ==== 페이징 컨트롤 ==== */
+        /* ==== 페이징 컨트롤 ==== */  
         pPaging = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pPaging.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 40));
         btnPrevPage = new JButton("이전");

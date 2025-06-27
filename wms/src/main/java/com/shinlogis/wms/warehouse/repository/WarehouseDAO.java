@@ -41,7 +41,7 @@ public class WarehouseDAO {
 				storageType.setTypeCode(rs.getString("type_name"));
 				storageType.setTypeName(rs.getString("type_code"));
 				wh.setStorageType(storageType);
-				
+
 
 				list.add(wh);
 			}
@@ -85,7 +85,7 @@ public class WarehouseDAO {
 				wh.setWarehouseId(rs.getInt("warehouse_id"));
 				wh.setWarehouseName(rs.getString("warehouse_name"));
 				wh.setAddress(rs.getString("address"));
-				
+
 				StorageType storageType = new StorageType();
 				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
 				storageType.setTypeCode(rs.getString("type_code"));

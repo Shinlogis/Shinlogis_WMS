@@ -36,7 +36,7 @@ public class DetailDAO {
 	 */
 	public int insertDetail(int receiptId, int snapshotId, InboundForm form, HeadquartersUser user) {
 		int result = 0;
-		String sql = "INSERT INTO io_plan_item (io_receipt_id, planned_quantity, product_snapshot, damage_code_id, damage_quantity, actual_quantity, 컬럼명	headquarters_user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO IO_DETAIL (io_receipt_id, planned_quantity, snapshot_id, actual_quantity) VALUES (?, ?, ?, ?)";
 
 		Connection connection = null;
 		PreparedStatement pstmt = null;
@@ -81,7 +81,7 @@ public class DetailDAO {
 				.append("dc.damage_code_id, dc.code AS damage_code, ")
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email, ")
 				.append("w.warehouse_id, w.warehouse_name, w.address, w.storage_type_id, w.warehouse_code, ")
-				.append("st.storage_type_id, st.type_code, st.type_name ")
+				.append("s.storage_type_code ")
 				.append("FROM io_detail ip ")
 				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("LEFT JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
@@ -155,9 +155,7 @@ public class DetailDAO {
 				snapshot.setProductName(rs.getString("product_name"));
 
 				StorageType storageType = new StorageType();
-				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
-				storageType.setTypeCode(rs.getString("type_code"));
-				storageType.setTypeName(rs.getString("type_name"));
+				storageType.setTypeCode(rs.getString("storage_type_code"));
 				snapshot.setStorageType(storageType);
 
 				snapshot.setSupplierName(rs.getString("supplier_name"));
@@ -281,7 +279,7 @@ public class DetailDAO {
 				.append("dc.damage_code_id, dc.code AS damage_code, dc.name AS damage_code_name,")
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email, ")
 				.append("w.warehouse_id, w.warehouse_name, w.address, w.storage_type_id, w.warehouse_code, ")
-				.append("st.storage_type_id, st.type_code, st.type_name ")
+				.append("s.storage_type_code ")
 				.append("FROM io_detail ip ")
 				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("LEFT JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
@@ -313,13 +311,13 @@ public class DetailDAO {
 			sql.append("AND s.supplier_name = ? ");
 			params.add(filters.get("supplier_name"));
 		}
-		if (filters.get("status") != "전체" && filters.get("status") != null) {
-			sql.append("AND ip.status = ? ");
-			params.add(filters.get("status"));
+		if (filters.get("damage_code_name") != null && !"전체".equals(filters.get("damage_code_name"))) {
+		    sql.append("AND dc.name = ? ");
+		    params.add(filters.get("damage_code_name"));
 		}
-		if (filters.get("scheduled_date") != null) {
-			sql.append("AND DATE(ir.scheduled_date) = ? ");
-			params.add(filters.get("scheduled_date"));
+		if (filters.get("processed_date") != null) {
+			sql.append("AND DATE(ir.processed_date) = ? ");
+			params.add(filters.get("processed_date"));
 		}
 
 //		System.out.println(sql.toString());
@@ -350,9 +348,7 @@ public class DetailDAO {
 				detail.setStatus(rs.getString("status"));
 
 				StorageType storageType = new StorageType();
-				storageType.setStorageTypeId(rs.getInt("storage_type_id"));
-				storageType.setTypeCode(rs.getString("type_code"));
-				storageType.setTypeName(rs.getString("type_name"));
+				storageType.setTypeCode(rs.getString("storage_type_code"));
 
 				Snapshot snapshot = new Snapshot();
 				snapshot.setSnapshotId(rs.getInt("snapshot_id"));
@@ -384,7 +380,7 @@ public class DetailDAO {
 				hq.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
 				hq.setId(rs.getString("hq_user_id"));
 //				hq.setEmail(rs.getString("hq_user_email")); // TODO: setter을 수정하거나 db에서 받아온 email을 분리해서 저장하는 방법이 필요
-//                    detail.(hq);
+				detail.setUser(hq);
 
 				list.add(detail);
 			}

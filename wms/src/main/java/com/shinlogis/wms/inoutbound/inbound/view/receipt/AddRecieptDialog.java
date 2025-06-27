@@ -3,6 +3,7 @@ package com.shinlogis.wms.inoutbound.inbound.view.receipt;
 import java.awt.*;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class AddRecieptDialog extends JDialog {
 	private AppMain appMain;
 	private HeadquartersUser user;
 
+	private JDateChooser chooserTop; // 전체 예정일
 	private JPanel formPanel;
 	private JScrollPane scrollPane;
 	private JButton btnAddRow, btnSave, btnCancel;
@@ -34,7 +36,7 @@ public class AddRecieptDialog extends JDialog {
 	private SnapshotDAO snapshotDAO = new SnapshotDAO();
 	private List<RowComponents> rowComponentsList = new ArrayList<>();
 
-	public AddRecieptDialog(Frame owner, AppMain appMain) {
+	public AddRecieptDialog(Frame owner, AppMain appMain, ReceiptModel iModel) {
 		super(owner, "입고예정 등록", true);
 		this.appMain = appMain;
 		this.user =	appMain.headquartersUser;
@@ -45,6 +47,16 @@ public class AddRecieptDialog extends JDialog {
 		formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
 		scrollPane = new JScrollPane(formPanel);
 		add(scrollPane, BorderLayout.CENTER);
+		
+		// 날짜 입력 필드 
+		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		topPanel.add(new JLabel("입고 예정일"));
+		chooserTop = new JDateChooser();
+		chooserTop.setPreferredSize(new Dimension(120, 25));
+		chooserTop.setDateFormatString("yyyy-MM-dd");
+		topPanel.add(chooserTop);
+		add(topPanel, BorderLayout.NORTH);
+
 
 		addFormRow();
 
@@ -65,6 +77,14 @@ public class AddRecieptDialog extends JDialog {
 			int successCount = 0; // 입고 성공 건 수 카운트
 			List<InboundForm> inboundForms = new ArrayList<>();
 			Map<String, Object> receiptMap = new HashMap<>();
+			
+			// 날짜 입력
+			java.util.Date utilDate = chooserTop.getDate();
+			if (utilDate == null) {
+				JOptionPane.showMessageDialog(this, "입고 예정일을 선택해주세요.");
+				return;
+			}
+			Date sqlDate = new java.sql.Date(utilDate.getTime());
 
 			// 각 행에 입력한 정보 추출
 			for (RowComponents row : rowComponentsList) {
@@ -76,6 +96,7 @@ public class AddRecieptDialog extends JDialog {
 					JOptionPane.showMessageDialog(this, "상품 정보가 누락된 항목이 있습니다.");
 					return;
 				}
+				
 
 				int qty;
 				try {
@@ -93,29 +114,20 @@ public class AddRecieptDialog extends JDialog {
 					return;
 				}
 
-				java.util.Date utilDate = row.chooser.getDate();
-				if (utilDate == null) {
-					JOptionPane.showMessageDialog(this, "예정일을 선택해주세요.");
-					return;
-				}
-
-				Date sqlDate = new java.sql.Date(utilDate.getTime());
-
 				// 입력한 정보로 form 생성
 				InboundForm form = new InboundForm();
 				form.setProduct(product);
 				form.setQuantity(qty);
-				form.setPlannedDate(sqlDate);
 
 				inboundForms.add(form);
 			}
 
+			// 입고예정 생성
+			receiptMap = receiptDAO.insertReceipt(sqlDate, user);
+			int receiptId = (Integer) receiptMap.get("id"); // 위에서 생성한 입고예정의 id
+			
 			// 입고상세 생성
 			for (InboundForm form : inboundForms) {
-				// 입고예정 생성
-				receiptMap = receiptDAO.insertReceipt(form, user);
-				int receiptId = (Integer) receiptMap.get("id"); // 위에서 생성한 입고예정의 id
-
 				int snapshotId = snapshotDAO.createSnapshotFromForm(form); // 스냅샷 ID 받아오기
 				int result = detailDAO.insertDetail(receiptId, snapshotId, form, user); // insert에 전달
 				if (result == 0) {
@@ -126,7 +138,10 @@ public class AddRecieptDialog extends JDialog {
 			}
 
 			JOptionPane.showMessageDialog(this, successCount + "건 등록 완료");
+			
 			dispose();
+			// TODO 테이블 갱신
+			iModel.setData(Collections.emptyMap());
 		});
 
 		btnCancel.addActionListener(e -> dispose());
@@ -135,6 +150,11 @@ public class AddRecieptDialog extends JDialog {
 		setLocationRelativeTo(owner);
 	}
 
+	/**
+	 * 다이얼로그에 입고항목 입력란을 추가하는 메서드
+	 * @author 김예진
+	 * @since 2025-06-26
+	 */
 	private void addFormRow() {
 		JPanel row = new JPanel(new GridBagLayout());
 		row.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -192,14 +212,6 @@ public class AddRecieptDialog extends JDialog {
 		row.add(tfQuantity, gbc);
 
 		gbc.gridx = ++col;
-		row.add(new JLabel("예정일"), gbc);
-		gbc.gridx = ++col;
-		JDateChooser chooser = new JDateChooser();
-		chooser.setPreferredSize(new Dimension(120, 25));
-		chooser.setDateFormatString("yyyy-MM-dd");
-		row.add(chooser, gbc);
-
-		gbc.gridx = ++col;
 		JButton btnDelete = new JButton("삭제");
 		row.add(btnDelete, gbc);
 
@@ -238,7 +250,7 @@ public class AddRecieptDialog extends JDialog {
 		});
 
 		rowComponentsList
-				.add(new RowComponents(tfProductCode, btnSearch, laProductName, laSupplierName, tfQuantity, chooser));
+				.add(new RowComponents(tfProductCode, btnSearch, laProductName, laSupplierName, tfQuantity));
 	}
 
 	private static class RowComponents {
@@ -247,16 +259,15 @@ public class AddRecieptDialog extends JDialog {
 		JLabel laProductName;
 		JLabel laSupplierName;
 		JTextField tfQuantity;
-		JDateChooser chooser;
 
-		public RowComponents(JTextField tfProductCode, JButton btnSearch, JLabel laProductName, JLabel laSupplierName,
-				JTextField tfQuantity, JDateChooser chooser) {
+		public RowComponents(JTextField tfProductCode, JButton btnSearch,
+				JLabel laProductName, JLabel laSupplierName, JTextField tfQuantity) {
 			this.tfProductCode = tfProductCode;
 			this.btnSearch = btnSearch;
 			this.laProductName = laProductName;
 			this.laSupplierName = laSupplierName;
 			this.tfQuantity = tfQuantity;
-			this.chooser = chooser;
 		}
 	}
+
 }

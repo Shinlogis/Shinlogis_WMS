@@ -12,7 +12,6 @@ import com.shinlogis.wms.product.model.Product;
 public class InboundForm {
     private Product product;
     private int quantity;
-    private Date plannedDate;
     
 	public Product getProduct() {
 		return product;
@@ -26,12 +25,5 @@ public class InboundForm {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public Date getPlannedDate() {
-		return plannedDate;
-	}
-	public void setPlannedDate(Date plannedDate) {
-		this.plannedDate = plannedDate;
-	}
-    
     
 }
