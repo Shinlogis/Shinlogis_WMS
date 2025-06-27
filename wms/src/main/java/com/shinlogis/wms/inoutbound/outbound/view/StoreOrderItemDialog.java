@@ -12,7 +12,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-public class LocationOrderItemDialog extends JDialog{
+import com.shinlogis.locationuser.order.model.StoreOrderItemModel;
+
+public class StoreOrderItemDialog extends JDialog{
 	JPanel p_title;
 	JTable tb_regist;
 	JLabel la_title;
@@ -24,7 +26,7 @@ public class LocationOrderItemDialog extends JDialog{
 	//임시버튼임.**********
 	JButton bt_tempo;
 	
-	public LocationOrderItemDialog() {
+	public StoreOrderItemDialog() {
 		setLayout(new FlowLayout());
 		// 제목 서식.
 		la_title = new JLabel("지점 주문 상세 조회");
@@ -35,7 +37,7 @@ public class LocationOrderItemDialog extends JDialog{
 		
 		
 		//본문서식
-		model = new LocationOrderItemModel();
+//		model = new StoreOrderItemModel();
 		tb_table= new JTable(model);
 		tb_table.setRowHeight(45);
 		sc_table = new JScrollPane(tb_table);

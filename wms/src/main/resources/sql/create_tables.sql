@@ -139,7 +139,7 @@ CREATE TABLE io_detail (
     snapshot_id INT NOT NULL,
     damage_code_id INT NOT NULL,
     damage_quantity INT NOT NULL,
-    actual_quantity INT NOT NULL,
+    actual_quantity INT NOT NULL DEFAULT 0,
     processed_date DATETIME,
     warehouse_id INT,
 
