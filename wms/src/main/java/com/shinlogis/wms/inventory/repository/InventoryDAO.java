@@ -77,7 +77,7 @@ public class InventoryDAO {
 		return 0;
 	}
 
-	// TODO 창고에 재고로 존재하는 상품은, 기존의 재고를 업데이트하는 식으로 재고에 저장Add commentMore actions
+	// TODO 창고에 재고로 존재하는 상품은, 기존의 재고를 업데이트하는 식으로 재고에 저장
 
 	// 조회: 중복 항목 병합 (inventory_id 제외)
 	public List<InventoryDTO> selectInventoryDetails(InventoryDTO inventoryDTO) {
@@ -99,10 +99,10 @@ public class InventoryDAO {
 		sql.append("WHERE 1=1 ");
 
 		if (inventoryDTO.getWarehouseCode() != null && !inventoryDTO.getWarehouseCode().isEmpty()) {
-			sql.append("AND w.warehouse_code = ? ");
+			sql.append("AND w.warehouse_code LIKE ? ");
 		}
 		if (inventoryDTO.getProductCode() != null && !inventoryDTO.getProductCode().isEmpty()) {
-			sql.append("AND p.product_code = ? ");
+			sql.append("AND p.product_code LIKE ? ");
 		}
 		if (inventoryDTO.getWarehouseName() != null && !inventoryDTO.getWarehouseName().isEmpty()) {
 			sql.append("AND w.warehouse_name LIKE ? ");

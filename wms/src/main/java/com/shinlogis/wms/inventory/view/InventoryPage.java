@@ -119,7 +119,7 @@ public class InventoryPage extends Page {
 		pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
 		laPageName = new JLabel("재고관리 > 상품관리");
-		pPageName.add(laPageName);
+		pPageName.add(laPageName); 
 
 		// 검색 결과 카운트 영역
 		pTableNorth = new JPanel(new BorderLayout());

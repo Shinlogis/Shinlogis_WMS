@@ -217,4 +217,51 @@ public class ProductDAO {
 
 	    return list;
 	}
+	/**
+	 * 다중 삭제하는 메서드
+	 * @author 김지민
+	 * @since 2025-06-27
+	 */
+	public int deleteProductsByCodes(List<String> codes) {
+	    String deleteInventorySQL = "DELETE FROM inventory WHERE product_id = (SELECT product_id FROM product WHERE product_code = ?)";
+	    String deleteOrderItemSQL = "DELETE FROM store_order_item WHERE product_id = (SELECT product_id FROM product WHERE product_code = ?)";
+	    String deleteProductSQL = "DELETE FROM product WHERE product_code = ?";
+
+	    int totalDeleted = 0;
+
+	    try (Connection conn = dbManager.getConnection()) {
+	        conn.setAutoCommit(false); // 트랜잭션 시작
+
+	        try (
+	            PreparedStatement deleteInventoryStmt = conn.prepareStatement(deleteInventorySQL);
+	            PreparedStatement deleteOrderItemStmt = conn.prepareStatement(deleteOrderItemSQL);
+	            PreparedStatement deleteProductStmt = conn.prepareStatement(deleteProductSQL);
+	        ) {
+	            for (String code : codes) {
+	                // 1. inventory에서 먼저 삭제
+	                deleteInventoryStmt.setString(1, code);
+	                deleteInventoryStmt.executeUpdate();
+
+	                // 2. store_order_item에서 삭제
+	                deleteOrderItemStmt.setString(1, code);
+	                deleteOrderItemStmt.executeUpdate();
+
+	                // 3. product에서 삭제
+	                deleteProductStmt.setString(1, code);
+	                int affectedRows = deleteProductStmt.executeUpdate();
+	                totalDeleted += affectedRows;
+	            }
+
+	            conn.commit();
+	        } catch (SQLException e) {
+	            conn.rollback();
+	            e.printStackTrace();
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return totalDeleted;
+	}
 }
