@@ -112,8 +112,10 @@ public class OutboundReceiptDAO {
 		try {
 			con = dbManager.getConnection();
 			// total로서 sql문을 받아온다.
-			String sql = "SELECT COUNT(*) AS total FROM io_receipt";
-			pstmt = con.prepareStatement(sql);
+			StringBuffer sql = new StringBuffer();
+			sql.append("SELECT COUNT(*) AS total FROM io_receipt ir"
+					+ " where ir.io_type = 'out' ");
+			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) {
@@ -243,6 +245,7 @@ public class OutboundReceiptDAO {
 			sql.append("FROM io_receipt ir ");
 			sql.append("JOIN location l ON ir.location_id = l.location_id ");
 			sql.append("WHERE 1=1 ");
+			sql.append("AND ir.io_type = 'out' ");
 
 			List<Object> params = new ArrayList<>();
 

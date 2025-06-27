@@ -201,7 +201,7 @@ public class OutboundDetailPage extends Page {
 		        new ButtonEditor(new JCheckBox(), (table, row, col) -> {
 		        	//클릭시 동작도 다시 재 정의 해주기
 		            int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		            new StoreOrderDialog();
+		            new OrderDialog();
 		        })
 		    );
 
@@ -219,9 +219,6 @@ public class OutboundDetailPage extends Page {
 		GridBagConstraints gbcTableNorth = new GridBagConstraints();
 		p_tableNorth = new JPanel(new GridBagLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-
-		
-		
 		
 		
 		tb_plan = new JTable(model = new OutboundDetailModel());
@@ -232,11 +229,9 @@ public class OutboundDetailPage extends Page {
 		    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 		        // 상세보기 클릭 시 동작 정의
 		        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		        new StoreOrderDialog();
+		        new OrderDialog();
 		    })
 		); 
-
-
 		
 		sc_table= new JScrollPane(tb_plan);
 		sc_table.setPreferredSize(new Dimension(1150,660));
@@ -250,8 +245,6 @@ public class OutboundDetailPage extends Page {
 		gbcTableNorth.insets = new Insets(0, 10, 0, 10); // 좌우 여백
 		p_tableNorth.add(la_counter, gbcTableNorth);
 		
-
-
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);

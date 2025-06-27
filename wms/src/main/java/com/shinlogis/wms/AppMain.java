@@ -39,7 +39,7 @@ import com.shinlogis.wms.inoutbound.inbound.view.process.ProcessPage;
 import com.shinlogis.wms.inoutbound.inbound.view.receipt.ReceiptPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundDetailPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundReceiptPage;
-import com.shinlogis.wms.inoutbound.outbound.view.OutboundRegiterPage;
+import com.shinlogis.wms.inoutbound.outbound.view.OutboundRegisterPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
@@ -54,7 +54,7 @@ public class AppMain extends JFrame {
 	JLabel la_outboundPlan, la_outboundDetail, la_outboundRegister;
 	JLabel la_inventory, la_warehouse, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat,la_home,la_main;
 
-	JLabel la_user, la_logout;
+	JLabel la_user, la_logout, la_locationName;
 	public Page[] pages;
 
 	HeadquartersJoin memberJoin;
@@ -310,18 +310,24 @@ public class AppMain extends JFrame {
 		p_north.removeAll();
 
 		la_user = new JLabel();
-		la_user.setFont(new Font("맑은 고딕{", Font.BOLD, 20));
+		la_user.setFont(new Font("맑은 고딕", Font.BOLD, 15));
 		la_logout = new JLabel("로그아웃");
-		la_logout.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		la_logout.setFont(new Font("맑은 고딕", Font.BOLD, 15));
+		la_locationName = new JLabel();
+		la_locationName.setFont(new Font("맑은 고딕", Font.BOLD, 15));
 
 		if (headquartersUser != null) {
 			la_user.setText(headquartersUser.getId());
 		} else if (locationUser != null) {
 			la_user.setText(locationUser.getId());
+			la_locationName.setText(locationUser.getLocation().getLocationName());
 		}
 
-		la_logout.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // 위쪽에 여백 추가
-		la_user.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // 위쪽에 여백 추가
+		la_logout.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0)); // 위쪽에 여백 추가
+		la_user.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0)); // 위쪽에 여백 추가
+		la_locationName.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0)); // 위쪽에 여백 추가
+		la_locationName.setHorizontalAlignment(JLabel.CENTER);
+		p_north.add(la_locationName);
 		p_north.add(la_user);
 		p_north.add(la_logout);
 
@@ -337,7 +343,7 @@ public class AppMain extends JFrame {
 				} else if (locationUser != null) {
 					locationUser = null;
 					new MemberLogin();
-					 AppMain.this.dispose();  // 현재 AppMain 창 닫기
+					
 				}
 			}
 		});
@@ -451,7 +457,7 @@ public class AppMain extends JFrame {
 			pages[10] = new SupplierPage(this);
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
-			pages[13] = new OutboundRegiterPage(this);
+			pages[13] = new OutboundRegisterPage(this);
 
 		} else if ("locationUser".equals(role)) {
 			pages = new Page[5];
