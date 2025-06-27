@@ -10,17 +10,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import com.shinlogis.locationuser.order.view.LocationMainPage;
+import com.shinlogis.locationuser.order.view.OrderPage;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.util.ImageUtil;
-import com.shinlogis.wms.common.util.StringUtil;
 import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.product.repository.ProductDAO;
 
 
 
@@ -29,40 +27,32 @@ public class ProductItem extends JPanel{
 	Image image;
 	ImageUtil imageUtil=new ImageUtil();
 	LocationMainPage mainPage; //현재 producttem을 생성한 주체 페이지이므로 
+	ProductDAO productDao = new ProductDAO();
+	
 	public ProductItem(LocationMainPage mainPage,Product product) {
 		this.mainPage=mainPage;
 		this.product=product;
-
+		
+		
 		image = imageUtil.getImage(product.getThumbnailPath(),185, 120);
 		//마우스 리스너 연결
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				//어떤 상품을 선택했는지 그 정보를 보관 
-				mainPage.product=product;
-				//페이지전환 
-				mainPage.appMain.showPage(Config.ORDER_PAGE);
+				// 선택한 상품 보관
+		        mainPage.product = product;
+
+		        // 페이지 전환
+		        mainPage.appMain.showPage(Config.ORDER_PAGE);
+				
 			}
 		});
-		
 		
 		setPreferredSize(new Dimension(195, 170));
 		setBackground(Color.WHITE);
 	}
 
 	protected void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		
-//		Graphics2D g2=(Graphics2D)g;
-//		g2.drawImage(image, 5, 5, 185, 120, this); 
-//		
-//		//상품명 그리기 
-//		g2.setFont(new Font("Gulim", Font.BOLD,20));
-//		
-//		String name = product.getProductName();
-//	    int nameWidth = g2.getFontMetrics().stringWidth(name);
-//	    int nameX = (getWidth() - nameWidth) / 2;
-//	    g2.drawString(name, nameX, 160);
 		super.paintComponent(g);
 	    Graphics2D g2 = (Graphics2D) g.create();
 

@@ -4,6 +4,7 @@ public class Location {
     private int locationId;
     private String locationName;
     private String address;
+    private String status;
     
 	public int getLocationId() {
 		return locationId;
@@ -23,7 +24,15 @@ public class Location {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String toString() {
-	    return locationName;  // 콤보박스에서 보일 텍스트
+	public String getStatus() {
+		return status;
 	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String toString() {
+		return locationName;
+	}
+    
+	
 }

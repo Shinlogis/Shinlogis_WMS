@@ -1,4 +1,4 @@
-package com.shinlogis.locationuser.orderList.view;
+package com.shinlogis.wms.location.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -35,99 +36,112 @@ import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.location.model.LocationModel;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.toedter.calendar.JDateChooser;
 
-public class OrderListPage extends Page{
+public class LocationPage extends Page{
 
-	/* ────────── 페이지명 영역 구성 요소 ────────── */    
-	private JPanel pPageName; // 페이지명 패널
-	private JLabel laPageName; // 페이지명
 		
 	/* ────────── 검색 영역 구성 요소 ────────── */
 	private JPanel pSearch; // 검색 Bar
-
-    private JDateChooser chooser; // 달력
+    private JTextField tf;
     private JButton btnSearch; // 검색 버튼
+    
+    private JPanel pSearch2; // 검색 Bar
+    private JTextField tf2;
+    private JButton btnSearch2; // 검색 버튼
 
     /* ────────── 목록 영역 구성 요소 ────────── */
 
-    private StoreOrderModel model;
-    ProductDAO productDao = new ProductDAO();
+    private LocationModel model;
+  
 
     private JPanel pTable; //전체 영역 
     private JPanel pTable_Content; //content 영역 
     private JPanel pTable_Content_title; //content 제목 영역 
-    private JLabel laContentTitle;
+    private JLabel laContentTitle; 
     
+    private JPanel pTable2; //전체 영역 
+    private JPanel pTable_Content2; //content 영역 
     private JPanel pTable_Content_title2; //content 제목 영역 
-    private JLabel laContentTitle2;
-    private StoreOrderItemModel model2;
-    
-    JTable table2 ;
-    JScrollPane scrollPane2;
-    private JButton btnOrder;  // 주문하기버튼 
-    int storeOrderId=0;
+    private JLabel laContentTitle2; 
     
     
-   
-	public OrderListPage(AppMain appMain) {
+	public LocationPage(AppMain appMain) {
 		super(appMain);
 			
 		/* ==== 검색 영역 ==== */
 		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
-		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.SEARCH_BAR_HEIGHT));
+		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, Config.SEARCH_BAR_HEIGHT));
 		pSearch.setBackground(Color.WHITE);
 		
-		// GridBagConstraints: 이 컴포넌트를 그리드에 어떻게 배치할지 설정하는 규칙 객체
-		// GridBagLayout에 컴포넌트를 add()할 때마다 그 컴포넌트의 위치, 크기, 여백, 정렬 방법 등을 담은 설정값을 같이 넘김
+		pSearch2 = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
+		pSearch2.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, Config.SEARCH_BAR_HEIGHT));
+		pSearch2.setBackground(Color.WHITE);
+		
 		GridBagConstraints gbc = new GridBagConstraints();		
 		gbc.insets = new Insets(5, 8, 5, 8); // 컴포넌트 주변 여백 설정
 		gbc.fill = GridBagConstraints.HORIZONTAL; // 셀 안에서 공간을 채우는 방식 설정. HORIZONTAL: 가로방향으로 셀을 꽉 채우기 (JtextField의 너비가 셀만큼 쭉 늘어남) 
 		
-		
-		 //주문일자 선택 
+		 //검색 선택 
         gbc.gridx = 2;
-        pSearch.add(new JLabel("주문일자"), gbc);
-        chooser = new JDateChooser();
-        chooser.setDateFormatString("yyyy-MM-dd");
-        chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height));
-        chooser.setBackground(Color.WHITE);
+        pSearch.add(new JLabel("지점검색"), gbc);
+        tf = new JTextField();
+        tf.setPreferredSize(new Dimension(150, tf.getPreferredSize().height));
+        tf.setBackground(Color.WHITE);
         gbc.gridx = 3;
-        pSearch.add(chooser, gbc);
+        pSearch.add(tf, gbc);
+        
+        gbc.gridx = 2;
+        pSearch2.add(new JLabel("지점검색"), gbc);
+        tf2 = new JTextField();
+        tf2.setPreferredSize(new Dimension(150, tf2.getPreferredSize().height));
+        tf2.setBackground(Color.WHITE);
+        gbc.gridx = 3;
+        pSearch2.add(tf2, gbc);
         
         // 검색 버튼
         btnSearch = new JButton("검색");
         gbc.gridx = 10;
         pSearch.add(btnSearch, gbc);
         
-        /* ==== 페이지명 영역 ==== */
-        pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
-        laPageName = new JLabel("주문하기 > 발주내역 조회");
-        pPageName.add(laPageName);
-        pPageName.setBackground(new Color(0xF1F1F1));
+        btnSearch2=new JButton("검색");
+        gbc.gridx = 10;
+        pSearch2.add(btnSearch2, gbc);
         
         //1.pTable 영역 
         pTable = new JPanel(); // 전체 
         pTable_Content = new JPanel(); //전체 > 내용 
         pTable_Content_title = new JPanel(new FlowLayout()); //전체 > 내용 > 제목 
-        laContentTitle = new JLabel("주문 목록"); //전체 > 내용 > 제목(라벨)
-        model = new StoreOrderModel(); 
+        laContentTitle = new JLabel("지점 목록"); //전체 > 내용 > 제목(라벨)
+        model = new LocationModel(); 
         JTable table = new JTable(model); //전체 > 내용 > 테이블  
         JScrollPane scrollPane = new JScrollPane(table);
         
-        pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-        pTable_Content.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 580));
-        //1.1 pTable 스타일영역 
-        pTable_Content_title.setPreferredSize(new Dimension(800, Config.TABLE_NORTH_HEIGHT-10));
-        laContentTitle.setPreferredSize(new Dimension(800, 20));
-        scrollPane.setPreferredSize(new Dimension(800, 240));  
-        
-        pTable_Content_title.setBackground(Color.white);
+ 
+        pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, 580));
+        pTable_Content.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, 580));
+        pTable_Content_title.setPreferredSize(new Dimension(800/2, Config.TABLE_NORTH_HEIGHT-10));
+        laContentTitle.setPreferredSize(new Dimension(800/2, 20));
+        scrollPane.setPreferredSize(new Dimension(800/2, 240));  
+        pTable_Content_title.setBackground(Color.WHITE);
         pTable_Content.setBackground(Color.WHITE);
         pTable.setBackground(new Color(0xF1F1F1));
+       
+        pTable2 = new JPanel(); // 전체 
+        pTable_Content2 = new JPanel(); //전체 > 내용 
+        pTable_Content_title2 = new JPanel(new FlowLayout()); //전체 > 내용 > 제목 
+        laContentTitle2 = new JLabel("주문 목록"); //전체 > 내용 > 제목(라벨)
         
+        pTable2.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, 580));
+        pTable_Content2.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, 580));
+        pTable_Content_title2.setPreferredSize(new Dimension(800/2, Config.TABLE_NORTH_HEIGHT-10));
+        laContentTitle2.setPreferredSize(new Dimension(800/2, 20));
+        pTable_Content_title2.setBackground(Color.white);
+        pTable_Content2.setBackground(Color.WHITE);
+        pTable.setBackground(new Color(0xF1F1F1));
+  
         
         //정렬 적용
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -167,82 +181,32 @@ public class OrderListPage extends Page{
         table.getColumnModel().getColumn(0).setMinWidth(60);     // 최소 너비
         table.getColumnModel().getColumn(0).setMaxWidth(60);     // 최대 너비
         table.getColumnModel().getColumn(0).setPreferredWidth(60); // 선호 너비
+        table.getColumnModel().getColumn(3).setMinWidth(80);     // 최소 너비
+        table.getColumnModel().getColumn(3).setMaxWidth(80);     // 최대 너비
+        table.getColumnModel().getColumn(3).setPreferredWidth(80); // 선호 너비
  
-        //1.2 pTable 부착 영역  
+        // 부착 영역  
         pTable_Content_title.add(laContentTitle);
         pTable_Content.add(pTable_Content_title);
         pTable_Content.add(scrollPane,BorderLayout.CENTER);
 		pTable.add(pTable_Content); 
 		
-		//2.pTable2 영역 
-        pTable_Content_title2 = new JPanel(new FlowLayout()); //전체 > 내용 > 제목 
-        laContentTitle2 = new JLabel("주문 상세 목록"); //전체 > 내용 > 제목(라벨)
-        model2 = new StoreOrderItemModel(storeOrderId); 
-        JTable table2 = new JTable(model2); //전체 > 내용 > 테이블 
-        JScrollPane scrollPane2 = new JScrollPane(table2);
-        
-        //2.1 pTable2 스타일영역 
-        pTable_Content_title2.setPreferredSize(new Dimension(800, Config.TABLE_NORTH_HEIGHT-10));
-        laContentTitle2.setPreferredSize(new Dimension(800, 20));
-        scrollPane2.setPreferredSize(new Dimension(800, 200));  
-        pTable_Content_title2.setBackground(Color.white);
-        table2.getColumnModel().getColumn(0).setMinWidth(60);     // 최소 너비
-        table2.getColumnModel().getColumn(0).setMaxWidth(60);     // 최대 너비
-        table2.getColumnModel().getColumn(0).setPreferredWidth(60); // 선호 너비
-		
-        //2.2 pTable2 부착 영역 
-        pTable_Content_title2.add(laContentTitle2);
-        pTable_Content.add(pTable_Content_title2);
-        pTable_Content.add(scrollPane2,BorderLayout.CENTER);
-        
-        pTable.add(pTable_Content);;	
-		
 		setLayout(new FlowLayout());
-		add(pPageName);
-		add(pSearch); 
+		add(pSearch);
+		add(pSearch2);
 		add(pTable); //content 영역 
+		add(pTable2);
 		setBackground(new Color(0xF1F1F1));
 		
 		//검색 이벤트 
 		btnSearch.addActionListener(e->{
-			  Date selectedDate = chooser.getDate();
-
-			    if (selectedDate != null) {
-			        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			        String formatted = sdf.format(selectedDate);
-			        System.out.println("포맷된 날짜: " + formatted);
-
-			        StoreOrderDAO dao = new StoreOrderDAO();
-			        List<StoreOrder> items = dao.selectByDate(formatted);
-			        model.setList(items);
-			    } else {
-			        JOptionPane.showMessageDialog(null, "날짜를 선택하세요.");
-			    }
-		});
-		
-		table.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        int row = table.getSelectedRow(); // 클릭된 행
-		        if (row != -1) {
-		            Object value = table.getValueAt(row, 0);
-		            if (value != null) {
-		                storeOrderId = Integer.parseInt(value.toString());
-
-		                // DAO 호출해서 주문 상세 가져오기
-		                StoreOrderItemDAO dao= new StoreOrderItemDAO();
-		                List<StoreOrderItem> list = dao.select(storeOrderId);
-
-		                model2.setList(list); 
-		            }
-		        }
-		    }
+			  String search = tf.getText();
 		});
 	}
 	
 	public void refresh() {
         List<StoreOrder> updatedList = new StoreOrderDAO().selectAll();
-        model.setList(updatedList);
-        model.fireTableDataChanged();
+      //  model.setList(updatedList);
+      //  model.fireTableDataChanged();
     }
 }

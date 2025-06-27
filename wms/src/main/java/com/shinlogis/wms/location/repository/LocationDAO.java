@@ -36,6 +36,7 @@ public class LocationDAO {
 				location.setLocationId(rs.getInt("location_id"));
 				location.setLocationName(rs.getString("location_name"));
 				location.setAddress(rs.getString("address"));
+				location.setStatus(rs.getString("status"));
 				
 				list.add(location);
 			} 
@@ -48,6 +49,8 @@ public class LocationDAO {
 		return list;
 		
 	}
+	
+
 	
 	
 	

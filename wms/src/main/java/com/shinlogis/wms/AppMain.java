@@ -42,6 +42,7 @@ import com.shinlogis.wms.inoutbound.outbound.view.OutboundReceiptPage;
 import com.shinlogis.wms.inoutbound.outbound.view.OutboundRegisterPage;
 import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.shinlogis.wms.location.model.LocationUser;
+import com.shinlogis.wms.location.view.LocationPage;
 import com.shinlogis.wms.location.view.LocatoinMyPage;
 import com.shinlogis.wms.main.view.MainPage;
 import com.shinlogis.wms.product.view.ProductPage;
@@ -235,6 +236,13 @@ public class AppMain extends JFrame {
 				}
 			});
 			
+			//지점 페이지
+			la_branch.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					showPage(Config.LOCATION_PAGE);
+				}
+			});
 			//공급사 페이지
 			la_supplier.addMouseListener(new MouseAdapter() {
 				@Override
@@ -447,7 +455,7 @@ public class AppMain extends JFrame {
 			pages[6] = new ProductPage(this);
 			pages[7] = new InventoryPage(this);
 			pages[8] = new WarehousePage(this);
-			pages[9] = null;
+			pages[9] = new LocationPage(this);
 			pages[10] = new SupplierPage(this);
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
@@ -459,7 +467,7 @@ public class AppMain extends JFrame {
 			pages[0] = new OrderPage(this);
 			pages[1] = orderListPage;
 			pages[2] = new LocatoinMyPage(this, locationUser.getLocationUserId());
-			pages[3] = null;
+			pages[3] = new OrderPage(this);
 			pages[4]=new LocationMainPage(this);
 		}
 
@@ -487,4 +495,5 @@ public class AppMain extends JFrame {
 			}
 		}
 	}
+	
 }

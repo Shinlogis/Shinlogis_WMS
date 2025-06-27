@@ -123,8 +123,6 @@ public class LocationMainPage extends Page{
 			}
 		});
 		
-		
-		
 		//조립
 		p_visual.add(la_title, BorderLayout.NORTH);
 		p_images.add(img1);

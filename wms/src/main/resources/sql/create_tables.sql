@@ -1,3 +1,5 @@
+use wms;
+-- SET SQL_SAFE_UPDATES = 0;
 SET FOREIGN_KEY_CHECKS = 0;
  DROP TABLE IF EXISTS `damaged_code`;               
  DROP TABLE IF EXISTS `headquarters_user`;          
@@ -19,7 +21,9 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE location (
     location_id INT AUTO_INCREMENT PRIMARY KEY,
     location_name VARCHAR(100) NOT NULL UNIQUE,
-    address VARCHAR(100)
+    address VARCHAR(100),
+     status VARCHAR(10) NOT NULL DEFAULT '활성',
+    CHECK (status IN ('활성', '탈퇴'))
 );
 
 -- [본사 소속 사용자 테이블]
@@ -64,6 +68,7 @@ CREATE TABLE storage_type (
 -- [상품 정보 테이블]
 CREATE TABLE product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
+	product_img VARCHAR(100),
     product_code VARCHAR(100) NOT NULL UNIQUE,
     product_name VARCHAR(100) NOT NULL,
     storage_type_id INT NOT NULL,
@@ -139,10 +144,9 @@ CREATE TABLE io_detail (
     snapshot_id INT NOT NULL,
     damage_code_id INT NOT NULL,
     damage_quantity INT NOT NULL,
-    actual_quantity INT NOT NULL DEFAULT 0,
+    actual_quantity INT NOT NULL,
     processed_date DATETIME,
     warehouse_id INT,
-     headquarters_user_id INT NOT NULL,
 
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
@@ -152,7 +156,6 @@ CREATE TABLE io_detail (
     FOREIGN KEY (io_receipt_id) REFERENCES io_receipt(io_receipt_id),
     FOREIGN KEY (snapshot_id) REFERENCES snapshot(snapshot_id),
     FOREIGN KEY (damage_code_id) REFERENCES damaged_code(damage_code_id),
-     foreign key (headquarters_user_id) references headquarters_user(headquarters_user_id),
     FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)
 );
 
@@ -173,9 +176,9 @@ CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
-	status varchar(10) not null default '대기' check(status in ('대기', '반려', '출고예정', '완료')),
+	status varchar(10) not null default '대기' check(status in ('대기', '완료')),
 
-    quantity INT NOT NULL CHECK(quantity > 0),                           -- 수량
+    quantity INT CHECK(quantity > 0),                           -- 수량
 
 
 
@@ -310,25 +313,27 @@ INSERT INTO storage_type (storage_type_id, type_code, type_name) VALUES (2, 'COL
 
 INSERT INTO storage_type (storage_type_id, type_code, type_name) VALUES (3, 'FROZEN', '냉동');
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (1, 'P001', '토마토', 2, 2, 4108);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (1, 'images/tomato.jpg', 'P001', '토마토', 2, 2, 4108);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (2, 'P002', '오렌지', 3, 3, 5879);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (2, 'images/orange.jpg', 'P002', '오렌지', 3, 3, 5879);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (3, 'P003', '참치', 1, 4, 8039);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (3, 'images/tuna.jpg', 'P003', '참치', 1, 4, 8039);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (4, 'P004', '닭가슴살', 2, 5, 7377);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (4, 'images/chickenbreast.jpg', 'P004', '닭가슴살', 2, 5, 7377);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (5, 'P005', '감자', 3, 6, 6010);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (5, 'images/potato.jpg', 'P005', '감자', 3, 6, 6010);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (6, 'P006', '양파', 1, 7, 4546);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (6, 'images/onion.jpg', 'P006', '양파', 1, 7, 4546);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (7, 'P007', '배추', 2, 8, 7674);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (7, 'images/napacabbage.jpg', 'P007', '배추', 2, 8, 7674);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (8, 'P008', '당근', 3, 9, 4426);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (8, 'images/carrot.jpg', 'P008', '당근', 3, 9, 4426);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (9, 'P009', '연어', 1, 10, 3588);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (9, 'images/salmon.jpg', 'P009', '연어', 1, 10, 3588);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (10, 'P010', '소고기', 2, 1, 6928);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (10, 'images/beef.jpg', 'P010', '소고기', 2, 1, 6928);
+
+INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (11, 'P011', '사과', 1, 3, 8252);
 
 INSERT INTO warehouse (warehouse_id, warehouse_name, address, storage_type_id, warehouse_code) VALUES (1, '인천1창고', '인천시 남동구 1번지', 2, 'W001');
 
@@ -480,7 +485,7 @@ INSERT INTO io_receipt (io_receipt_id, io_type, user_id, created_at, scheduled_d
 
 INSERT INTO io_receipt (io_receipt_id, io_type, user_id, created_at, scheduled_date, status, processed_date, location_id) VALUES (20, 'IN', 1, '2025-06-20 00:00:00', '2025-06-21 00:00:00', '예정', '2025-06-21 12:00:00', 1);
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (1, 1, 88, 14, 2, 0, 16, NULL, '보류');Add commentMore actions
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (1, 1, 88, 14, 2, 0, 16, NULL, '보류');
 
 INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (2, 1, 79, 5, 3, 1, 75,  '2025-06-22 12:00:00', '완료');
 
@@ -494,74 +499,71 @@ INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_i
 
 INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (7, 4, 54, 4, 2, 4, 13,  NULL, '보류');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (3, 2, 20, 1, 2, 1, 37, 16, '2025-06-23 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (8, 4, 84, 19, 1, 1, 64, '2025-06-25 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (4, 2, 14, 1, 1, 0, 83, 5, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (9, 5, 98, 1, 5, 4, 61,  NULL, '보류');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (5, 3, 60, 9, 1, 1, 92, 15, NULL, '보류');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (10, 5, 84, 9, 5, 2, 41,  '2025-06-26 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (6, 3, 78, 5, 5, 4, 30, 2, NULL, '보류');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity,  processed_date, status) VALUES (11, 6, 97, 12, 2, 4, 82, '2025-06-27 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (7, 4, 54, 4, 2, 4, 13, 4, NULL, '보류');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (12, 6, 39, 18, 3, 5, 77, NULL, '보류');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (8, 4, 84, 19, 1, 1, 64, 1, '2025-06-25 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (13, 7, 43, 15, 3, 1, 67, NULL, '보류');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (9, 5, 98, 1, 5, 4, 61, 5, NULL, '보류');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (14, 7, 58, 11, 1, 0, 12, '2025-06-28 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (10, 5, 84, 9, 5, 2, 41, 17, '2025-06-26 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (15, 8, 76, 2, 1, 0, 62,  '2025-06-29 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (11, 6, 97, 12, 2, 4, 82, 4, '2025-06-27 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (16, 8, 60, 10, 5, 5, 23,  NULL, '진행 중');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (12, 6, 39, 18, 3, 5, 77, 4, NULL, '보류');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (17, 9, 10, 12, 2, 1, 90,  NULL, '진행 중');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (13, 7, 43, 15, 3, 1, 67, 12, NULL, '보류');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (18, 9, 42, 10, 1, 1, 7, NULL, '진행 중');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (14, 7, 58, 11, 1, 0, 12, 3, '2025-06-28 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (19, 10, 22, 9, 5, 5, 63,  '2025-06-21 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (15, 8, 76, 2, 1, 0, 62, 4, '2025-06-29 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (20, 10, 55, 3, 1, 5, 79,  NULL, '예정');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (16, 8, 60, 10, 5, 5, 23, 13, NULL, '진행 중');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (21, 11, 84, 17, 5, 1, 70, NULL, '예정');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (17, 9, 10, 12, 2, 1, 90, 16, NULL, '진행 중');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (22, 11, 35, 8, 4, 2, 40,  '2025-06-22 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (18, 9, 42, 10, 1, 1, 7, 4, NULL, '진행 중');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (23, 12, 31, 20, 4, 2, 59, NULL, '진행 중');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (19, 10, 22, 9, 5, 5, 63, 3, '2025-06-21 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (24, 12, 60, 9, 1, 1, 99,  '2025-06-23 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (20, 10, 55, 3, 1, 5, 79, 12, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (25, 13, 81, 4, 5, 0, 76,  '2025-06-24 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (21, 11, 84, 17, 5, 1, 70, 3, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (26, 13, 50, 12, 4, 1, 13, NULL, '예정');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (22, 11, 35, 8, 4, 2, 40, 7, '2025-06-22 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (27, 14, 99, 4, 5, 4, 81,  '2025-06-25 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (23, 12, 31, 20, 4, 2, 59, 16, NULL, '진행 중');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (28, 14, 71, 4, 2, 0, 13,  NULL, '예정');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (24, 12, 60, 9, 1, 1, 99, 19, '2025-06-23 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (29, 15, 71, 15, 3, 0, 18, '2025-06-26 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (25, 13, 81, 4, 5, 0, 76, 7, '2025-06-24 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (30, 15, 47, 20, 2, 4, 85, '2025-06-26 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (26, 13, 50, 12, 4, 1, 13, 10, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (31, 16, 81, 3, 5, 5, 72,  NULL, '예정');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (27, 14, 99, 4, 5, 4, 81, 12, '2025-06-25 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (32, 16, 81, 12, 2, 3, 23, '2025-06-27 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (28, 14, 71, 4, 2, 0, 13, 2, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (33, 17, 23, 6, 3, 2, 18,  NULL, '예정');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (29, 15, 71, 15, 3, 0, 18, 3, '2025-06-26 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (34, 17, 36, 3, 5, 3, 78,  '2025-06-28 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (30, 15, 47, 20, 2, 4, 85, 19, '2025-06-26 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (35, 18, 12, 14, 1, 2, 26, NULL, '진행 중');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (31, 16, 81, 3, 5, 5, 72, 7, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (36, 18, 13, 1, 1, 0, 24,  NULL, '진행 중');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (32, 16, 81, 12, 2, 3, 23, 18, '2025-06-27 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (37, 19, 55, 10, 5, 1, 67, NULL, '보류');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (33, 17, 23, 6, 3, 2, 18, 15, NULL, '예정');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (38, 19, 35, 17, 2, 3, 80, '2025-06-21 12:00:00', '완료');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (34, 17, 36, 3, 5, 3, 78, 17, '2025-06-28 12:00:00', '완료');
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (39, 20, 19, 11, 3, 0, 82, NULL, '보류');
 
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (35, 18, 12, 14, 1, 2, 26, 6, NULL, '진행 중');
-
-INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES (36, 18, 13, 1, 1, 0, 24, 9, NULL, '진행 중');
-
+INSERT INTO io_detail (io_detail_id, io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, processed_date, status) VALUES (40, 20, 71, 3, 4, 3, 42, '2025-06-21 12:00:00', '완료');
 
 INSERT INTO store_order (order_date, location_id, total_price, status) VALUES
 (NOW() - INTERVAL 10 DAY, 1, 18000, '대기'),
