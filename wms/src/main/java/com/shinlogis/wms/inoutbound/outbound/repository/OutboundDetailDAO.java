@@ -38,7 +38,9 @@ public class OutboundDetailDAO {
 				.append("INNER JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 				.append("INNER JOIN warehouse w ON id.warehouse_id = w.warehouse_id ")
 				.append("INNER JOIN location l ON ir.location_id = l.location_id ")
-				.append("ORDER BY id.io_detail_id DESC");
+				.append(" where ir.io_type = 'out' ")
+				.append("ORDER BY id.io_detail_id DESC ");
+
 			
 			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
@@ -84,7 +86,9 @@ public class OutboundDetailDAO {
 		           .append("INNER JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 		           .append("INNER JOIN warehouse w ON id.warehouse_id = w.warehouse_id ")
 		           .append("INNER JOIN location l ON ir.location_id = l.location_id ")
-		           .append("WHERE 1=1 ");
+		           .append("WHERE 1=1 ")
+		           .append("AND ir.io_type = 'out'  ");
+;
 
 		        List<Object> params = new ArrayList<>();
 
@@ -286,8 +290,11 @@ public class OutboundDetailDAO {
 		}
 		return totalCount;
 	}
-
-	// ResultSet에서 IODetail 객체 생성하는 공통 메서드
+	
+/**
+ * <h2>ResultSet에서 IODetail 객체 생성하는 공통 메서드
+ * @author 이세형
+ * */
 	private IODetail createIODetailFromResultSet(ResultSet rs) throws SQLException {
 		IODetail outboundDetail = new IODetail();
 		outboundDetail.setIoDetailId(rs.getInt("io_detail_id"));

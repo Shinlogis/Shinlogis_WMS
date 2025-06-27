@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
+import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
 
@@ -20,8 +21,7 @@ public class StoreOrderModel extends AbstractTableModel {
 	};
 	public StoreOrderModel() {
 		storeOrderDAO=new StoreOrderDAO();
-		list=storeOrderDAO.selectAll();  //디비에 있는 주문목록 다 가져와서 list에 넣기 
-		
+		list=storeOrderDAO.selectAll();
 	}
 	@Override
 	public int getColumnCount() {
@@ -46,7 +46,12 @@ public class StoreOrderModel extends AbstractTableModel {
 		
 		switch (col) {
         case 0: return storeOrder.getStoreOrderId();
-        case 1: return storeOrder.getItems().get(0).getProduct().getProductName()+" 외 "+storeOrder.getItems().size()+"건";
+        case 1: if (storeOrder.getItems()==null) {
+        	return 0;
+        }else if(storeOrder.getItems().size() == 1)return storeOrder.getItems().get(0).getProduct().getProductName();
+        else {
+            return storeOrder.getItems().get(0).getProduct().getProductName() + " 외 " + (storeOrder.getItems().size() - 1) + "건";
+        }
         case 2: return storeOrder.getOrderDate();
         case 3: return storeOrder.getTotalPrice();
         default: return null;
@@ -63,6 +68,13 @@ public class StoreOrderModel extends AbstractTableModel {
 	        default: return Object.class;   
 	    }
 	}
+	
+	//데이터 갱신 
+	public void setList(List<StoreOrder> newList) {
+	    this.list = newList;
+	    fireTableDataChanged(); // JTable에 데이터 변경 알림
+	}
+	
 	
 
 

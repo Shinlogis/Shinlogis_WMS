@@ -5,9 +5,16 @@ import com.shinlogis.wms.product.model.Product;
 public class StoreOrderItem {
 	private int itemId;
 	private int storeOrderId;
-	
 	private int quantity;
 	private Product product;
+	private String status;
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public int getItemId() {
 		return itemId;
 	}

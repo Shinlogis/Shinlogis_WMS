@@ -48,8 +48,8 @@ public class OutboundReceiptPage extends Page {
 	private JButton bt_search; // 검색 버튼
 
 	/* ================= 목록 영역 ================ */
-	private JPanel p_tableNorth;//데이터 수 라벨, 조회, 등록버튼 패널
-	private JPanel buttonPanel;//버튼 두개 붙일 패널
+	private JPanel p_tableNorth;// 데이터 수 라벨, 조회, 등록버튼 패널
+	private JPanel buttonPanel;// 버튼 두개 붙일 패널
 
 	private JLabel la_counter;
 	private JButton bt_regist;// 출고예정 등록버튼
@@ -60,9 +60,9 @@ public class OutboundReceiptPage extends Page {
 //	private InboundPlanItemModel inboundPlanItemModel;
 	private int count;
 	OutboundReceiptDAO outboundReceiptDAO;
-	
+
 	public OutboundReceiptPage(AppMain appMain) {
-		
+
 		super(appMain);
 		outboundReceiptDAO = new OutboundReceiptDAO();
 		/* ===================제목 영역================= */
@@ -141,79 +141,73 @@ public class OutboundReceiptPage extends Page {
 		// 검색버튼
 		bt_search = new JButton("검색");
 		bt_search.addActionListener(e -> {
-			//1. 검색 조건 수집 
-		    String id = tf_outboundPlanId.getText().trim();
-		    String product = tf_outboundProduct.getText().trim();
-		    String store = tf_targetStore.getText().trim();
-		    java.util.Date schedDate = ch_reservatedDate.getDate();
-		    java.util.Date regDate = ch_registeredDate.getDate();
-		    String selectedStatus = (String) cb_status.getSelectedItem();
+			// 1. 검색 조건 수집
+			String id = tf_outboundPlanId.getText().trim();
+			String product = tf_outboundProduct.getText().trim();
+			String store = tf_targetStore.getText().trim();
+			java.util.Date schedDate = ch_reservatedDate.getDate();
+			java.util.Date regDate = ch_registeredDate.getDate();
+			String selectedStatus = (String) cb_status.getSelectedItem();
 
-		    // 테이블 모델 갱신
-		    model = new OutboundReceiptModel(id, product, store, schedDate, regDate, selectedStatus);
-		    tb_plan.setModel(model);
+			// 테이블 모델 갱신
+			model = new OutboundReceiptModel(id, product, store, schedDate, regDate, selectedStatus);
+			tb_plan.setModel(model);
 
 			tb_plan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
-			tb_plan.getColumn("상세보기").setCellEditor(
-			    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-			        // 상세보기 클릭 시 동작 정의
-			        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-			        JOptionPane.showMessageDialog(null, "출고예정 상세보기: ID = " + ioReceiptId);
-			    })
-			);
-			
-		    
-		    
-		    
-		    
-		    // 검색결과 수 갱신
-		    int searchCount = outboundReceiptDAO.countByCondition(id, product, store, schedDate, regDate, selectedStatus);
-		    la_counter.setText("총 " + searchCount + "개의 출고예정 검색");
-		});
+			tb_plan.getColumn("상세보기").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, col) -> {
+				String selectedPlanId = table.getValueAt(row, 0).toString(); // 출고예정ID 가져오기
 
+				OutboundDetailPage detailPage = (OutboundDetailPage) appMain.pages[Config.OUTBOUND_PROCESS_PAGE];
+				detailPage.searchByPlanId(selectedPlanId); // 검색 조건 전달 및 검색 실행
+
+				appMain.showPage(Config.OUTBOUND_PROCESS_PAGE); // 페이지 전환
+			}));
+
+			// 검색결과 수 갱신
+			int searchCount = outboundReceiptDAO.countByCondition(id, product, store, schedDate, regDate,
+					selectedStatus);
+			la_counter.setText("총 " + searchCount + "개의 출고예정 검색");
+		});
 
 		gbcSearch.gridx = 8;// (7,1)
 		p_search.add(bt_search, gbcSearch);
-		
-		
 
 		/* ===================테이블 콘텐트 영역================= */
 
-		
 		/* ================ 검색 결과 카운트, 등록 및 조회 버튼 영역 ========== */
 		GridBagConstraints gbcTableNorth = new GridBagConstraints();
 		p_tableNorth = new JPanel(new GridBagLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-		
-		//count 변수에 출고예정을 담아줌
+
+		// count 변수에 출고예정을 담아줌
 		count = outboundReceiptDAO.countTotal();
-		la_counter = new JLabel("총 "+count+"개의 출고예정 검색");
+		la_counter = new JLabel("총 " + count + "개의 출고예정 검색");
 		gbcTableNorth.gridx = 0;
 		gbcTableNorth.gridy = 0;
 		gbcTableNorth.weightx = 1.0; // 남는 공간 차지
 		gbcTableNorth.anchor = GridBagConstraints.WEST;
 		gbcTableNorth.insets = new Insets(0, 10, 0, 10); // 좌우 여백
 		p_tableNorth.add(la_counter, gbcTableNorth);
-		
-		
+
 		/* ===================테이블 영역================= */
-		
-		//테이블 디자인
+
+		// 테이블 디자인
 		tb_plan = new JTable(model = new OutboundReceiptModel());
 		tb_plan.setRowHeight(45);
-		 
+
 		tb_plan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
-		tb_plan.getColumn("상세보기").setCellEditor(
-		    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-		        // 상세보기 클릭 시 동작 정의
-		        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		        JOptionPane.showMessageDialog(null, "출고예정 상세보기: ID = " + ioReceiptId);
-		    })
-		);
-		
-		sc_table= new JScrollPane(tb_plan);
-		sc_table.setPreferredSize(new Dimension(1150,660));
-		
+		tb_plan.getColumn("상세보기").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, col) -> {
+			String selectedPlanId = table.getValueAt(row, 0).toString(); // 출고예정ID 가져오기
+
+			OutboundDetailPage detailPage = (OutboundDetailPage) appMain.pages[Config.OUTBOUND_PROCESS_PAGE];
+			detailPage.searchByPlanId(selectedPlanId); // 검색 조건 전달 및 검색 실행
+
+			appMain.showPage(Config.OUTBOUND_PROCESS_PAGE); // 페이지 전환
+		}));
+
+		sc_table = new JScrollPane(tb_plan);
+		sc_table.setPreferredSize(new Dimension(1150, 660));
+
 		// 테이블(컨텐트영역) 디자인
 
 //		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));

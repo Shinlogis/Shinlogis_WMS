@@ -72,8 +72,14 @@ public class Snapshot {
 	 * @return
 	 */
 	public boolean isStorageTypeMatched(Snapshot snapshot, Warehouse warehouse) {
-	    return snapshot.getStorageType() != null &&
-	           warehouse.getStorageType() != null &&
-	           snapshot.getStorageType().getTypeCode().equals(warehouse.getStorageType().getTypeCode());
+	    if (snapshot.getStorageType() == null || warehouse.getStorageType() == null) return false;
+
+	    String snapshotTypeCode = snapshot.getStorageType().getTypeCode();
+	    String warehouseTypeCode = warehouse.getStorageType().getTypeCode();
+
+	    if (snapshotTypeCode == null || warehouseTypeCode == null) return false;
+
+	    return snapshotTypeCode.equals(warehouseTypeCode);
 	}
+
 }

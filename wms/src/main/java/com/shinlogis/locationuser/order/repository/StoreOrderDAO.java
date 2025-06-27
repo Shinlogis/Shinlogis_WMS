@@ -99,7 +99,7 @@ public class StoreOrderDAO {
 	        	StringBuffer sql = new StringBuffer();
 				//지점 주문, 지점주문 상세 나눴기 때문에 조인 해놓음
 	        	
-				sql.append("select soi.store_order_id as store_order_id,count(p.product_id) as cnt,so.order_date as order_date,total_price");
+				sql.append("select soi.store_order_id as store_order_id,count(p.product_id) as cnt,so.order_date as order_date,total_price,location_id");
 				sql.append(" from store_order so inner join store_order_item soi inner join product p ");
 				sql.append(" on so.store_order_id =soi.store_order_id and soi.product_id= p.product_id");
 				sql.append(" GROUP by soi.store_order_id,so.order_date ");
@@ -114,16 +114,15 @@ public class StoreOrderDAO {
 					StoreOrder storeOrder= new StoreOrder();
 					storeOrder.setStoreOrderId(rs.getInt("store_order_id"));
 					storeOrder.setCnt(rs.getInt("cnt"));
-					//storeOrder.setQuantity(rs.getInt("quantity"));
 					storeOrder.setOrderDate(rs.getString("order_date"));
 					storeOrder.setTotalPrice(rs.getInt("total_price"));
+					storeOrder.setLocationId(rs.getInt("location_id"));
 					
 					sql.delete(0, sql.length());
-					sql.append("select distinct(p.product_id) as product_id, product_name,price");
+					sql.append("select p.product_id as product_id, product_name,price,soi.quantity as quantity,store_order_id");
 					sql.append(" from product p join store_order_item soi"); 
 					sql.append(" on p.product_id =soi.product_id");
-					sql.append(" and p.product_id in (");
-					sql.append(" select product_id from store_order_item where store_order_id=?)");
+					sql.append(" where soi.store_order_id=?");
 					
 					PreparedStatement pstmt2= null;
 					pstmt2= connection.prepareStatement(sql.toString());
@@ -139,8 +138,9 @@ public class StoreOrderDAO {
 						product.setProductName(rs2.getString("product_name"));
 						product.setPrice(rs2.getInt("price"));
 						item.setProduct(product);
+						item.setQuantity(rs2.getInt("quantity"));
+						item.setStoreOrderId(rs2.getInt("store_order_id"));
 						itemList.add(item);
-						
 					}
 					
 					storeOrder.setItems(itemList);
@@ -156,5 +156,74 @@ public class StoreOrderDAO {
 	    }
 	    
 	    return list;
+	}
+	
+	//날짜로 주문목록 검색 
+	public List<StoreOrder> selectByDate(String date) {
+		Connection connection = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		List<StoreOrder> list = new ArrayList<>();
+		
+
+		try {
+			connection = dbManager.getConnection();
+			try {
+				StringBuffer sql = new StringBuffer();
+				sql.append("select soi.store_order_id as store_order_id,count(p.product_id) as cnt,so.order_date as order_date,total_price");
+				sql.append(" from store_order so inner join store_order_item soi inner join product p");
+				sql.append(" on so.store_order_id =soi.store_order_id and soi.product_id= p.product_id");
+				sql.append(" GROUP by soi.store_order_id,so.order_date ");
+				sql.append(" having DATE(so.order_date) = ?");
+				sql.append(" order by so.store_order_id asc ");
+				pstmt = connection.prepareStatement(sql.toString());
+				pstmt.setString(1, date);
+				rs = pstmt.executeQuery();
+
+				while (rs.next()) {
+					StoreOrder storeOrder= new StoreOrder();
+					storeOrder.setStoreOrderId(rs.getInt("store_order_id"));
+					storeOrder.setCnt(rs.getInt("cnt"));
+					storeOrder.setOrderDate(rs.getString("order_date"));
+					storeOrder.setTotalPrice(rs.getInt("total_price"));
+					
+					sql.delete(0, sql.length());
+					sql.append("select p.product_id as product_id, product_name,price,soi.quantity as quantity,store_order_id");
+					sql.append(" from product p join store_order_item soi"); 
+					sql.append(" on p.product_id =soi.product_id");
+					sql.append(" where soi.store_order_id=?");
+					
+					PreparedStatement pstmt2= null;
+					pstmt2= connection.prepareStatement(sql.toString());
+					 
+					pstmt2.setInt(1, rs.getInt("store_order_id"));
+					ResultSet rs2 =pstmt2.executeQuery();
+					
+					List<StoreOrderItem> itemList=new ArrayList();
+					while(rs2.next()) {
+						StoreOrderItem item= new StoreOrderItem();
+						Product product = new Product();
+						product.setProductId(rs2.getInt("product_id"));
+						product.setProductName(rs2.getString("product_name"));
+						product.setPrice(rs2.getInt("price"));
+						item.setProduct(product);
+						item.setQuantity(rs2.getInt("quantity"));
+						item.setStoreOrderId(rs2.getInt("store_order_id"));
+						itemList.add(item);
+					}
+					
+					storeOrder.setItems(itemList);
+					list.add(storeOrder);
+					dbManager.release(pstmt2, rs2);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} finally {
+			dbManager.release(pstmt, rs);
+		}
+
+		return list;
 	}
 }
