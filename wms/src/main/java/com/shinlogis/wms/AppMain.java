@@ -282,6 +282,7 @@ public class AppMain extends JFrame {
 		// 메뉴 그룹 추가
 		addMenuGroups();
 	}
+	
 
 	private void createMyPage() {
 		p_north.setLayout(new FlowLayout(FlowLayout.RIGHT, 30, 0)); // 오른쪽 정렬
@@ -455,4 +456,3 @@ public class AppMain extends JFrame {
 		}
 	}
 }
-

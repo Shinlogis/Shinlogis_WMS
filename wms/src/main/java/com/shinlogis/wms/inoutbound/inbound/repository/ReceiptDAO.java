@@ -5,13 +5,17 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.model.InboundForm;
 
 /**
  * 입고예정 전표 DAO입니다.
@@ -20,7 +24,47 @@ import com.shinlogis.wms.inoutbound.model.IOReceipt;
  */
 public class ReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
+	
+	/**
+	 * 폼에 작성한 내용으로 입고예정을 등록하는 메서드
+	 * @param inboundForm
+	 * @return
+	 */
+	public Map<String, Object> insertReceipt(Date date, HeadquartersUser user) {
+	    Map<String, Object> resultMap = new HashMap<>();
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    int result = 0;
+	    int id = 0; // 초기화 필요
+	    
+	    StringBuffer sql = new StringBuffer();
+	    sql.append("insert into io_receipt (io_type, user_id, created_at, scheduled_date) values(?, ?, now(), ?)");
+	    
+	    try {
+	        conn = dbManager.getConnection();
+	        pstmt = conn.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+	        pstmt.setString(1, "IN");
+	        pstmt.setInt(2, user.getHeadquartersUserId());
+	        pstmt.setDate(3, date);
+	        
+	        pstmt.executeUpdate();
+	        resultMap.put("result", result);
+	        
+	        ResultSet rs = pstmt.getGeneratedKeys();
+	        if (rs.next()) {
+	            id = rs.getInt(1);
+	            resultMap.put("id", id);
+	            System.out.println("예정id "+id);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        dbManager.release(pstmt);
+	    }
+	    return resultMap;
+	}
 
+	
 	/**
 	 * 입고 전표, 전표에 맞는 상품 정보를 가져오는 메서드
 	 *
@@ -30,111 +74,144 @@ public class ReceiptDAO {
 	 * @since 2025-06-22
 	 */
 	public List<IOReceipt> selectInboundReceiptsWithItemInfo(Map<String, Object> filters) {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+	    Connection conn = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
 
-		List<IOReceipt> result = new ArrayList<>();
+	    List<IOReceipt> result = new ArrayList<>();
 
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append("  r.io_receipt_id, ").append("  r.io_type, ").append("  r.user_id, ")
-				.append("  u.id       AS user_id_str, ").append("  r.status, ")
-//                .append("  u.email, ")
-				.append("  r.created_at, ").append("  r.scheduled_date, ").append("  r.processed_date, ")
-				.append("  r.location_id, ").append("  sf.supplier_name, ")
-				// 첫 상품명
-				.append("  ( ").append("    SELECT s.product_name ").append("    FROM io_detail d ")
-				.append("    JOIN snapshot s ").append("      ON s.snapshot_id = d.snapshot_id ")
-				.append("    WHERE d.io_receipt_id = r.io_receipt_id ").append("    ORDER BY d.io_detail_id ")
-				.append("    LIMIT 1 ").append("  ) AS first_product_name, ")
-				// 첫 공급사명
-				.append("  ( ").append("    SELECT s.supplier_name ").append("    FROM io_detail d ")
-				.append("    JOIN snapshot s ").append("      ON s.snapshot_id = d.snapshot_id ")
-				.append("    WHERE d.io_receipt_id = r.io_receipt_id ").append("    ORDER BY d.io_detail_id ")
-				.append("    LIMIT 1 ").append("  ) AS supplier_name, ")
-				// 아이템 개수
-				.append("  ( ").append("    SELECT COUNT(*) ").append("    FROM io_detail d ")
-				.append("    WHERE d.io_receipt_id = r.io_receipt_id ").append("  ) AS item_count ")
-				.append("FROM io_receipt r ").append("JOIN headquarters_user u ")
-				.append("  ON r.user_id = u.headquarters_user_id ").append("JOIN location l ")
-				.append("  ON r.location_id = l.location_id ")
+	    StringBuilder sql = new StringBuilder();
+	    sql.append("SELECT ")
+	       .append("  r.io_receipt_id, ")
+	       .append("  r.io_type, ")
+	       .append("  r.user_id, ")
+	       .append("  u.id AS user_id_str, ")
+	       .append("  r.status, ")
+	       .append("  r.created_at, ")
+	       .append("  r.scheduled_date, ")
+	       .append("  r.processed_date, ")
+	       .append("  r.location_id, ")
 
-				.append("JOIN io_detail df ON df.io_receipt_id = r.io_receipt_id ")
-				.append("JOIN snapshot sf ON sf.snapshot_id = df.snapshot_id ").append("WHERE r.io_type = 'IN'");
+	       // 첫 번째 상품명
+	       .append("  ( ")
+	       .append("    SELECT s.product_name ")
+	       .append("    FROM io_detail d ")
+	       .append("    JOIN snapshot s ON s.snapshot_id = d.snapshot_id ")
+	       .append("    WHERE d.io_receipt_id = r.io_receipt_id ")
+	       .append("    ORDER BY d.io_detail_id ")
+	       .append("    LIMIT 1 ")
+	       .append("  ) AS first_product_name, ")
 
-		// 검색 필터 추가
-		List<Object> params = new ArrayList<>();
-		if (filters.get("io_receipt_id") != null) {
-			sql.append("AND r.io_receipt_id = ? ");
-			params.add(filters.get("io_receipt_id"));
-		}
-		if (filters.get("scheduled_date") != null) {
-			sql.append("AND DATE(r.scheduled_date) = ? ");
-			params.add(filters.get("scheduled_date"));
-		}
-		if (filters.get("product_name") != null) {
-			sql.append("AND sf.product_name = ? ");
-			params.add(filters.get("product_name"));
-		}
-		if (filters.get("supplier_name") != null) {
-			sql.append("AND sf.supplier_name = ? ");
-			params.add(filters.get("supplier_name"));
-		}
-		if (filters.get("status") != "전체" && filters.get("status") != null) {
-			sql.append("AND r.status = ? ");
-			params.add(filters.get("status"));
-		}
+	       // 첫 번째 공급사명
+	       .append("  ( ")
+	       .append("    SELECT s.supplier_name ")
+	       .append("    FROM io_detail d ")
+	       .append("    JOIN snapshot s ON s.snapshot_id = d.snapshot_id ")
+	       .append("    WHERE d.io_receipt_id = r.io_receipt_id ")
+	       .append("    ORDER BY d.io_detail_id ")
+	       .append("    LIMIT 1 ")
+	       .append("  ) AS supplier_name, ")
 
-		try {
-			conn = dbManager.getConnection();
-			ps = conn.prepareStatement(sql.toString());
+	       // 아이템 개수
+	       .append("  ( ")
+	       .append("    SELECT COUNT(*) ")
+	       .append("    FROM io_detail d ")
+	       .append("    WHERE d.io_receipt_id = r.io_receipt_id ")
+	       .append("  ) AS item_count ")
 
-			for (int i = 0; i < params.size(); i++) {
-				ps.setObject(i + 1, params.get(i));
-			}
-			rs = ps.executeQuery();
+	       .append("FROM io_receipt r ")
+	       .append("JOIN headquarters_user u ON r.user_id = u.headquarters_user_id ")
+	       .append("WHERE r.io_type = 'IN' ");
 
-			while (rs.next()) {
-				IOReceipt r = new IOReceipt();
-				r.setIoReceiptId(rs.getInt("io_receipt_id"));
-				r.setIoType(rs.getString("io_type"));
+	    // 검색 필터 추가
+	    List<Object> params = new ArrayList<>();
 
-				HeadquartersUser u = new HeadquartersUser();
-				u.setHeadquartersUserId(rs.getInt("user_id"));
-				u.setId(rs.getString("user_id_str"));
-//                u.setEmail(rs.getString("email")); // TODO: setter을 수정 필요
-				r.setUser(u);
+	    if (filters.get("io_receipt_id") != null) {
+	    	sql.append("AND r.io_receipt_id = ? ");
+	    	params.add(filters.get("io_receipt_id"));
+	    }
 
-				r.setCreatedAt(rs.getDate("created_at"));
-				r.setScheduledDate(rs.getDate("scheduled_date"));
+	    if (filters.get("scheduled_date") != null) {
+	    	sql.append("AND DATE(r.scheduled_date) = ? ");
+	    	params.add(filters.get("scheduled_date"));
+	    }
 
-				Date p = rs.getDate("processed_date");
-				r.setProcessedDate(p != null ? p : null);
+	    if (filters.get("product_name") != null) {
+	    	sql.append("AND EXISTS ( ")
+	    	   .append("  SELECT 1 FROM io_detail d ")
+	    	   .append("  JOIN snapshot s ON s.snapshot_id = d.snapshot_id ")
+	    	   .append("  WHERE d.io_receipt_id = r.io_receipt_id ")
+	    	   .append("  AND s.product_name = ? ")
+	    	   .append(") ");
+	    	params.add(filters.get("product_name"));
+	    }
 
-				r.setStatus(rs.getString("status"));
+	    if (filters.get("supplier_name") != null) {
+	    	sql.append("AND EXISTS ( ")
+	    	   .append("  SELECT 1 FROM io_detail d ")
+	    	   .append("  JOIN snapshot s ON s.snapshot_id = d.snapshot_id ")
+	    	   .append("  WHERE d.io_receipt_id = r.io_receipt_id ")
+	    	   .append("  AND s.supplier_name = ? ")
+	    	   .append(") ");
+	    	params.add(filters.get("supplier_name"));
+	    }
 
-				// 인포 정보
-				r.setFirstProductName(rs.getString("first_product_name"));
-				r.setSupplierName(rs.getString("supplier_name"));
-				r.setItemCount(rs.getInt("item_count"));
+	    if (filters.get("status") != null && !"전체".equals(filters.get("status"))) {
+	    	sql.append("AND r.status = ? ");
+	    	params.add(filters.get("status"));
+	    }
 
-				result.add(r);
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			dbManager.release(ps, rs);
-		}
+	    try {
+	        conn = dbManager.getConnection();
+	        ps = conn.prepareStatement(sql.toString());
 
-		return result;
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
+	        }
+
+	        rs = ps.executeQuery();
+
+	        while (rs.next()) {
+	            IOReceipt r = new IOReceipt();
+	            r.setIoReceiptId(rs.getInt("io_receipt_id"));
+	            r.setIoType(rs.getString("io_type"));
+
+	            HeadquartersUser u = new HeadquartersUser();
+	            u.setHeadquartersUserId(rs.getInt("user_id"));
+	            u.setId(rs.getString("user_id_str"));
+	            r.setUser(u);
+
+	            r.setCreatedAt(rs.getDate("created_at"));
+	            r.setScheduledDate(rs.getDate("scheduled_date"));
+
+	            Date p = rs.getDate("processed_date");
+	            r.setProcessedDate(p != null ? p : null);
+
+	            r.setStatus(rs.getString("status"));
+
+	            // 인포 정보
+	            r.setFirstProductName(rs.getString("first_product_name"));
+	            r.setSupplierName(rs.getString("supplier_name"));
+	            r.setItemCount(rs.getInt("item_count"));
+
+	            result.add(r);
+	        }
+	    } catch (SQLException e) {
+	        throw new RuntimeException(e);
+	    } finally {
+	        dbManager.release(ps, rs);
+	    }
+
+	    return result;
 	}
+
 
 
 	/**
 	 * 입고 전표 select
 	 *
 	 * @return
-	 * @author 김예진
+	 * @author 김예 V
 	 * @since 2025-06-19
 	 */
 //    public List<IOReceipt> selectInboundReceipts() {
