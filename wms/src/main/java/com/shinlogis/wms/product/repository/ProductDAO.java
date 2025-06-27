@@ -269,4 +269,77 @@ public class ProductDAO {
 
 	    return totalDeleted;
 	}
+	
+	/**
+	 * 상품을 등록하는 메서드
+	 * @return 성공 시 true, 실패 시 false
+	 * @author 김지민
+	 * @since 2025-06-27
+	 */
+	public boolean insertProduct(ProductDTO productDTO) {
+	    String sql = "INSERT INTO product (product_img, product_code, product_name, storage_type_id, supplier_id, price) "
+	               + "VALUES (?, ?, ?, ?, ?, ?)";
+
+	    try (
+	        Connection connection = dbManager.getConnection();
+	        PreparedStatement pstmt = connection.prepareStatement(sql)
+	    ) {
+	        pstmt.setString(1, productDTO.getThumbnailPath());
+	        pstmt.setString(2, productDTO.getProductCode());
+	        pstmt.setString(3, productDTO.getProductName());
+	        pstmt.setInt(4, productDTO.getStorageTypeId()); 
+	        pstmt.setInt(5, productDTO.getSupplierId());      
+	        pstmt.setInt(6, productDTO.getPrice());
+
+	        int rowsAffected = pstmt.executeUpdate();
+	        return rowsAffected > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+	
+	/**
+	 * 공급사 이름으로 Id 조회
+	 * @author 김지민
+	 * @since 2025-06-27
+	 */
+	public int getSupplierIdByName(String supplierName) {
+	    String sql = "SELECT supplier_id FROM supplier WHERE name = ?";
+	    try (
+	        Connection conn = dbManager.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql);
+	    ) {
+	        pstmt.setString(1, supplierName);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt("supplier_id");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0;  // 없으면 0 혹은 -1 처리
+	}
+
+	/**
+ 	 * 보관타입 이름으로 ID 조회
+	 * @author 김지민
+	 * @since 2025-06-27
+	 */
+	public int getStorageTypeIdByName(String typeName) {
+	    String sql = "SELECT storage_type_id FROM storage_type WHERE type_name = ?";
+	    try (
+	        Connection conn = dbManager.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql);
+	    ) {
+	        pstmt.setString(1, typeName);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt("storage_type_id");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0;  // 없으면 0 혹은 -1 처리
+	}
 }

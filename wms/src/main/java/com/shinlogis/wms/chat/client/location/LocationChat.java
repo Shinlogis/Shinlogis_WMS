@@ -162,6 +162,8 @@ public class LocationChat extends JFrame{
 			
 			locationClientThread.send(result);
 			
+			appendMessage(location.getLocationName() + " 이 입장했습니다.", false);
+			
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
