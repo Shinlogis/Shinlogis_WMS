@@ -218,6 +218,8 @@ public class DetailPage extends Page {
 		// 검수 버튼에 기능 추가
 		tblPlan.getColumn("입고").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 			IODetail detail = inboundDetailModel.getIODetailAt(row);
+			// TODO 
+			System.out.println(detail.getProductSnapshot().getStorageType().getTypeCode());
 			CheckDetailDialog dialog = new CheckDetailDialog(appMain, detail, inboundDetailModel);
 			dialog.setVisible(true);
 		}));

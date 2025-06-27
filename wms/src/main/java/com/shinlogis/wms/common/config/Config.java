@@ -15,8 +15,8 @@ public class Config {
 	public static final int INBOUND_PLAN_PAGE = 1; 
 	public static final int INBOUND_ITEM_PAGE = 2; 
 	public static final int INBOUND_PROCESS_PAGE = 3; 
-	public static final int OUTBOUND_PLAN_PAGE = 4; 
-	public static final int OUTBOUND_PROCESS_PAGE = 5;
+	public static final int OUTBOUND_PLAN_PAGE = 4; //출고 예정페이지
+	public static final int OUTBOUND_PROCESS_PAGE = 5;//출고 디테일페이지
 	public static final int PRODUCT_PAGE   = 6; //상품페이지  
 	public static final int INVENTORY_PAGE = 7; //재고관리페이지 
 	public static final int WAREHOUSE_PAGE = 8; //창고관리페이지

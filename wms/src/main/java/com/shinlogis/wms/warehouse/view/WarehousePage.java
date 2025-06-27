@@ -40,7 +40,7 @@ public class WarehousePage extends Page {
 	public JButton btnSearch;
 
 	private JPanel pTable;
-	private JLabel laCount;
+	private JLabel laPlanCount;
 	private JTable table;
 	private JScrollPane scrollPane;
 	private DefaultTableModel model;
@@ -105,25 +105,21 @@ public class WarehousePage extends Page {
 		pTableNorth = new JPanel(new BorderLayout());
 		pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
 
-		// 왼쪽 패널
-		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-		leftPanel.setOpaque(false);
-		leftPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); // 내부 여백 제거
-		laCount = new JLabel("총 0개의 창고 검색");
-		leftPanel.add(laCount);
+		laPlanCount = new JLabel("총 0개의 상품 검색");
+		laPlanCount.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-		// 오른쪽 패널
-		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		// 선택삭제 버튼 오른쪽에 배치
+		JButton btnDeleteSelected = new JButton("선택삭제");
+		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		rightPanel.setOpaque(false);
-		rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); // 필요시
-		JButton btnDelete = new JButton("선택 삭제");
-		rightPanel.add(btnDelete);
+		rightPanel.setBackground(Color.WHITE); // 배경색 일치
+		rightPanel.add(btnDeleteSelected);
 
 		// 상단 패널에 부착
-		pTableNorth.add(leftPanel, BorderLayout.WEST);
+		pTableNorth.add(laPlanCount, BorderLayout.WEST);
 		pTableNorth.add(rightPanel, BorderLayout.EAST);
 
-		btnDelete.addActionListener(e -> deleteSelectedWarehouses());
+		btnDeleteSelected.addActionListener(e -> deleteSelectedWarehouses());
 
 		/* ==== 테이블 ==== */
 		model = new DefaultTableModel(columnNames, 0) {
@@ -231,7 +227,7 @@ public class WarehousePage extends Page {
 					warehouse.getAddress(), "보기", });
 		}
 
-		laCount.setText("총 " + totalRows + "개의 창고 검색");
+		laPlanCount.setText("총 " + totalRows + "개의 창고 검색");
 		laPageInfo.setText(currentPage + " / " + totalPages);
 		btnPrevPage.setEnabled(currentPage > 1);
 		btnNextPage.setEnabled(currentPage < totalPages);
@@ -241,6 +237,7 @@ public class WarehousePage extends Page {
 		InventoryPage inventoryPage = (InventoryPage) appMain.pages[Config.INVENTORY_PAGE];
 
 		inventoryPage.warehouseCode.setText(warehouseCode); // 값을 전달
+		inventoryPage.productCode.setText("");
 		inventoryPage.btnSearch.doClick(); // 검색 이벤트 실행
 		appMain.showPage(Config.INVENTORY_PAGE);
 	}

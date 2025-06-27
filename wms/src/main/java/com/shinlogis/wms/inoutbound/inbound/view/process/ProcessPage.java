@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -22,6 +23,7 @@ import javax.swing.JTextField;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.toedter.calendar.JDateChooser;
 
@@ -60,7 +62,8 @@ public class ProcessPage extends Page {
 		super(appMain);
 
 		ReceiptDAO ioReceiptDAO = new ReceiptDAO();
-
+		DamagedCodeDAO damagedCodeDAO = new DamagedCodeDAO();
+		
 		/* ==== 검색 영역 ==== */
 		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
 		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.SEARCH_BAR_HEIGHT));
@@ -99,7 +102,10 @@ public class ProcessPage extends Page {
 		// 상태
 		gbc.gridx = 6;
 		pSearch.add(new JLabel("파손코드"), gbc);
-		cbStatus = new JComboBox<>(new String[] { "전체", "예정", "진행 중", "완료", "보류" });
+		List<String> codeName = damagedCodeDAO.selectAllNames();
+		codeName.add(0, "전체");  // 맨 앞에 "전체" 추가
+		String[] codeArray = codeName.toArray(new String[0]); // 컬렉션을 배열로 변환
+		cbStatus = new JComboBox<>(codeArray);
 		gbc.gridx = 7;
 		pSearch.add(cbStatus, gbc);
 
@@ -122,9 +128,10 @@ public class ProcessPage extends Page {
 				filters.put("processed_date", new java.sql.Date(chooser.getDate().getTime()));
 			if (!tfProductName.getText().trim().isEmpty())
 				filters.put("product_name", tfProductName.getText().trim());
+			
 			String status = (String) cbStatus.getSelectedItem();
 			if (!"전체".equals(status))
-				filters.put("status", status);
+				filters.put("damage_code_name", status);
 			// TODO: 유저 추가
 //			if (!tfUser.getText().trim().isEmpty())
 //				filters.put("product_name", tfUser.getText().trim());
