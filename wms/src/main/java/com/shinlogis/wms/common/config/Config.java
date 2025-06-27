@@ -34,6 +34,7 @@ public class Config {
 	public static final int ORDER_LIST_PAGE = 1; 
 	public static final int LOCATION_MY_PAGE = 2; 
 	public static final int LOCATION_CHATTING_PAGE = 3; 
+	public static final int LOCATION_MAIN_PAGE = 4; 
 	
 	public static final int INBOUND_DETAIL_EDIT_DIALOG_PAGE = 13;
 
