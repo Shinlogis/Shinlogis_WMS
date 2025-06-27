@@ -36,7 +36,7 @@ public class DetailDAO {
 	 */
 	public int insertDetail(int receiptId, int snapshotId, InboundForm form, HeadquartersUser user) {
 		int result = 0;
-		String sql = "INSERT INTO IO_DETAIL (io_receipt_id, planned_quantity, snapshot_id, actual_quantity) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO IO_DETAIL (io_receipt_id, planned_quantity, snapshot_id, actual_quantity, headquarters_user_id ) VALUES (?, ?, ?, ?, ?)";
 
 		Connection connection = null;
 		PreparedStatement pstmt = null;
@@ -48,7 +48,8 @@ public class DetailDAO {
 				pstmt.setInt(1, receiptId);
 				pstmt.setInt(2, form.getQuantity());
 				pstmt.setInt(3, snapshotId);
-				pstmt.setInt(4, user.getHeadquartersUserId());
+				pstmt.setInt(4, 0);
+				pstmt.setInt(5, user.getHeadquartersUserId());
 
 				result = pstmt.executeUpdate();
 			} catch (SQLException e) {

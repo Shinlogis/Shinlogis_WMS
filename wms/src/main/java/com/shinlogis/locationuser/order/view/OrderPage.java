@@ -25,6 +25,8 @@ import javax.swing.table.TableColumnModel;
 
 import com.shinlogis.locationuser.order.model.OrderModel;
 import com.shinlogis.locationuser.order.model.StoreOrder;
+import com.shinlogis.locationuser.order.model.StoreOrderItem;
+import com.shinlogis.locationuser.order.model.StoreOrderModel;
 import com.shinlogis.locationuser.order.repository.StoreOrderDAO;
 import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 import com.shinlogis.wms.AppMain;
@@ -58,11 +60,9 @@ public class OrderPage extends Page{
     private JPanel pTable_Content; //content 내용 영역 
     private JButton btnOrder;  // 주문하기버튼 
     DBManager dbManager=DBManager.getInstance();
-   
+    
 	public OrderPage(AppMain appMain) {
 		super(appMain);
-		
-		
 		/* ==== 검색 영역 ==== */
 		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
 		pSearch.setPreferredSize(new Dimension(700, Config.SEARCH_BAR_HEIGHT));
@@ -194,7 +194,7 @@ public class OrderPage extends Page{
 					    JOptionPane.WARNING_MESSAGE
 					);
 				JDialog dialog = optionPane.createDialog("입력 오류");
-				dialog.setLocation(680, 320); // 원하는 좌표
+				dialog.setLocation(680, 320);
 				dialog.setVisible(true);
 			    return;
 			}
@@ -210,15 +210,26 @@ public class OrderPage extends Page{
 					storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
 					
 					try {
-						storeOrderDao.insertStoreOrder(storeOrder);
+						storeOrderDao.insert(storeOrder);
 						int pk=storeOrderDao.getRecentId();
 						storeOrder.setStoreOrderId(pk);
-						storeItemDao.insertStoreOrderItem(storeOrder);
+						
+						for (StoreOrderItem item : storeOrder.getItems()) {
+						    item.setStoreOrderId(pk);  
+						    storeItemDao.insert(item);
+						    item.setStoreOrderId(pk); 
+						}
+						model.tableChanged();
+						
 						con.commit();
+						JOptionPane.showMessageDialog(null, "주문이 완료되었습니다");
+						
+						
 					} catch (OrderInsertException e1) {
 						e1.printStackTrace();
-						throw new OrderInsertException(e1.getMessage());
-					}
+						con.rollback();
+						JOptionPane.showMessageDialog(this, e1.getMessage());
+					} 
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -236,13 +247,9 @@ public class OrderPage extends Page{
 						e1.printStackTrace();
 					}//start
 				}
-				
-				
 			}
-			
-			List<Product> p=productDao.selectOrderProduct();
-			model.setList(p);
-			pTable.updateUI();
+		
+			pTable.updateUI();    
 			tfProduct.setText("");
 		});			
 	}

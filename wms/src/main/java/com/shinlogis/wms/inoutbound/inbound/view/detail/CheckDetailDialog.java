@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
+import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,9 @@ import com.shinlogis.wms.common.util.NumericTextFieldUtil;
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inventory.repository.InventoryDAO;
+import com.shinlogis.wms.product.model.Product;
+import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 import com.shinlogis.wms.warehouse.model.Warehouse;
 import com.shinlogis.wms.warehouse.repository.WarehouseDAO;
@@ -31,6 +35,7 @@ public class CheckDetailDialog extends JDialog {
 	private DamagedCodeDAO damagedCodeDAO = new DamagedCodeDAO();
 	private WarehouseDAO warehouseDAO = new WarehouseDAO();
 	private DetailDAO detailDAO = new DetailDAO();
+	private InventoryDAO inventoryDAO = new InventoryDAO();
 
 	private JLabel laIOReceipt;
 	private JLabel laIODetail;
@@ -205,7 +210,16 @@ public class CheckDetailDialog extends JDialog {
 		btnSave.addActionListener(e -> {
 			int result = detailDAO.processInboundDetail(detail.getIoDetailId(), cbDamagedTypeCode.getSelectedIndex()+1, Integer.parseInt(tfDamagedQuantity.getText().trim()), Integer.parseInt(laPlannedQuantity.getText().toString()), warehouse.getWarehouseId());
 			if (result > 0) {
-				JOptionPane.showMessageDialog(this, "검수 완료");				
+//				(int warehouseId, int productId, Date expiryDate, int quantityToAdd) {
+				ProductDAO productDAO = new ProductDAO();
+				java.sql.Date sqlDate = new java.sql.Date(chooser.getDate().getTime());
+				Product product = productDAO.selectByCode(detail.getProductSnapshot().getProductCode());
+				Boolean result2 = inventoryDAO.addOrUpdateInventory(warehouse.getWarehouseId(), product.getProductId(), sqlDate, detail.getPlannedQuantity());
+				if(result2) {
+					JOptionPane.showMessageDialog(this, "검수 완료");									
+				} else {
+					JOptionPane.showMessageDialog(this, "검수 실패");			
+				}
 			} else {
 				JOptionPane.showMessageDialog(this, "오류가 발생했습니다.");
 			}

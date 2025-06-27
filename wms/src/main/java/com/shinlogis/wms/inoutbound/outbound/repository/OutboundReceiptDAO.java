@@ -162,11 +162,11 @@ public class OutboundReceiptDAO {
 			}
 			if (scheduledDate != null) {
 				sql.append("AND DATE(ir.scheduled_date) = ? ");
-				params.add(new java.sql.Date(scheduledDate.getTime())); // 🔥 수정
+				params.add(new java.sql.Date(scheduledDate.getTime())); 
 			}
 			if (createdAt != null) {
 				sql.append("AND DATE(ir.created_at) = ? ");
-				params.add(new java.sql.Date(createdAt.getTime())); // 🔥 수정
+				params.add(new java.sql.Date(createdAt.getTime()));
 			}
 			if (status != null && !"전체".equals(status)) {
 				sql.append("AND ir.status = ? ");

@@ -3,8 +3,10 @@ package com.shinlogis.wms.warehouse.repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.storageType.model.StorageType;
@@ -169,5 +171,120 @@ public class WarehouseDAO {
 	    }
 
 	    return list;
+	}
+	public int deleteWarehousesByCodes(List<String> codes) {
+	    Connection conn = null;
+	    PreparedStatement pstmtSelect = null;
+	    PreparedStatement pstmtDeleteInventory = null;
+	    PreparedStatement pstmtDeleteIoDetail = null;
+	    PreparedStatement pstmtDeleteWarehouse = null;
+	    ResultSet rs = null;
+	    int totalDeleted = 0;
+
+	    try {
+	        conn = dbManager.getConnection();
+	        conn.setAutoCommit(false);
+
+	        // 1) warehouse_code -> warehouse_id 조회
+	        StringBuilder selectSql = new StringBuilder("SELECT warehouse_id FROM warehouse WHERE warehouse_code IN (");
+	        for (int i = 0; i < codes.size(); i++) {
+	            selectSql.append("?");
+	            if (i != codes.size() - 1) {
+	                selectSql.append(",");
+	            }
+	        }
+	        selectSql.append(")");
+
+	        pstmtSelect = conn.prepareStatement(selectSql.toString());
+	        for (int i = 0; i < codes.size(); i++) {
+	            pstmtSelect.setString(i + 1, codes.get(i));
+	        }
+	        rs = pstmtSelect.executeQuery();
+
+	        List<Integer> warehouseIds = new ArrayList<>();
+	        while (rs.next()) {
+	            warehouseIds.add(rs.getInt("warehouse_id"));
+	        }
+
+	        if (warehouseIds.isEmpty()) {
+	            conn.rollback();
+	            return 0;
+	        }
+
+	        // 2) inventory 삭제
+	        StringBuilder deleteInventorySql = new StringBuilder("DELETE FROM inventory WHERE warehouse_id IN (");
+	        for (int i = 0; i < warehouseIds.size(); i++) {
+	            deleteInventorySql.append("?");
+	            if (i != warehouseIds.size() - 1) {
+	                deleteInventorySql.append(",");
+	            }
+	        }
+	        deleteInventorySql.append(")");
+
+	        pstmtDeleteInventory = conn.prepareStatement(deleteInventorySql.toString());
+	        for (int i = 0; i < warehouseIds.size(); i++) {
+	            pstmtDeleteInventory.setInt(i + 1, warehouseIds.get(i));
+	        }
+	        pstmtDeleteInventory.executeUpdate();
+
+	        // 3) io_detail 삭제 추가
+	        StringBuilder deleteIoDetailSql = new StringBuilder("DELETE FROM io_detail WHERE warehouse_id IN (");
+	        for (int i = 0; i < warehouseIds.size(); i++) {
+	            deleteIoDetailSql.append("?");
+	            if (i != warehouseIds.size() - 1) {
+	                deleteIoDetailSql.append(",");
+	            }
+	        }
+	        deleteIoDetailSql.append(")");
+
+	        pstmtDeleteIoDetail = conn.prepareStatement(deleteIoDetailSql.toString());
+	        for (int i = 0; i < warehouseIds.size(); i++) {
+	            pstmtDeleteIoDetail.setInt(i + 1, warehouseIds.get(i));
+	        }
+	        pstmtDeleteIoDetail.executeUpdate();
+
+	        // 4) warehouse 삭제
+	        StringBuilder deleteWarehouseSql = new StringBuilder("DELETE FROM warehouse WHERE warehouse_id IN (");
+	        for (int i = 0; i < warehouseIds.size(); i++) {
+	            deleteWarehouseSql.append("?");
+	            if (i != warehouseIds.size() - 1) {
+	                deleteWarehouseSql.append(",");
+	            }
+	        }
+	        deleteWarehouseSql.append(")");
+
+	        pstmtDeleteWarehouse = conn.prepareStatement(deleteWarehouseSql.toString());
+	        for (int i = 0; i < warehouseIds.size(); i++) {
+	            pstmtDeleteWarehouse.setInt(i + 1, warehouseIds.get(i));
+	        }
+	        totalDeleted = pstmtDeleteWarehouse.executeUpdate();
+
+	        conn.commit();
+
+	    } catch (Exception e) {
+	        if (conn != null) {
+	            try {
+	                conn.rollback();
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
+	            }
+	        }
+	        e.printStackTrace();
+	    } finally {
+	        dbManager.release(pstmtSelect, rs);
+	        dbManager.release(pstmtDeleteInventory);
+	        dbManager.release(pstmtDeleteIoDetail);
+	        dbManager.release(pstmtDeleteWarehouse);
+	        if (conn != null) {
+	            try {
+	                conn.setAutoCommit(true);
+	                conn.close();
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
+	            }
+	        }
+	    }
+
+	    return totalDeleted;
 	}
 }

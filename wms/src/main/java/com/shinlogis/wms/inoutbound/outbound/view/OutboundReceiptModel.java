@@ -26,6 +26,11 @@ public class OutboundReceiptModel extends AbstractTableModel {
 	}
 
 	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return columnIndex == 6;
+	}
+	
+	@Override
 	public int getRowCount() {
 		return outboundReceiptList.size();
 	}
