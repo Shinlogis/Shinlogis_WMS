@@ -14,6 +14,8 @@ import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
+import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailModel;
+import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailPage;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.inoutbound.model.InboundForm;
 import com.shinlogis.wms.product.model.Product;
@@ -22,6 +24,8 @@ import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 import com.toedter.calendar.JDateChooser;
 
 public class AddRecieptDialog extends JDialog {
+	private Runnable onSavedCallback; // 저장 후 실행할 콜백
+	
 	private AppMain appMain;
 	private HeadquartersUser user;
 
@@ -36,8 +40,9 @@ public class AddRecieptDialog extends JDialog {
 	private SnapshotDAO snapshotDAO = new SnapshotDAO();
 	private List<RowComponents> rowComponentsList = new ArrayList<>();
 
-	public AddRecieptDialog(Frame owner, AppMain appMain, ReceiptModel iModel) {
+	public AddRecieptDialog(Frame owner, AppMain appMain, ReceiptModel iModel, Runnable onSaveCallback) {
 		super(owner, "입고예정 등록", true);
+		this.onSavedCallback = onSavedCallback;
 		this.appMain = appMain;
 		this.user =	appMain.headquartersUser;
 
@@ -138,10 +143,14 @@ public class AddRecieptDialog extends JDialog {
 			}
 
 			JOptionPane.showMessageDialog(this, successCount + "건 등록 완료");
-			
+			// 저장 후 콜백 함수가 있으면 실행 (부모 페이지 갱신용)
+			 if (onSaveCallback != null) {
+		            onSaveCallback.run();
+		        }
+			 
 			dispose();
-			// TODO 테이블 갱신
 			iModel.setData(Collections.emptyMap());
+			
 		});
 
 		btnCancel.addActionListener(e -> dispose());

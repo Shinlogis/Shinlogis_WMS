@@ -64,6 +64,7 @@ CREATE TABLE storage_type (
 -- [상품 정보 테이블]
 CREATE TABLE product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
+	product_img VARCHAR(100),
     product_code VARCHAR(100) NOT NULL UNIQUE,
     product_name VARCHAR(100) NOT NULL,
     storage_type_id INT NOT NULL,
@@ -73,6 +74,7 @@ CREATE TABLE product (
     FOREIGN KEY (storage_type_id) REFERENCES storage_type(storage_type_id),
     FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id)
 );
+
 
 -- [창고 테이블]
 CREATE TABLE warehouse (
@@ -126,6 +128,7 @@ CREATE TABLE io_receipt (
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     processed_date DATETIME,
     location_id INT,
+    active BOOLEAN DEFAULT TRUE,
     CHECK (io_type IN ('IN', 'OUT')),
     FOREIGN KEY (user_id) REFERENCES headquarters_user(headquarters_user_id),
     FOREIGN KEY (location_id) REFERENCES location(location_id)
@@ -137,13 +140,13 @@ CREATE TABLE io_detail (
     io_receipt_id INT NOT NULL,
     planned_quantity INT NOT NULL DEFAULT 0,
     snapshot_id INT NOT NULL,
-    damage_code_id INT NOT NULL,
-    damage_quantity INT NOT NULL,
-    actual_quantity INT NOT NULL DEFAULT 0,
+    damage_code_id INT,
+    damage_quantity INT,
+    actual_quantity INT NOT NULL,
     processed_date DATETIME,
     warehouse_id INT,
-     headquarters_user_id INT NOT NULL,
-
+    headquarters_user_id INT NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
     status VARCHAR(100) NOT NULL DEFAULT '예정',
     CHECK (planned_quantity >= 0),
     CHECK (damage_quantity >= 0),
@@ -310,25 +313,27 @@ INSERT INTO storage_type (storage_type_id, type_code, type_name) VALUES (2, 'COL
 
 INSERT INTO storage_type (storage_type_id, type_code, type_name) VALUES (3, 'FROZEN', '냉동');
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (1, 'P001', '토마토', 2, 2, 4108);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (1, 'images/tomato.jpg', 'P001', '토마토', 2, 2, 4108);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (2, 'P002', '오렌지', 3, 3, 5879);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (2, 'images/orange.jpg', 'P002', '오렌지', 3, 3, 5879);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (3, 'P003', '참치', 1, 4, 8039);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (3, 'images/tuna.jpg', 'P003', '참치', 1, 4, 8039);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (4, 'P004', '닭가슴살', 2, 5, 7377);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (4, 'images/chickenbreast.jpg', 'P004', '닭가슴살', 2, 5, 7377);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (5, 'P005', '감자', 3, 6, 6010);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (5, 'images/potato.jpg', 'P005', '감자', 3, 6, 6010);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (6, 'P006', '양파', 1, 7, 4546);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (6, 'images/onion.jpg', 'P006', '양파', 1, 7, 4546);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (7, 'P007', '배추', 2, 8, 7674);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (7, 'images/napacabbage.jpg', 'P007', '배추', 2, 8, 7674);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (8, 'P008', '당근', 3, 9, 4426);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (8, 'images/carrot.jpg', 'P008', '당근', 3, 9, 4426);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (9, 'P009', '연어', 1, 10, 3588);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (9, 'images/salmon.jpg', 'P009', '연어', 1, 10, 3588);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (10, 'P010', '소고기', 2, 1, 6928);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (10, 'images/beef.jpg', 'P010', '소고기', 2, 1, 6928);
+
+INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (11, 'P011', '사과', 1, 3, 8252);
 
 INSERT INTO warehouse (warehouse_id, warehouse_name, address, storage_type_id, warehouse_code) VALUES (1, '인천1창고', '인천시 남동구 1번지', 2, 'W001');
 

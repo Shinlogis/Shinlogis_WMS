@@ -437,10 +437,10 @@ public class AppMain extends JFrame {
 
 		if ("headquartersUser".equals(role)) {
 			pages = new Page[14];
-
 			pages[0] = new MainPage(this);
-			pages[1] = new ReceiptPage(this);
-			pages[2] = new DetailPage(this);
+			DetailPage detailPage = new DetailPage(this);
+			pages[2] = detailPage;
+			pages[1] = new ReceiptPage(this, detailPage);
 			pages[3] = new ProcessPage(this);
 			pages[4] = new OutboundReceiptPage(this);
 			pages[5] = new OutboundDetailPage(this);
