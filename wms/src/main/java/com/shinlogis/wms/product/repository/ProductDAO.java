@@ -265,4 +265,39 @@ public class ProductDAO {
 
 	    return totalDeleted;
 	}
+	
+	//썸네일 상품검색 
+		public List<Product> selectthumbnail(int storage_type_id) {
+			List<Product> list = new ArrayList<>();
+			String sql = "select * from product where storage_type_id =? limit 12";
+
+			Connection connection = null;
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+
+			try {
+				connection = dbManager.getConnection();
+				try {
+					pstmt = connection.prepareStatement(sql);
+					pstmt.setInt(1, storage_type_id);
+					rs = pstmt.executeQuery();
+					
+					while (rs.next()) {
+						Product product = new Product();
+						
+						product.setProductId(rs.getInt("product_id"));
+						product.setProductName(rs.getString("product_name"));
+						product.setPrice(rs.getInt("price"));
+
+						list.add(product);
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			} finally {
+				dbManager.release(pstmt, rs);
+			}
+
+			return list;
+		}
 }
