@@ -236,6 +236,7 @@ public class AppMain extends JFrame {
 				public void mouseClicked(MouseEvent e) {
 					if(headquartersUser.getId().equals("yujin")) {
 						showPage(Config.CHATTING_PAGE);
+						
 						ChattingPage chattingPage = (ChattingPage)pages[Config.CHATTING_PAGE];
 						chattingPage.createConnection();
 						System.out.println("접속 시도 중");

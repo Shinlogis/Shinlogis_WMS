@@ -40,6 +40,7 @@ public class ServerThread extends Thread{
 	}
 	
 	
+	//받을 때는 문자열을 객체로
 	public void listen() {
 		String msg = null;
 		
@@ -91,12 +92,12 @@ public class ServerThread extends Thread{
 				
 				if(obj.getMe().equals("head")) { //본사에서 전송된 메시지라면, locationList 에 들어있는 지사쓰레의 send() 호출
 					int discoveredIndex = getIndexOfThreadInList(server.locationList ,locationId);
-					send(obj.getMsg()); //나에게 보내기 
-					if(discoveredIndex != -1)server.locationList.get(discoveredIndex).send(obj.getMsg());; //너에게 보내기
+					send(msg); //나에게 보내기 
+					if(discoveredIndex != -1)server.locationList.get(discoveredIndex).send(msg);; //너에게 보내기
 				}else if(obj.getMe().equals("location")) { //지사에서 전송된 메시지라면, headList 에 들어있는 지사쓰레드의 send() 호출 
 					int discoveredIndex = getIndexOfThreadInList(server.headList , locationId);
-					send(obj.getMsg()); //나에게 보내기 
-					if(discoveredIndex != -1)server.headList.get(discoveredIndex).send(obj.getMsg());; //너에게 보내기						
+					send(msg); //나에게 보내기 
+					if(discoveredIndex != -1)server.headList.get(discoveredIndex).send(msg);; //너에게 보내기						
 				}; 
 			}else if(obj.getRequestType().equals("exit")){
 				

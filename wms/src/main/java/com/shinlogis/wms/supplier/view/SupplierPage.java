@@ -138,6 +138,10 @@ public class SupplierPage extends Page{
 			new AddSupplierDialog(appMain, model);
 		});
 		
+		bt_delete.addActionListener(e->{
+			model.deleteSupplier();
+		});
+		
 	}
 	
 	

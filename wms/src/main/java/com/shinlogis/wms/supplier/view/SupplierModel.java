@@ -1,10 +1,13 @@
 package com.shinlogis.wms.supplier.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
+import com.shinlogis.wms.common.Exception.SupplierException;
 import com.shinlogis.wms.supplier.model.Supplier;
 import com.shinlogis.wms.supplier.repository.SupplierDAO;
 
@@ -19,16 +22,6 @@ public class SupplierModel extends AbstractTableModel{
 		list = supplierDAO.showSuppliers();
 	}
 	
-	@Override
-	public Class<?> getColumnClass(int col) {
-	    switch (col) {
-	        case 0: return Boolean.class;   // 체크박스 열
-	        case 1: return Integer.class;   // 상품명
-	        case 2: return String.class;  // 가격
-	        case 3: return String.class;  // 수량입력
-	        default: return Object.class;
-	    }
-	}
 	
 	@Override
 	public int getRowCount() {
@@ -67,14 +60,45 @@ public class SupplierModel extends AbstractTableModel{
 	}
 	
 	@Override
+	public Class<?> getColumnClass(int col) {
+	    switch (col) {
+	        case 0: return Boolean.class;   // 체크박스 열
+	        case 1: return Integer.class;   // 상품명
+	        case 2: return String.class;  // 가격
+	        case 3: return String.class;  // 수량입력
+	        default: return Object.class;
+	    }
+	}
+	
+	@Override
 	public void setValueAt(Object value, int row, int col) {
 	    if (col == 0) { // 체크박스 열이면
 	        list.get(row).setChecked((Boolean) value); // 공급사 객체에 체크 상태 반영
 	        fireTableCellUpdated(row, col); // 변경 알림
 	    }
 	}
-
 	
+	//테이블 삭제
+	public void deleteSupplier() {
+		
+		for(Supplier supplier : list) {
+			if(supplier.isChecked()) {
+				supplier.setStatus("비활성");
+				try {
+					supplierDAO.deleteSupplier(supplier);
+				} catch (SupplierException e) {
+					e.printStackTrace();
+					JOptionPane.showInputDialog(e.getMessage());
+				}
+			}
+		}
+		JOptionPane.showMessageDialog(null, "삭제에 성공하였습니다.");
+		list = supplierDAO.showSuppliers();
+		fireTableDataChanged();
+	}
+	
+
+	//테이블 새로 갱신
 	public void tableChanged() {
 		list = supplierDAO.showSuppliers();
 	    fireTableDataChanged();      
