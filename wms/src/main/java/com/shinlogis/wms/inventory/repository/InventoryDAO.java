@@ -53,6 +53,28 @@ public class InventoryDAO {
 		}
 		return list;
 	}
+	// TODO 입고처리된 새로운 상품을 재고에 저장
+	public int addToInventory() {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int result = 0;
+
+		StringBuffer sql = new StringBuffer();
+		sql.append("INSERT INTO inventory (quantity, warehouse_id, expiry_date, product_id VALUES (?, ?, NOW(), ?)");
+
+		try {
+			conn = dbManager.getConnection();
+			pstmt = conn.prepareStatement(sql.toString());
+//			pstmt.setInt(1, );
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+//		result = pstmt.executeUpdate();
+
+		return 0;
+	}
 
 
 	// 조회: 중복 항목 병합 (inventory_id 제외)
@@ -75,10 +97,10 @@ public class InventoryDAO {
 		sql.append("WHERE 1=1 ");
 
 		if (inventoryDTO.getWarehouseCode() != null && !inventoryDTO.getWarehouseCode().isEmpty()) {
-			sql.append("AND w.warehouse_code = ? ");
+			sql.append("AND w.warehouse_code LIKE ? ");
 		}
 		if (inventoryDTO.getProductCode() != null && !inventoryDTO.getProductCode().isEmpty()) {
-			sql.append("AND p.product_code = ? ");
+			sql.append("AND p.product_code LIKE ? ");
 		}
 		if (inventoryDTO.getWarehouseName() != null && !inventoryDTO.getWarehouseName().isEmpty()) {
 			sql.append("AND w.warehouse_name LIKE ? ");
