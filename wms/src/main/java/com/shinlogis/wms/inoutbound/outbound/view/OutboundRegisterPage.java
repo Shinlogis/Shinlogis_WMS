@@ -60,6 +60,7 @@ public class OutboundRegisterPage extends Page {
 	private int count;
 	private int storeOrderId = 0;
 	AppMain appMain;
+	
 
 	public OutboundRegisterPage(AppMain appMain) {
 		super(appMain);
@@ -190,7 +191,7 @@ public class OutboundRegisterPage extends Page {
 	    tb_order.getColumn("출고 등록").setCellRenderer(new ButtonRenderer());
 		tb_order.getColumn("출고 등록").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 		    int selectedOrderId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		    OutboundRegisterDialog ourboundRegisterDialog = new OutboundRegisterDialog();
+		    OutboundRegisterDialog ourboundRegisterDialog = new OutboundRegisterDialog(appMain);
 //==============등록 다이얼로그 띄워서 insert 쿼리랑 연결할거임
 		    // DAO로부터 새로운 상세 리스트 가져오기
 //		    OrderDetailDAO orderDetailDAO = new OrderDetailDAO();

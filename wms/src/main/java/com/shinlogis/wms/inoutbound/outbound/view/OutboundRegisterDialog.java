@@ -1,79 +1,205 @@
 package com.shinlogis.wms.inoutbound.outbound.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+
+import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.inoutbound.outbound.repository.OutboundDetailDAO;
+import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
+import com.shinlogis.wms.location.model.Location;
+import com.shinlogis.wms.location.repository.LocationDAO;
+import com.toedter.calendar.JDateChooser;
 
 public class OutboundRegisterDialog extends JDialog {
-	JPanel p_title;
-	JTable tb_regist;
-	JLabel la_title;
-	
-	JPanel p_content;
-	
-	JPanel p_bttn;
-	JButton bt_close;
-	JButton bt_register;
-	
-	public OutboundRegisterDialog() {
-		setLayout(new FlowLayout());
-		// 제목 서식.
-		la_title = new JLabel("출고등록");
-		la_title.setFont(new Font("맑은 고딕", Font.PLAIN, 20)); //제목양식
-		p_title = new JPanel();
-		p_title.add(la_title);
-		p_title.setPreferredSize(new Dimension(700,100));
-		p_title.setBackground(new Color(0xFF7F50));
-		
-		//본문서식
-		p_content = new JPanel();
-		p_content.setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.BOTH; // 셀을 가득 채움
-		gbc.insets = new Insets(5, 5, 5, 5); // 셀 간 여백
+    JPanel p_title;
+    JLabel la_title;
 
-		for (int y = 0; y < 4; y++) { // 세로 4줄
-		    for (int x = 0; x < 5; x++) { // 가로 5칸
-		        gbc.gridx = x; // x 위치 (열)
-		        gbc.gridy = y; // y 위치 (행)
-		        JLabel label = new JLabel("[" + y + "," + x + "]");
-		        p_content.add(label, gbc);
-		    }
-		}
-		
-//==================버튼생성
-		
-		// 버튼 패널 생성
-		p_bttn = new JPanel();
-		bt_register = new JButton("등록");
-		bt_close = new JButton("닫기");
-		p_bttn.setPreferredSize(new Dimension(700, 80));
-		p_bttn.setBackground(new Color(0xF5F5F5)); // 연한 회색 배경 (원하는 색으로 변경 가능)
+    JPanel p_form;
+    JDateChooser ch_reservatedDate;
+    JTextField tf_productName;
+    JTextField tf_quantity;
+    JComboBox<Location> cb_location;
+    private List<IODetail> outboundDetailList = new ArrayList<>();
+    AppMain appMain;
+    Date ScheduledDate;
+    JTable tb_products;
+    DefaultTableModel model;
 
-		// 버튼들을 버튼 패널에 추가
-		p_bttn.add(bt_register);
-		p_bttn.add(bt_close);
+    JPanel p_bttn;
+    JButton bt_register;
+    JButton bt_close;
 
-		// 버튼 패널을 다이얼로그에 추가
-		add(p_bttn);
-		
-		add(p_title);
-		add(p_content);
-		add(p_bttn);
-		setTitle("출고 등록 하기");		
-		setBounds(300, 200, 0, 0);
-		setSize(new Dimension(700, 800));
-		setVisible(true);
-	}
+    public OutboundRegisterDialog(AppMain appMain) {
+    	this.appMain= appMain;
+        setLayout(new BorderLayout());
+
+        // ===== 제목
+        la_title = new JLabel("출고등록");
+        la_title.setFont(new Font("맑은 고딕", Font.BOLD, 22));
+        la_title.setHorizontalAlignment(SwingConstants.CENTER);
+        p_title = new JPanel(new BorderLayout());
+        p_title.setPreferredSize(new Dimension(700, 50));
+        p_title.setBackground(new Color(0xFF7F50));
+        p_title.add(la_title);
+
+        // ===== 입력 폼
+        p_form = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        ch_reservatedDate = new JDateChooser();
+        ch_reservatedDate.setDateFormatString("yyyy-MM-dd");
+        ch_reservatedDate.setPreferredSize(new Dimension(150, 25));
+        cb_location = new JComboBox<>();
+        tf_productName = new JTextField();
+        tf_productName.setPreferredSize(new Dimension(150,25));
+        tf_quantity = new JTextField();
+        tf_quantity.setPreferredSize(new Dimension(150,25));
+        gbc.insets = new Insets(5, 5, 5, 5); // 컴포넌트 간 간격
+        gbc.fill = GridBagConstraints.HORIZONTAL; // 가로로 늘리기
+        gbc.weightx = 0.3; // 라벨 너비 비율
+
+        // 1행 - 출고예정일
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        p_form.add(new JLabel("출고예정일"), gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.7;
+        p_form.add(ch_reservatedDate, gbc);
+
+        // 2행 - 주문지점
+        gbc.gridx = 2;
+        gbc.weightx = 0.3;
+        p_form.add(new JLabel("주문지점"), gbc);
+
+        gbc.gridx = 3;
+        gbc.weightx = 0.7;
+        p_form.add(cb_location, gbc);
+
+     // y=1 위치를 빈 공간으로 유지하기 위해
+        gbc.gridx = 0;
+        gbc.gridy = 1; // 전체 칼럼 폭을 차지하게
+        gbc.weighty = 0.1; // 조금 아래로 밀리게
+        p_form.add(new JLabel(""), gbc);
+
+        
+        // 3행 - 상품명
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0.3;
+        p_form.add(new JLabel("상품명"), gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.7;
+        p_form.add(tf_productName, gbc);
+
+        // 4행 - 주문수량
+        gbc.gridx = 2;
+        gbc.weightx = 0.3;
+        p_form.add(new JLabel("주문수량"), gbc);
+
+        gbc.gridx = 3;
+        gbc.weightx = 0.7;
+        p_form.add(tf_quantity, gbc);
+
+        
+        loadLocations();
+
+
+        // ===== 테이블
+        setupProductTable();
+
+        // ===== 버튼
+        p_bttn = new JPanel();
+        bt_register = new JButton("등록");
+        bt_close = new JButton("닫기");
+        p_bttn.add(bt_register);
+        p_bttn.add(bt_close);
+
+        bt_register.addActionListener(e -> {
+            try {
+                // 1. 출고 전표 insert
+                OutboundReceiptDAO receiptDAO = new OutboundReceiptDAO();
+                IOReceipt receipt = new IOReceipt();
+                //선택한 날짜를 담아 줄 테이트 추저..
+                ScheduledDate = new Date(ch_reservatedDate.getDate().getTime());
+
+                // UI에서 입력받은 값들 세팅
+                
+
+				int	ioReceiptId = receiptDAO.insertAllOutbounds(appMain, receipt, null, ScheduledDate);
+
+                // 2. 출고 상세 insert
+                OutboundDetailDAO detailDAO = new OutboundDetailDAO();
+                for (IODetail detail : outboundDetailList) { // 리스트에서 꺼내
+                    detail.getIoReceipt().setIoReceiptId(ioReceiptId); // FK 세팅
+                    detailDAO.insertOutboundDetail(detail);
+                }
+
+                System.out.println("출고 등록 완료!");
+                this.dispose(); // 닫기
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        bt_close.addActionListener(e -> this.dispose());
+
+        // ===== 전체 배치
+        add(p_title, BorderLayout.NORTH);
+        add(p_form, BorderLayout.CENTER);
+        add(new JScrollPane(tb_products), BorderLayout.SOUTH);
+        add(p_bttn, BorderLayout.PAGE_END);
+
+        setTitle("출고 등록 하기");        
+        setBounds(300, 200, 700, 500);
+        setVisible(true);
+    }
+
+    //출고지점 이름을 선택하게끔 하기 위한 메서드
+    private void loadLocations() {
+        LocationDAO locationDAO = new LocationDAO();
+        List<Location> locations = locationDAO.getLocation();
+        for (Location loc : locations) {
+            cb_location.addItem(loc);
+        }
+    }
+
+    private void setupProductTable() {
+        String[] columns = {"상품코드", "상품명", "계획수량"};
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return col == 2; // 계획수량만 수정 가능
+            }
+        };
+        tb_products = new JTable(model);
+
+        // 임시 데이터
+        model.addRow(new Object[] {"P001", "테스트상품1", 10});
+        model.addRow(new Object[] {"P002", "테스트상품2", 20});
+    }
 
 }

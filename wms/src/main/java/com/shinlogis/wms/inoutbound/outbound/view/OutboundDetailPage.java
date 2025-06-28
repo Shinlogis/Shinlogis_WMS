@@ -201,7 +201,7 @@ public class OutboundDetailPage extends Page {
 		        new ButtonEditor(new JCheckBox(), (table, row, col) -> {
 		        	//클릭시 동작도 다시 재 정의 해주기
 		            int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		            new OutboundRegisterDialog();
+		            new OutboundRegisterDialog(app);
 		        })
 		    );
 
@@ -229,7 +229,7 @@ public class OutboundDetailPage extends Page {
 		    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 		        // 상세보기 클릭 시 동작 정의
 		        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		        new OutboundRegisterDialog();
+		        new OutboundRegisterDialog(app);
 		    })
 		); 
 		

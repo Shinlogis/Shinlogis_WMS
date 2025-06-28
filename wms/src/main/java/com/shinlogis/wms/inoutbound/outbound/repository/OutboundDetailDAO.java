@@ -329,4 +329,27 @@ public class OutboundDetailDAO {
 
 		return outboundDetail;
 	}
+	public int insertOutboundDetail(IODetail detail) throws SQLException {
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    con = dbManager.getConnection();
+	    
+	    String sql = "INSERT INTO io_detail (io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, warehouse_id, status) " +
+	                 "VALUES (?, ?, ?, 0, 0, 0, ?, '예정')";
+	    pstmt = con.prepareStatement(sql);
+	    
+	    pstmt.setInt(1, detail.getIoReceipt().getIoReceiptId());
+	    pstmt.setInt(2, detail.getPlannedQuantity());
+	    pstmt.setInt(3, detail.getProductSnapshot().getSnapshotId());
+	    pstmt.setInt(4, detail.getWarehouse().getWarehouseId());
+
+	    int affectedRows = pstmt.executeUpdate();
+	    if (affectedRows == 0) {
+	        throw new SQLException("출고 상세 생성 실패");
+	    }
+
+	    dbManager.release(pstmt);
+	    return affectedRows;
+	}
+
 }
