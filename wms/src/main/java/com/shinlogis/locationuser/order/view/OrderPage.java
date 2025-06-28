@@ -259,4 +259,12 @@ public class OrderPage extends Page{
 		 OrderConfirmDialog dialog = new OrderConfirmDialog(null, model.getSelectedProducts());
 		 return dialog.isConfirmed();
     }
+	
+	//검색 
+	public void searchProductByName(String productName) {
+		tfProduct.setText(productName); // 검색바에 자동 입력
+
+	    // 검색 로직 호출 (이미 만들어 둔 검색 버튼 클릭과 동일하게 동작하도록)
+		btnSearch.doClick();
+	}
 }
