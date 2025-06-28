@@ -22,7 +22,9 @@ import javax.swing.JTextField;
 import com.shinlogis.wms.common.util.NumericTextFieldUtil;
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
 import com.shinlogis.wms.inventory.repository.InventoryDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
@@ -36,6 +38,7 @@ public class CheckDetailDialog extends JDialog {
 	private WarehouseDAO warehouseDAO = new WarehouseDAO();
 	private DetailDAO detailDAO = new DetailDAO();
 	private InventoryDAO inventoryDAO = new InventoryDAO();
+	private ReceiptDAO receiptDAO = new ReceiptDAO();
 
 	private JLabel laIOReceipt;
 	private JLabel laIODetail;
@@ -208,24 +211,49 @@ public class CheckDetailDialog extends JDialog {
 
 		// 저장 버튼
 		btnSave.addActionListener(e -> {
-			int result = detailDAO.processInboundDetail(detail.getIoDetailId(), cbDamagedTypeCode.getSelectedIndex()+1, Integer.parseInt(tfDamagedQuantity.getText().trim()), Integer.parseInt(laPlannedQuantity.getText().toString()), warehouse.getWarehouseId());
-			if (result > 0) {
-//				(int warehouseId, int productId, Date expiryDate, int quantityToAdd) {
-				ProductDAO productDAO = new ProductDAO();
-				java.sql.Date sqlDate = new java.sql.Date(chooser.getDate().getTime());
-				Product product = productDAO.selectByCode(detail.getProductSnapshot().getProductCode());
-				Boolean result2 = inventoryDAO.addOrUpdateInventory(warehouse.getWarehouseId(), product.getProductId(), sqlDate, detail.getPlannedQuantity());
-				if(result2) {
-					JOptionPane.showMessageDialog(this, "검수 완료");									
-				} else {
-					JOptionPane.showMessageDialog(this, "검수 실패");			
-				}
-			} else {
-				JOptionPane.showMessageDialog(this, "오류가 발생했습니다.");
-			}
-			dispose();
-			model.setData(Collections.emptyMap());
+		    int result = detailDAO.processInboundDetail(
+		        detail.getIoDetailId(),
+		        cbDamagedTypeCode.getSelectedIndex() + 1,
+		        Integer.parseInt(tfDamagedQuantity.getText().trim()),
+		        Integer.parseInt(laPlannedQuantity.getText().trim()),
+		        warehouse.getWarehouseId()
+		    );
+
+		    if (result > 0) {
+		        ProductDAO productDAO = new ProductDAO();
+		        java.sql.Date sqlDate = new java.sql.Date(chooser.getDate().getTime());
+		        Product product = productDAO.selectByCode(detail.getProductSnapshot().getProductCode());
+
+		        boolean result2 = inventoryDAO.addOrUpdateInventory(
+		            warehouse.getWarehouseId(),
+		            product.getProductId(),
+		            sqlDate,
+		            detail.getPlannedQuantity()
+		        );
+
+		        // 상세 상태는 이 시점에서 '완료'로 변경됨
+		        detailDAO.updateStatus(detail.getIoDetailId(), "완료");
+
+		        // 전표 ID 가져오기
+		        int receiptId = detail.getIoReceipt().getIoReceiptId();
+
+		        // 전표 상태 판단 & 갱신
+		        String newStatus = receiptDAO.determineReceiptStatus(receiptId);
+		        receiptDAO.updateReceiptStatus(receiptId, newStatus);
+
+		        if (result2) {
+		            JOptionPane.showMessageDialog(this, "검수 완료");
+		        } else {
+		            JOptionPane.showMessageDialog(this, "검수 실패");
+		        }
+		    } else {
+		        JOptionPane.showMessageDialog(this, "오류가 발생했습니다.");
+		    }
+
+		    dispose();
+		    model.setData(Collections.emptyMap());
 		});
+
 
 		btnCancel.addActionListener(e -> dispose());
 
