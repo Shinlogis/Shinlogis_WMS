@@ -351,5 +351,21 @@ public class OutboundDetailDAO {
 	    dbManager.release(pstmt);
 	    return affectedRows;
 	}
+	
+	//상태 업데이트 및 날짜 업데이트
+	public boolean updateStatusAndProcessedDate(int ioDetailId, String status, java.sql.Date processedDate) {
+	    String sql = "UPDATE io_detail SET status = ?, processed_date = ? WHERE io_detail_id = ?";
+	    try (Connection con = dbManager.getConnection();
+	         PreparedStatement pstmt = con.prepareStatement(sql)) {
+	        pstmt.setString(1, status);
+	        pstmt.setDate(2, processedDate);
+	        pstmt.setInt(3, ioDetailId);
+	        int updated = pstmt.executeUpdate();
+	        return updated > 0;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
 
 }

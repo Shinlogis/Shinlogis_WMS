@@ -104,6 +104,7 @@ public class OutboundRegisterDialog extends JDialog {
         p_form.add(new JLabel(""), gbc);
 
         
+        
         // 3행 - 상품명
         gbc.gridx = 0;
         gbc.gridy = 2;
