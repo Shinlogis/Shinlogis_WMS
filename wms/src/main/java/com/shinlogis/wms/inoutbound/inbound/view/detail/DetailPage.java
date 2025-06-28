@@ -29,20 +29,23 @@ import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.toedter.calendar.JDateChooser;
 
 public class DetailPage extends Page {
 	DetailDAO detailDAO = new DetailDAO();
+	ReceiptDAO receiptDAO = new ReceiptDAO();
 	
 	private JPanel pPageName;
 	private JLabel laPageName;
 
 	private JPanel pSearch;
-	private JTextField tfPlanId, tfPlanItemId, tfProductCode, tfSupplierName, tfProduct;
+	public JTextField tfPlanId;
+	private JTextField tfPlanItemId, tfProductCode, tfSupplierName, tfProduct;
 	private JComboBox<String> cbStatus;
 	private JDateChooser chooser;
-	private JButton btnSearch;
+	public JButton btnSearch;
 
 	private JPanel pTable;
 	private JLabel laPlanCount;
@@ -110,14 +113,25 @@ public class DetailPage extends Page {
 
 		JButton btnDelete = new JButton("삭제");
 		btnDelete.addActionListener(cbStatus);
-		btnDelete.setPreferredSize(new Dimension(140, 30));
+
 		// 버튼 클릭 시 이벤트
 		btnDelete.addActionListener(e -> {
 			int cnt = 0;
 		    List<Integer> checkedIds = inboundDetailModel.getSelectedDetailIds();
 		    for (int i=0; i<checkedIds.size(); i++) {
-		    	detailDAO.deactivateIoDetail(checkedIds.get(i));
+		    	int ioDetailId = checkedIds.get(i);
+				// 선택한 입고상세를 비활성화
+		    	detailDAO.deactivateIoDetail(ioDetailId);
 		    	cnt++;
+
+				// 상위 입고예정 ID 찾기
+				int ioReceiptId = detailDAO.findReceiptIdByDetailId(ioDetailId);
+
+				// 위에서 입고상세를 비활성화시킨 후, 해당 상위 입고예정이 모두 비활성화됐을 경우
+				if (detailDAO.areAllDetailsInactiveByReceiptId(ioDetailId)){
+					// 해당 입고예정에는 더이상 입고상세가 존재하지 않으므로, 비활성화
+					receiptDAO.deactivateIoReceipt(ioReceiptId);
+				}
 		    }
 		    JOptionPane.showMessageDialog(this, cnt+"건을 삭제했습니다.");
 		    currentPage = 1;
@@ -239,4 +253,6 @@ public class DetailPage extends Page {
 		currentPage = 1;
 		loadDetailData(Collections.emptyMap());
 	}
+
+
 }

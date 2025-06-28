@@ -184,6 +184,10 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.INBOUND_PLAN_PAGE);
+					ReceiptPage receiptPage = (ReceiptPage) pages[Config.INBOUND_PLAN_PAGE];
+					if (receiptPage != null) {
+						receiptPage.refresh();
+					}
 				}
 			});
 
@@ -191,6 +195,10 @@ public class AppMain extends JFrame {
 			la_inboundDetail.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					DetailPage detailPage = (DetailPage) pages[Config.INBOUND_ITEM_PAGE];
+					if (detailPage != null) {
+						detailPage.refreshDetailModel();
+					}
 					showPage(Config.INBOUND_ITEM_PAGE);
 				}
 			});

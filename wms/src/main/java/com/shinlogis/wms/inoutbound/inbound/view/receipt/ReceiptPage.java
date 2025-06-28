@@ -11,23 +11,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.ButtonEditor;
 import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailPage;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.toedter.calendar.JDateChooser;
 
 public class ReceiptPage extends Page {
@@ -49,6 +44,7 @@ public class ReceiptPage extends Page {
 	private ReceiptModel iModel;
 	private JPanel pTableNorth;
 	private JButton btnRegister;
+	private JButton btnDelete;
 
 	private DetailPage detailPage;
 	private int currentPage = 1;
@@ -57,11 +53,14 @@ public class ReceiptPage extends Page {
 	private JButton btnPrevPage, btnNextPage;
 	private JLabel laPageInfo;
 	private JPanel pPaging;
-
+	private AppMain appMain;
+	
 	public ReceiptPage(AppMain appMain, DetailPage detailPage) {
 		super(appMain);
+		this.appMain = appMain;
 		this.detailPage = detailPage;
-		ReceiptDAO dao = new ReceiptDAO();
+		ReceiptDAO receiptDAO = new ReceiptDAO();
+		DetailDAO detailDAO = new DetailDAO();
 
 		pSearch = new JPanel(new GridBagLayout());
 		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.SEARCH_BAR_HEIGHT));
@@ -105,7 +104,7 @@ public class ReceiptPage extends Page {
 		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
 		pTableNorth.add(laPlanCount);
 
-		btnRegister = new JButton("입고예정 등록");
+		btnRegister = new JButton("등록");
 		btnRegister.addActionListener(e -> {
 			AddRecieptDialog dialog = new AddRecieptDialog(appMain, appMain, iModel, () -> {
 				if (detailPage != null) detailPage.refreshDetailModel();
@@ -115,14 +114,44 @@ public class ReceiptPage extends Page {
 		});
 		pTableNorth.add(btnRegister);
 
+		btnDelete = new JButton("삭제");
+		// 버튼 클릭 시 이벤트
+		btnDelete.addActionListener(e -> {
+			int receiptCnt = 0;
+			int detailCnt = 0;
+			List<Integer> checkedIds = iModel.getSelectedReceiptIds();
+			for (int i=0; i<checkedIds.size(); i++) {
+				int ioReceipt = checkedIds.get(i);
+				// 선택한 입고예정을 비활성화
+				receiptDAO.deactivateIoReceipt(ioReceipt);
+				receiptCnt++;
+
+				// 하위 입고상세 ID 찾기
+				List<Integer> detailIds = receiptDAO.findDetailIsdByReceiptId(ioReceipt);
+
+				// 비활성화시킨 입고예정의 하위 입고상세가 존재하는 경우, 모두 비활성화
+				if (!detailIds.isEmpty()){
+					for (int id: detailIds){
+						detailDAO.deactivateIoDetail(id);
+						detailCnt++;
+					}
+				}
+			}
+			JOptionPane.showMessageDialog(this, "입고예정" + receiptCnt+"건을 삭제했습니다.\n하위 입고상세 "+detailCnt+"건이 삭제되었습니다.");
+			currentPage = 1;
+			loadReceiptData(getSearchFilters()); // 입고예정 새로고침
+		});
+		pTableNorth.add(btnDelete);
+
 		iModel = new ReceiptModel();
 		tblPlan = new JTable(iModel);
 		tblPlan.setRowHeight(45);
 		tblPlan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("상세보기").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-			IOReceipt receipt = iModel.getIOReceiptAt(row);
-			// 상세보기 다이얼로그 로직 작성
+			int receipt = (int)iModel.getValueAt(row, 1);
+			showDetailPage(receipt);
 		}));
+
 
 		scTable = new JScrollPane(tblPlan);
 		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 680));
@@ -181,23 +210,41 @@ public class ReceiptPage extends Page {
 			filters.put("product_name", tfProduct.getText().trim());
 		return filters;
 	}
-
 	private void loadReceiptData(Map<String, Object> filters) {
-		ReceiptDAO dao = new ReceiptDAO();
-		fullList = dao.selectInboundReceiptsWithItemInfo(filters); // 전체 데이터 저장
+		// 1. 전체 데이터 로드
+		iModel.setFullData(filters);
+		fullList = iModel.getFullList();
+
+		// 2. 페이징 계산
 		int totalRows = fullList.size();
 		int totalPages = (int) Math.ceil(totalRows / (double) rowsPerPage);
 		if (totalPages == 0) totalPages = 1;
 
-		// 페이징 계산 후 현재 페이지 데이터만 모델에 설정
+		// 3. 현재 페이지 데이터 설정
 		int start = (currentPage - 1) * rowsPerPage;
-		int end = Math.min(start + rowsPerPage, fullList.size());
+		int end = Math.min(start + rowsPerPage, totalRows);
 		List<IOReceipt> currentPageList = fullList.subList(start, end);
-		iModel.setData(currentPageList);
+		iModel.setCurrentPageData(currentPageList);
 
+		// 4. UI 갱신
 		laPlanCount.setText("총 " + totalRows + "개의 입고예정 검색");
 		laPageInfo.setText(currentPage + " / " + totalPages);
 		btnPrevPage.setEnabled(currentPage > 1);
 		btnNextPage.setEnabled(currentPage < totalPages);
 	}
+
+	public void refresh() {
+		currentPage = 1;
+		loadReceiptData(Collections.emptyMap());
+	}
+
+	public void showDetailPage(int detailId) {
+		DetailPage detailPage = (DetailPage) appMain.pages[Config.INBOUND_ITEM_PAGE];
+
+		detailPage.tfPlanId.setText(Integer.toString(detailId)); // 값을 전달
+		detailPage.btnSearch.doClick(); // 검색 이벤트 실행
+		appMain.showPage(Config.INBOUND_ITEM_PAGE);
+	}
+
+
 }

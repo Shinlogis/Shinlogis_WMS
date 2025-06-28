@@ -149,7 +149,7 @@ public class AddRecieptDialog extends JDialog {
 		        }
 			 
 			dispose();
-			iModel.setData(Collections.emptyMap());
+			iModel.setFullData(Collections.emptyMap());
 			
 		});
 

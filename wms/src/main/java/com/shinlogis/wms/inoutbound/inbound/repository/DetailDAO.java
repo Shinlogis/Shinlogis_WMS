@@ -89,7 +89,7 @@ public class DetailDAO {
 				.append("LEFT JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 				.append("LEFT JOIN warehouse w ON ip.warehouse_id = w.warehouse_id ")
 				.append("LEFT JOIN storage_type st ON st.storage_type_id = w.storage_type_id ")
-				.append("WHERE ir.io_type = 'IN' AND ip.active = true");
+				.append("WHERE ir.io_type = 'IN' AND ip.active = true ");
 //		System.out.println(sql);
 		// 검색 필터 추가
 		List<Object> params = new ArrayList<>();
@@ -461,5 +461,80 @@ public class DetailDAO {
 		}
 		return result;
 	}
+
+
+	/**
+	 * 특정 입고상세 ID에 해당하는 입고예정 ID를 반환
+	 * @auther 김예진
+	 * @since 2025-06-28
+	 * @param detailId 입고상세 ID
+	 * @return 상위 입고예정 ID
+	 */
+	public int findReceiptIdByDetailId(int detailId) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int receiptId = -1;
+
+		String sql = "SELECT io_receipt_id FROM io_detail WHERE io_detail_id = ?";
+
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, detailId);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				receiptId = rs.getInt("io_receipt_id");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps, rs);
+		}
+
+		return receiptId;
+	}
+
+	/**
+	 * 특정 입고예정 ID의 모든 입고상세가 비활성화되었는지 여부를 반환
+	 * @auther 김예진
+	 * @since 2025-06-28
+	 * @param receiptId 입고예정 ID
+	 * @return true: 모두 비활성화됨, false: 하나라도 활성화됨
+	 */
+	public boolean areAllDetailsInactiveByReceiptId(int receiptId) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean result = false;
+
+		String sql = "SELECT COUNT(CASE WHEN active = true THEN 1 END) AS active FROM io_detail WHERE io_receipt_id = ?";
+
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, receiptId);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				int activeCount = rs.getInt("active");
+				if (activeCount == 0) {
+					result = true;  // 모두 비활성화됨
+				} else {
+					result = false; // 하나라도 활성화됨
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps, rs);
+		}
+
+		return result;
+	}
+
+
+
 
 }
