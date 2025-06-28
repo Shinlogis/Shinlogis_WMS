@@ -8,7 +8,8 @@ public class ProductDTO {
 	private String storageTypeName;  // storage_type.type_name
 	private int price;
 	private String thumbnailPath;
-
+	private int storageTypeId;
+	private int supplierId;
 	public ProductDTO() {
 	
 	}
@@ -21,7 +22,21 @@ public class ProductDTO {
 		this.price = price;
 		this.thumbnailPath = thumbnailPath;
 	}
+	
+	// getter & setter
+	public int getStorageTypeId() {
+	    return storageTypeId;
+	}
+	public void setStorageTypeId(int storageTypeId) {
+	    this.storageTypeId = storageTypeId;
+	}
 
+	public int getSupplierId() {
+	    return supplierId;
+	}
+	public void setSupplierId(int supplierId) {
+	    this.supplierId = supplierId;
+	}
 	public String getThumbnailPath() {
 		return thumbnailPath;
 	}

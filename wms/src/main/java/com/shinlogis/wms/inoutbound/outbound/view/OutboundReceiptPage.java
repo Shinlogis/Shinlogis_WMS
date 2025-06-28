@@ -49,11 +49,8 @@ public class OutboundReceiptPage extends Page {
 
 	/* ================= 목록 영역 ================ */
 	private JPanel p_tableNorth;// 데이터 수 라벨, 조회, 등록버튼 패널
-	private JPanel buttonPanel;// 버튼 두개 붙일 패널
 
 	private JLabel la_counter;
-	private JButton bt_regist;// 출고예정 등록버튼
-	private JButton bt_checkOrder;// 출고신청 조회
 	private JTable tb_plan; // 출고예정 목록 테이블
 	private JScrollPane sc_table;
 	private AbstractTableModel model;
