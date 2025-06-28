@@ -6,197 +6,245 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.ButtonEditor;
 import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
-import com.shinlogis.wms.inoutbound.inbound.view.detail.EditDetailDialog;
-import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailPage;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.inventory.view.InventoryPage;
 import com.toedter.calendar.JDateChooser;
 
-/**
- * 입고예정 전표 페이지입니다.
- * 
- * @author 김예진
- */
 public class ReceiptPage extends Page {
-	/* ────────── 페이지명 영역 구성 요소 ────────── */
-	private JPanel pPageName; // 페이지명 패널
-	private JLabel laPageName; // 페이지명
+	private JPanel pPageName;
+	private JLabel laPageName;
 
-	/* ────────── 검색 영역 구성 요소 ────────── */
-	private JPanel pSearch; // 검색 Bar
+	private JPanel pSearch;
+	private JTextField tfPlanId;
+	private JDateChooser chooser;
+	private JTextField tfSupplierName;
+	private JComboBox<String> cbStatus;
+	private JTextField tfProduct;
+	private JButton btnSearch;
 
-	private JTextField tfPlanId; // 입고예정ID
-	private JDateChooser chooser; // 달력
-	private JTextField tfSupplierName; // 공급사명
-	private JComboBox<String> cbStatus; // 상태 (예정/처리 중/완료)
-	private JTextField tfProduct; // 상품명
-	private JButton btnSearch; // 검색 버튼
-
-	/* ────────── 목록 영역 구성 요소 ────────── */
 	private JPanel pTable;
-
 	private JLabel laPlanCount;
-	private JTable tblPlan; // 입고예정 목록 테이블
+	private JTable tblPlan;
 	private JScrollPane scTable;
 	private ReceiptModel iModel;
-
 	private JPanel pTableNorth;
-	private JButton btnRegister; // 입고예정등록
+	private JButton btnRegister;
+	private JButton btnDelete;
 
-	public ReceiptPage(AppMain appMain) {
+	private DetailPage detailPage;
+	private int currentPage = 1;
+	private final int rowsPerPage = 14;
+	private List<IOReceipt> fullList;
+	private JButton btnPrevPage, btnNextPage;
+	private JLabel laPageInfo;
+	private JPanel pPaging;
+	private AppMain appMain;
+	
+	public ReceiptPage(AppMain appMain, DetailPage detailPage) {
 		super(appMain);
+		this.appMain = appMain;
+		this.detailPage = detailPage;
+		ReceiptDAO receiptDAO = new ReceiptDAO();
+		DetailDAO detailDAO = new DetailDAO();
 
-		ReceiptDAO ioReceiptDAO = new ReceiptDAO();
-
-		/* ==== 검색 영역 ==== */
-		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
+		pSearch = new JPanel(new GridBagLayout());
 		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.SEARCH_BAR_HEIGHT));
 		pSearch.setBackground(Color.WHITE);
-
-		// GridBagConstraints: 이 컴포넌트를 그리드에 어떻게 배치할지 설정하는 규칙 객체
-		// GridBagLayout에 컴포넌트를 add()할 때마다 그 컴포넌트의 위치, 크기, 여백, 정렬 방법 등을 담은 설정값을 같이 넘김
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(5, 8, 5, 8); // 컴포넌트 주변 여백 설정
-		gbc.fill = GridBagConstraints.HORIZONTAL; // 셀 안에서 공간을 채우는 방식 설정. HORIZONTAL: 가로방향으로 셀을 꽉 채우기 (JtextField의 너비가
-													// 셀만큼 쭉 늘어남)
-
-		// 입고예정ID
-		gbc.gridx = 0; // 열(column) 0번
-		gbc.gridy = 0; // 행(row) 0번
-		pSearch.add(new JLabel("입고예정ID"), gbc); // Grid 좌표 (0, 0)에 입고예정ID 라벨 추가
+		gbc.insets = new Insets(5, 8, 5, 8);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 
 		tfPlanId = new JTextField(10);
-		gbc.gridx = 1; // 열 1번 (행은 바꾸지 않았으므로 여기서도 0)
-		pSearch.add(tfPlanId, gbc);
-
-		// 입고예정일자
-		gbc.gridx = 2;
-		pSearch.add(new JLabel("입고예정일자"), gbc);
 		chooser = new JDateChooser();
 		chooser.setDateFormatString("yyyy-MM-dd");
-		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height)); // 권장 높이보다 넓어지지 않게 하려고 높이를
-																							// chooser.getPreferredSize().height로
-																							// 설정
-		gbc.gridx = 3;
-		pSearch.add(chooser, gbc);
-
-		// 공급사명
-		gbc.gridx = 4;
-		pSearch.add(new JLabel("공급사명"), gbc);
 		tfSupplierName = new JTextField(10);
-		gbc.gridx = 5;
-		pSearch.add(tfSupplierName, gbc);
-
-		// 상태
-		gbc.gridx = 6;
-		pSearch.add(new JLabel("상태"), gbc);
-		cbStatus = new JComboBox<>(new String[] { "전체", "예정", "진행 중", "완료", "보류" });
-		gbc.gridx = 7;
-		pSearch.add(cbStatus, gbc);
-
-		// 상품명
-		gbc.gridx = 8;
-		pSearch.add(new JLabel("상품명"), gbc);
+		cbStatus = new JComboBox<>(new String[] {"전체", "예정", "진행 중", "완료", "보류"});
 		tfProduct = new JTextField(10);
-		gbc.gridx = 9;
-		pSearch.add(tfProduct, gbc);
-
-		// 검색 버튼
 		btnSearch = new JButton("검색");
-		// 검색 버튼 클릭 시 입력한 검색어를 조건으로 select
-		btnSearch.addActionListener(e -> {
-			// 검색 필터를 저장
-			Map<String, Object> filters = new HashMap<>();
-			if (!tfPlanId.getText().trim().isEmpty())
-				filters.put("io_receipt_id", Integer.parseInt(tfPlanId.getText().trim()));
-			if (chooser.getDate() != null)
-				filters.put("scheduled_date", new java.sql.Date(chooser.getDate().getTime()));
-			if (!tfSupplierName.getText().trim().isEmpty())
-				filters.put("supplier_name", tfSupplierName.getText().trim());
-			String status = (String) cbStatus.getSelectedItem();
-			if (!"전체".equals(status))
-				filters.put("status", status);
-			if (!tfProduct.getText().trim().isEmpty())
-				filters.put("product_name", tfProduct.getText().trim());
+		
+		gbc.gridx = 0; gbc.gridy = 0; pSearch.add(new JLabel("입고예정ID"), gbc);
+		gbc.gridx = 1; pSearch.add(tfPlanId, gbc);
+		gbc.gridx = 2; pSearch.add(new JLabel("입고예정일자"), gbc);
+		gbc.gridx = 3; pSearch.add(chooser, gbc);
+		gbc.gridx = 4; pSearch.add(new JLabel("공급사명"), gbc);
+		gbc.gridx = 5; pSearch.add(tfSupplierName, gbc);
+		gbc.gridx = 6; pSearch.add(new JLabel("상태"), gbc);
+		gbc.gridx = 7; pSearch.add(cbStatus, gbc);
+		gbc.gridx = 8; pSearch.add(new JLabel("상품명"), gbc);
+		gbc.gridx = 9; pSearch.add(tfProduct, gbc);
+		gbc.gridx = 10; pSearch.add(btnSearch, gbc);
 
-			// 모델에 필터 적용
-			iModel.setData(filters);
-			laPlanCount.setText("총 " + iModel.getRowCount() + "개의 입고예정 검색");
+		btnSearch.addActionListener(e -> {
+			currentPage = 1;
+			loadReceiptData(getSearchFilters());
 		});
 
-		gbc.gridx = 10;
-		pSearch.add(btnSearch, gbc);
-
-		/* ==== 페이지명 영역 ==== */
 		pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
 		laPageName = new JLabel("입고관리 > 입고예정");
 		pPageName.add(laPageName);
 
-		/* ==== 검색 결과 카운트, 등록 버튼 영역 ==== */
 		pTableNorth = new JPanel(new FlowLayout());
-		pTableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-
 		laPlanCount = new JLabel("총 0개의 입고예정 검색");
 		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
 		pTableNorth.add(laPlanCount);
 
-		btnRegister = new JButton("입고예정 등록");
+		btnRegister = new JButton("등록");
 		btnRegister.addActionListener(e -> {
-			AddRecieptDialog dialog = new AddRecieptDialog(appMain, appMain, iModel);
+			AddRecieptDialog dialog = new AddRecieptDialog(appMain, appMain, iModel, () -> {
+				if (detailPage != null) detailPage.refreshDetailModel();
+				loadReceiptData(Collections.emptyMap());
+			});
 			dialog.setVisible(true);
 		});
-		
-		
 		pTableNorth.add(btnRegister);
 
-		/* ==== 테이블 영역 ==== */
-		pTable = new JPanel(new FlowLayout()); // FlowLayout: 컴포넌트를 좌에서 우로 순서대로, 한 줄에 배치하는 레이아웃 매니저
+		btnDelete = new JButton("삭제");
+		// 버튼 클릭 시 이벤트
+		btnDelete.addActionListener(e -> {
+			int receiptCnt = 0;
+			int detailCnt = 0;
+			List<Integer> checkedIds = iModel.getSelectedReceiptIds();
+			for (int i=0; i<checkedIds.size(); i++) {
+				int ioReceipt = checkedIds.get(i);
+				// 선택한 입고예정을 비활성화
+				receiptDAO.deactivateIoReceipt(ioReceipt);
+				receiptCnt++;
 
-		tblPlan = new JTable(iModel = new ReceiptModel());
-		// 상세보기 버튼
+				// 하위 입고상세 ID 찾기
+				List<Integer> detailIds = receiptDAO.findDetailIsdByReceiptId(ioReceipt);
+
+				// 비활성화시킨 입고예정의 하위 입고상세가 존재하는 경우, 모두 비활성화
+				if (!detailIds.isEmpty()){
+					for (int id: detailIds){
+						detailDAO.deactivateIoDetail(id);
+						detailCnt++;
+					}
+				}
+			}
+			JOptionPane.showMessageDialog(this, "입고예정" + receiptCnt+"건을 삭제했습니다.\n하위 입고상세 "+detailCnt+"건이 삭제되었습니다.");
+			currentPage = 1;
+			loadReceiptData(getSearchFilters()); // 입고예정 새로고침
+		});
+		pTableNorth.add(btnDelete);
+
+		iModel = new ReceiptModel();
+		tblPlan = new JTable(iModel);
+		tblPlan.setRowHeight(45);
 		tblPlan.getColumn("상세보기").setCellRenderer(new ButtonRenderer());
 		tblPlan.getColumn("상세보기").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-			IOReceipt receipt = iModel.getIOReceiptAt(row);
-//			EditInboundDetailDialog dialog = new EditInboundDetailDialog(appMain, receipt);
-//			dialog.setVisible(true);
+			int receipt = (int)iModel.getValueAt(row, 1);
+			showDetailPage(receipt);
 		}));
 
+
 		scTable = new JScrollPane(tblPlan);
-		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, Config.TABLE_HEIGHT - 60));
+		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 680));
 
-		pTable.add(laPlanCount);
+		btnPrevPage = new JButton("이전");
+		btnNextPage = new JButton("다음");
+		laPageInfo = new JLabel("1 / 1");
+		btnPrevPage.addActionListener(e -> {
+			if (currentPage > 1) {
+				currentPage--;
+				loadReceiptData(getSearchFilters());
+			}
+		});
+		btnNextPage.addActionListener(e -> {
+			int totalPages = (int) Math.ceil(fullList.size() / (double) rowsPerPage);
+			if (currentPage < totalPages) {
+				currentPage++;
+				loadReceiptData(getSearchFilters());
+			}
+		});
 
-		pTable.add(pTableNorth);
-		pTable.add(scTable);
+		pPaging = new JPanel(new FlowLayout());
+		pPaging.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 40));
+		pPaging.add(btnPrevPage);
+		pPaging.add(laPageInfo);
+		pPaging.add(btnNextPage);
 
+		pTable = new JPanel(new FlowLayout());
 		pTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
 		pTable.setBackground(Color.WHITE);
+		pTable.add(pTableNorth);
+		pTable.add(scTable);
+		pTable.add(pPaging);
 
-		/* ==== 레이아웃 배치 ==== */
 		setLayout(new FlowLayout());
 		add(pPageName);
 		add(pSearch);
 		add(pTable);
-
 		setBackground(Color.LIGHT_GRAY);
 
+		loadReceiptData(Collections.emptyMap());
 	}
+
+	private Map<String, Object> getSearchFilters() {
+		Map<String, Object> filters = new HashMap<>();
+		if (!tfPlanId.getText().trim().isEmpty())
+			filters.put("io_receipt_id", Integer.parseInt(tfPlanId.getText().trim()));
+		if (chooser.getDate() != null)
+			filters.put("scheduled_date", new java.sql.Date(chooser.getDate().getTime()));
+		if (!tfSupplierName.getText().trim().isEmpty())
+			filters.put("supplier_name", tfSupplierName.getText().trim());
+		String status = (String) cbStatus.getSelectedItem();
+		if (!"전체".equals(status))
+			filters.put("status", status);
+		if (!tfProduct.getText().trim().isEmpty())
+			filters.put("product_name", tfProduct.getText().trim());
+		return filters;
+	}
+	private void loadReceiptData(Map<String, Object> filters) {
+		// 1. 전체 데이터 로드
+		iModel.setFullData(filters);
+		fullList = iModel.getFullList();
+
+		// 2. 페이징 계산
+		int totalRows = fullList.size();
+		int totalPages = (int) Math.ceil(totalRows / (double) rowsPerPage);
+		if (totalPages == 0) totalPages = 1;
+
+		// 3. 현재 페이지 데이터 설정
+		int start = (currentPage - 1) * rowsPerPage;
+		int end = Math.min(start + rowsPerPage, totalRows);
+		List<IOReceipt> currentPageList = fullList.subList(start, end);
+		iModel.setCurrentPageData(currentPageList);
+
+		// 4. UI 갱신
+		laPlanCount.setText("총 " + totalRows + "개의 입고예정 검색");
+		laPageInfo.setText(currentPage + " / " + totalPages);
+		btnPrevPage.setEnabled(currentPage > 1);
+		btnNextPage.setEnabled(currentPage < totalPages);
+	}
+
+	public void refresh() {
+		currentPage = 1;
+		loadReceiptData(Collections.emptyMap());
+	}
+
+	public void showDetailPage(int detailId) {
+		DetailPage detailPage = (DetailPage) appMain.pages[Config.INBOUND_ITEM_PAGE];
+
+		detailPage.tfPlanId.setText(Integer.toString(detailId)); // 값을 전달
+		detailPage.btnSearch.doClick(); // 검색 이벤트 실행
+		appMain.showPage(Config.INBOUND_ITEM_PAGE);
+	}
+
+
 }
