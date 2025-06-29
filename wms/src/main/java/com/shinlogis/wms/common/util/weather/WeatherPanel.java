@@ -1,4 +1,5 @@
 package com.shinlogis.wms.common.util.weather;
+
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
@@ -22,30 +23,38 @@ public class WeatherPanel extends JPanel {
         lblCity.setFont(new Font("맑은 고딕", Font.BOLD, 22));
         lblCity.setForeground(Color.WHITE);
         lblCity.setHorizontalAlignment(SwingConstants.CENTER);
+        lblCity.setVerticalAlignment(SwingConstants.CENTER);  // 세로 중앙 정렬
         add(lblCity, BorderLayout.NORTH);
 
-        // 중앙: 아이콘 + 온도 & 설명
-        JPanel centerPanel = new JPanel(new BorderLayout());
+        // 중앙: 아이콘 + 온도 & 설명을 세로로 중앙 정렬
+        JPanel centerPanel = new JPanel();
         centerPanel.setOpaque(false);
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));  // 수직 박스 레이아웃
 
+// 아이콘 라벨
         lblIcon = new JLabel();
+        lblIcon.setAlignmentX(Component.CENTER_ALIGNMENT); // 가로 중앙 정렬
         lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
-        centerPanel.add(lblIcon, BorderLayout.WEST);
+        lblIcon.setVerticalAlignment(SwingConstants.CENTER);
+        centerPanel.add(lblIcon);
 
-        JPanel tempDescPanel = new JPanel(new GridLayout(2, 1));
-        tempDescPanel.setOpaque(false);
-
+// 온도 라벨
         lblTemp = new JLabel("온도: 로딩중...");
         lblTemp.setFont(new Font("맑은 고딕", Font.BOLD, 36));
         lblTemp.setForeground(Color.WHITE);
+        lblTemp.setAlignmentX(Component.CENTER_ALIGNMENT);  // 가로 중앙 정렬
+        lblTemp.setHorizontalAlignment(SwingConstants.CENTER);
+        lblTemp.setVerticalAlignment(SwingConstants.CENTER);
+        centerPanel.add(lblTemp);
 
+// 날씨 설명 라벨
         lblDescription = new JLabel(""); // 날씨 설명 (예: 맑음, 흐림 등)
         lblDescription.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         lblDescription.setForeground(Color.WHITE);
-
-        tempDescPanel.add(lblTemp);
-        tempDescPanel.add(lblDescription);
-        centerPanel.add(tempDescPanel, BorderLayout.CENTER);
+        lblDescription.setAlignmentX(Component.CENTER_ALIGNMENT);  // 가로 중앙 정렬
+        lblDescription.setHorizontalAlignment(SwingConstants.CENTER);
+        lblDescription.setVerticalAlignment(SwingConstants.CENTER);
+        centerPanel.add(lblDescription);
 
         add(centerPanel, BorderLayout.CENTER);
 
@@ -56,10 +65,14 @@ public class WeatherPanel extends JPanel {
         lblSunrise = new JLabel("일출: 로딩중...");
         lblSunrise.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
         lblSunrise.setForeground(Color.WHITE);
+        lblSunrise.setHorizontalAlignment(SwingConstants.CENTER);
+        lblSunrise.setVerticalAlignment(SwingConstants.CENTER);  // 세로 중앙 정렬
 
         lblSunset = new JLabel("일몰: 로딩중...");
         lblSunset.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
         lblSunset.setForeground(Color.WHITE);
+        lblSunset.setHorizontalAlignment(SwingConstants.CENTER);
+        lblSunset.setVerticalAlignment(SwingConstants.CENTER);  // 세로 중앙 정렬
 
         bottomPanel.add(lblSunrise);
         bottomPanel.add(lblSunset);
@@ -88,6 +101,8 @@ public class WeatherPanel extends JPanel {
                         lblIcon.setIcon(new ImageIcon(new URL(iconUrl)));
                     } catch (Exception e) {
                         lblIcon.setText("아이콘 없음");
+                        lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
+                        lblIcon.setVerticalAlignment(SwingConstants.CENTER);
                     }
                 });
             } catch (Exception e) {
