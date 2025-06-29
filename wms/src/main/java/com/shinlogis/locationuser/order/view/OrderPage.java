@@ -23,19 +23,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-<<<<<<< HEAD
-import src.main.java.com.shinlogis.locationuser.order.model.OrderModel;
-import src.main.java.com.shinlogis.locationuser.order.model.StoreOrder;
-import src.main.java.com.shinlogis.locationuser.order.repository.StoreOrderDAO;
-import src.main.java.com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
-import src.main.java.com.shinlogis.wms.AppMain;
-import src.main.java.com.shinlogis.wms.common.Exception.OrderInsertException;
-import src.main.java.com.shinlogis.wms.common.config.Config;
-import src.main.java.com.shinlogis.wms.common.config.Page;
-import src.main.java.com.shinlogis.wms.common.util.DBManager;
-import src.main.java.com.shinlogis.wms.product.model.Product;
-import src.main.java.com.shinlogis.wms.product.repository.ProductDAO;
-=======
+
 import com.shinlogis.locationuser.order.model.OrderModel;
 import com.shinlogis.locationuser.order.model.StoreOrder;
 import com.shinlogis.locationuser.order.model.StoreOrderItem;
@@ -49,7 +37,6 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
->>>>>>> 05d278e43b0ad701c938523e28fbc8b185bf855d
 
 public class OrderPage extends Page{
 
@@ -181,90 +168,90 @@ public class OrderPage extends Page{
 	
 		//주문하기 이벤트 
 		btnOrder.addActionListener(e -> {
-			// 전체 상품 리스트 중 체크만 된 것
-			List<Product> checkedProducts = model.getAllProducts().stream()
-			    .filter(Product::isChecked)
-			    .toList();
-
-			if (checkedProducts.isEmpty()) {
-			    JOptionPane optionPane = new JOptionPane(
-					    "상품을 선택하세요.",
-					    JOptionPane.WARNING_MESSAGE
-					);
-			    JDialog dialog = optionPane.createDialog("입력 오류");
-				dialog.setLocation(715, 320); // 원하는 좌표
-				dialog.setVisible(true);
-			    return;
-			}
-
-			// 체크는 했지만 수량을 입력하지 않은 상품
-			List<Product> checkedZero = checkedProducts.stream()
-			    .filter(p -> p.getQuantity() <= 0)
-			    .toList();
-
-			if (!checkedZero.isEmpty()) {
-				JOptionPane optionPane = new JOptionPane(
-						"체크한 상품 중\n수량이 입력되지 않은 항목이 있습니다.",
-					    JOptionPane.WARNING_MESSAGE
-					);
-				JDialog dialog = optionPane.createDialog("입력 오류");
-				dialog.setLocation(680, 320);
-				dialog.setVisible(true);
-			    return;
-			}
-		
-			if(isConfirmed()) {
-				Connection con=dbManager.getConnection();
-				try {
-					con.setAutoCommit(false);//start
-					StoreOrder storeOrder =new StoreOrder();
-					StoreOrderDAO storeOrderDao = new StoreOrderDAO();
-					StoreOrderItemDAO storeItemDao= new StoreOrderItemDAO();
-					
-					storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
-					
-					try {
-						storeOrderDao.insert(storeOrder);
-						int pk=storeOrderDao.getRecentId();
-						storeOrder.setStoreOrderId(pk);
-						
-						for (StoreOrderItem item : storeOrder.getItems()) {
-						    item.setStoreOrderId(pk);  
-						    storeItemDao.insert(item);
-						    item.setStoreOrderId(pk); 
-						}
-						model.tableChanged();
-						
-						con.commit();
-						JOptionPane.showMessageDialog(null, "주문이 완료되었습니다");
-						
-						
-					} catch (OrderInsertException e1) {
-						e1.printStackTrace();
-						con.rollback();
-						JOptionPane.showMessageDialog(this, e1.getMessage());
-					} 
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					try {
-						con.rollback();
-					} catch (SQLException e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
-					}
-				}finally {
-					try {
-						con.setAutoCommit(true);
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}//start
-				}
-			}
-		
-			pTable.updateUI();    
-			tfProduct.setText("");
+//			// 전체 상품 리스트 중 체크만 된 것
+//			List<Product> checkedProducts = model.getAllProducts().stream()
+//			    .filter(Product::isChecked)
+//			    .toList();
+//
+//			if (checkedProducts.isEmpty()) {
+//			    JOptionPane optionPane = new JOptionPane(
+//					    "상품을 선택하세요.",
+//					    JOptionPane.WARNING_MESSAGE
+//					);
+//			    JDialog dialog = optionPane.createDialog("입력 오류");
+//				dialog.setLocation(715, 320); // 원하는 좌표
+//				dialog.setVisible(true);
+//			    return;
+//			}
+//
+//			// 체크는 했지만 수량을 입력하지 않은 상품
+//			List<Product> checkedZero = checkedProducts.stream()
+//			    .filter(p -> p.getQuantity() <= 0)
+//			    .toList();
+//
+//			if (!checkedZero.isEmpty()) {
+//				JOptionPane optionPane = new JOptionPane(
+//						"체크한 상품 중\n수량이 입력되지 않은 항목이 있습니다.",
+//					    JOptionPane.WARNING_MESSAGE
+//					);
+//				JDialog dialog = optionPane.createDialog("입력 오류");
+//				dialog.setLocation(680, 320);
+//				dialog.setVisible(true);
+//			    return;
+//			}
+//
+//			if(isConfirmed()) {
+//				Connection con=dbManager.getConnection();
+//				try {
+//					con.setAutoCommit(false);//start
+//					StoreOrder storeOrder =new StoreOrder();
+//					StoreOrderDAO storeOrderDao = new StoreOrderDAO();
+//					StoreOrderItemDAO storeItemDao= new StoreOrderItemDAO();
+//
+//					storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
+//
+//					try {
+//						storeOrderDao.insert(storeOrder);
+//						int pk=storeOrderDao.getRecentId();
+//						storeOrder.setStoreOrderId(pk);
+//
+//						for (StoreOrderItem item : storeOrder.getItems()) {
+//						    item.setStoreOrderId(pk);
+//						    storeItemDao.insert(item);
+//						    item.setStoreOrderId(pk);
+//						}
+//						model.tableChanged();
+//
+//						con.commit();
+//						JOptionPane.showMessageDialog(null, "주문이 완료되었습니다");
+//
+//
+//					} catch (OrderInsertException e1) {
+//						e1.printStackTrace();
+//						con.rollback();
+//						JOptionPane.showMessageDialog(this, e1.getMessage());
+//					}
+//				} catch (SQLException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//					try {
+//						con.rollback();
+//					} catch (SQLException e2) {
+//						// TODO Auto-generated catch block
+//						e2.printStackTrace();
+//					}
+//				}finally {
+//					try {
+//						con.setAutoCommit(true);
+//					} catch (SQLException e1) {
+//						// TODO Auto-generated catch block
+//						e1.printStackTrace();
+//					}//start
+//				}
+//			}
+//
+//			pTable.updateUI();
+//			tfProduct.setText("");
 		});			
 	}
 	
