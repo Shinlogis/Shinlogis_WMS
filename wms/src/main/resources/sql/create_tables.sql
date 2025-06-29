@@ -207,11 +207,7 @@ INSERT INTO location (location_id, location_name, address) VALUES (7, '부천점
 
 INSERT INTO location (location_id, location_name, address) VALUES (8, '양천점', '서울시 양천구 8번지');
 
-<<<<<<< HEAD
 INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점', '서울시 노원구 9번지');
-=======
-INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점';, '서울시 노원구 9번지');
->>>>>>> 89fa044a1ecb63a52518351a550a7fb70da56789
 
 INSERT INTO location (location_id, location_name, address) VALUES (10, '강서점', '서울시 강서구 10번지');
 
@@ -364,7 +360,6 @@ INSERT INTO product (product_id, product_img, product_code, product_name, storag
 INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (38, 'images/frozen_squid.png', 'P038', '냉동오징어', 3, 3, 6300);
 INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (39, 'images/frozen_croissant.png', 'P039', '냉동크로와상', 3, 4, 5700);
 
-INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (11, 'P011', '사과', 1, 3, 8252);
 
 INSERT INTO warehouse (warehouse_id, warehouse_name, address, storage_type_id, warehouse_code) VALUES (1, '인천1창고', '인천시 남동구 1번지', 2, 'W001');
 
