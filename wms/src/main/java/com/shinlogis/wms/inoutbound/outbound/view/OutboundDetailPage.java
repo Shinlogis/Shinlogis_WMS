@@ -25,7 +25,9 @@ import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.outbound.model.OutboundDetailSimpleDTO;
 import com.shinlogis.wms.inoutbound.outbound.repository.OutboundDetailDAO;
+import com.shinlogis.wms.inventory.repository.InventoryDAO;
 import com.toedter.calendar.JDateChooser;
 
 public class OutboundDetailPage extends Page {
@@ -220,6 +222,7 @@ public class OutboundDetailPage extends Page {
 					detail.setProccessedDate(now);
 					model.fireTableRowsUpdated(row, row);
 					new JOptionPane().showMessageDialog(null, "출고등록이 완료되었습니다.");
+
 				}
 				bt_search.doClick();
 			}));
@@ -242,25 +245,56 @@ public class OutboundDetailPage extends Page {
 
 		tb_plan.getColumn("출고확정").setCellRenderer(new ButtonRenderer());
 		tb_plan.getColumn("출고확정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-			OutboundDetailModel model = (OutboundDetailModel) table.getModel();
-			IODetail detail = model.getIODetailAt(row);
+		    OutboundDetailModel model = (OutboundDetailModel) table.getModel();
+		    IODetail detail = model.getIODetailAt(row);
 
-			if ("완료".equals(detail.getStatus())) {
-				new JOptionPane().showMessageDialog(null, "이미 출고 완료된 내역입니다.");
-				return;
-			}
+		    if ("완료".equals(detail.getStatus())) {
+		        JOptionPane.showMessageDialog(null, "이미 출고 완료된 내역입니다.");
+		        return;
+		    }
 
-			int ioDetailId = detail.getIoDetailId();
-			java.sql.Date now = new java.sql.Date(System.currentTimeMillis());
-			boolean success = outboundDetailDAO.updateStatusAndProcessedDate(ioDetailId, "완료", now);
+		    int ioDetailId = detail.getIoDetailId();
+		    java.sql.Date now = new java.sql.Date(System.currentTimeMillis());
 
-			if (success) {
-				detail.setStatus("완료");
-				detail.setProccessedDate(now);
-				model.fireTableRowsUpdated(row, row);
-				new JOptionPane().showMessageDialog(null, "출고등록이 완료되었습니다.");
-			}
-			bt_search.doClick();
+		    // 출고 상세 정보 조회 (상품코드, 창고명, 출고수량)
+		    OutboundDetailSimpleDTO simpleDTO = new OutboundDetailSimpleDTO(null, null, null, 0);
+		    OutboundDetailSimpleDTO dto = simpleDTO.selectSimpleByIoDetailId(ioDetailId);
+
+		    if (dto == null) {
+		        JOptionPane.showMessageDialog(null, "출고 상세 정보를 찾을 수 없습니다.");
+		        return;
+		    }
+
+		    String productCode = dto.getProductCode();
+		    String warehouseName = dto.getWarehouseName();
+		    int plannedQuantity = dto.getPlannedQuantity();
+
+		    InventoryDAO inventoryDAO = new InventoryDAO();
+		    int currentQty = inventoryDAO.getQuantity(productCode, warehouseName);
+
+		    if (currentQty < plannedQuantity) {
+		        JOptionPane.showMessageDialog(null, "현재 재고가 부족하여 출고할 수 없습니다.\n현재 재고: " + currentQty + ", 출고 요청: " + plannedQuantity);
+		        return;
+		    }
+
+		    boolean decreased = inventoryDAO.decreaseQuantity(productCode, warehouseName, plannedQuantity);
+		    if (!decreased) {
+		        JOptionPane.showMessageDialog(null, "출고 처리 중 오류가 발생했습니다. (수량 차감 실패)");
+		        return;
+		    }
+
+		    boolean success = outboundDetailDAO.updateStatusAndProcessedDate(ioDetailId, "완료", now);
+
+		    if (success) {
+		        detail.setStatus("완료");
+		        detail.setProccessedDate(now);
+		        model.fireTableRowsUpdated(row, row);
+		        JOptionPane.showMessageDialog(null, "출고 등록이 완료되었습니다.");
+		    } else {
+		        JOptionPane.showMessageDialog(null, "출고 상태 업데이트에 실패했습니다.");
+		    }
+
+		    bt_search.doClick();
 		}));
 
 		sc_table = new JScrollPane(tb_plan);

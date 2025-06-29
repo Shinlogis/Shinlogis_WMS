@@ -14,7 +14,6 @@ import com.shinlogis.wms.inventory.model.InventoryDTO;
 public class InventoryDAO {
 	DBManager dbManager = DBManager.getInstance();
 
-<<<<<<< Updated upstream
 	public List<InventoryDTO> selectInventoryDetails() {
 		List<InventoryDTO> list = new ArrayList<>();
 		Connection conn = null;
@@ -54,6 +53,7 @@ public class InventoryDAO {
 		}
 		return list;
 	}
+
 	// TODO 입고처리된 새로운 상품을 재고에 저장
 	public int addToInventory() {
 		Connection conn = null;
@@ -77,10 +77,8 @@ public class InventoryDAO {
 		return 0;
 	}
 
-<<<<<<< HEAD
 	// TODO 창고에 재고로 존재하는 상품은, 기존의 재고를 업데이트하는 식으로 재고에 저장
 }
-=======
     // 조회: 중복 항목 병합 (inventory_id 제외)
     public List<InventoryDTO> selectInventoryDetails(InventoryDTO inventoryDTO) {
         List<InventoryDTO> list = new ArrayList<>();
@@ -276,9 +274,6 @@ public class InventoryDAO {
         }
     }
 }
->>>>>>> Stashed changes
-=======
-
 	// 조회: 중복 항목 병합 (inventory_id 제외)
 	public List<InventoryDTO> selectInventoryDetails(InventoryDTO inventoryDTO) {
 		List<InventoryDTO> list = new ArrayList<>();
@@ -394,7 +389,6 @@ public class InventoryDAO {
 			int deleted = deletePstmt.executeUpdate();
 			System.out.println("삭제된 행 수: " + deleted);
 
-
 			// 2. 새 병합 행 삽입
 			insertPstmt = conn.prepareStatement(insertSql);
 			insertPstmt.setString(1, warehouseCode);
@@ -502,7 +496,7 @@ public class InventoryDAO {
 			dbManager.release(pstmt, null);
 		}
 	}
-	
+
 	/**
 	 * 입고처리할 때 이미 동일한 상품이 재고로 추가되는 경우 수량을 업데이트하고, 없으면 새로 삽입
 	 * @auther 김예진
@@ -578,6 +572,45 @@ public class InventoryDAO {
 	        }
 	    }
 	}
+	        
+	public int getQuantity(String productCode, String warehouseName) {
+	    String sql =
+	            "SELECT i.quantity " +
+	            "FROM inventory i " +
+	            "JOIN product p ON i.product_id = p.product_id " +
+	            "JOIN warehouse w ON i.warehouse_id = w.warehouse_id " +
+	            "WHERE p.product_code = ? AND w.warehouse_name = ?";
+            try (Connection conn = dbManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, productCode);
+                pstmt.setString(2, warehouseName);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) return rs.getInt("quantity");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return 0;
+        }
 
-}
->>>>>>> 05d278e43b0ad701c938523e28fbc8b185bf855d
+        public boolean decreaseQuantity(String productCode, String warehouseName, int amount) {
+            String sql =
+                    "UPDATE inventory i " +
+                    "JOIN product p ON i.product_id = p.product_id " +
+                    "JOIN warehouse w ON i.warehouse_id = w.warehouse_id " +
+                    "SET i.quantity = i.quantity - ? " +
+                    "WHERE p.product_code = ? AND w.warehouse_name = ? AND i.quantity >= ?";
+
+            try (Connection conn = dbManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, amount);
+                pstmt.setString(2, productCode);
+                pstmt.setString(3, warehouseName);
+                pstmt.setInt(4, amount);
+                int updated = pstmt.executeUpdate();
+                return updated > 0;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }

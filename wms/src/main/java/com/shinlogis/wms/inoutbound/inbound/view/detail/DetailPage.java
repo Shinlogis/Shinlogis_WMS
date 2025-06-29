@@ -60,7 +60,7 @@ public class DetailPage extends Page {
 
 	private List<IODetail> fullList;
 	private int currentPage = 1;
-	private final int rowsPerPage = 14;
+	private final int rowsPerPage = 10;
 
 	public DetailPage(AppMain appMain) {
 		super(appMain);
@@ -171,7 +171,7 @@ public class DetailPage extends Page {
 		}));
 
 		scTable = new JScrollPane(tblPlan);
-		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, 680));
+		scTable.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 40, 500));
 
 		btnPrevPage = new JButton("이전");
 		btnNextPage = new JButton("다음");
