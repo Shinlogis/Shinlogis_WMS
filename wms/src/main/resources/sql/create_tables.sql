@@ -21,7 +21,9 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE location (
     location_id INT AUTO_INCREMENT PRIMARY KEY,
     location_name VARCHAR(100) NOT NULL UNIQUE,
-    address VARCHAR(100)
+    address VARCHAR(100),
+    status VARCHAR(10) NOT NULL DEFAULT '활성',
+    CHECK (status IN ('활성', '탈퇴'))
 );
 
 -- [본사 소속 사용자 테이블]
@@ -66,7 +68,7 @@ CREATE TABLE storage_type (
 -- [상품 정보 테이블]
 CREATE TABLE product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
-	product_img VARCHAR(100),
+    product_img VARCHAR(100),
     product_code VARCHAR(100) NOT NULL UNIQUE,
     product_name VARCHAR(100) NOT NULL,
     storage_type_id INT NOT NULL,
@@ -168,8 +170,8 @@ CREATE TABLE store_order (
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     location_id INT NOT NULL,
     total_price int not null,
-	status varchar(10) not null default '대기' check (status in ('대기', '완료')),
-	 
+   status varchar(10) not null default '대기' check (status in ('대기', '완료')),
+    
     CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES location(location_id)
 );
 
@@ -178,7 +180,7 @@ CREATE TABLE store_order_item (
     item_id INT AUTO_INCREMENT PRIMARY KEY, -- 상세 ID (PK)
     store_order_id INT NOT NULL,            -- 주문 ID (FK)
     product_id INT NOT NULL,                -- 상품 ID (FK)
-	status varchar(10) not null default '대기' check(status in ('대기', '완료')),
+   status varchar(10) not null default '대기' check(status in ('대기', '완료')),
 
     quantity INT CHECK(quantity > 0),                           -- 수량
 
@@ -189,25 +191,29 @@ CREATE TABLE store_order_item (
     CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
 
-INSERT INTO location (location_id, location_name, address) VALUES (1, '스시맛집지점', '서울시 강남구 1번지');
+INSERT INTO location (location_id, location_name, address) VALUES (1, '강남점', '서울시 강남구 1번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (2, '토마토마트지점', '서울시 강남구 2번지');
+INSERT INTO location (location_id, location_name, address) VALUES (2, '마포점', '서울시 마포구 2번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (3, '맛나제과지점', '서울시 강남구 3번지');
+INSERT INTO location (location_id, location_name, address) VALUES (3, '김포점', '김포시 3번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (4, '오렌지카페지점', '서울시 강남구 4번지');
+INSERT INTO location (location_id, location_name, address) VALUES (4, '시흥점', '시흥시 4번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (5, '치킨천국지점', '서울시 강남구 5번지');
+INSERT INTO location (location_id, location_name, address) VALUES (5, '부평점', '부평시 5번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (6, '초밥도감지점', '서울시 강남구 6번지');
+INSERT INTO location (location_id, location_name, address) VALUES (6, '구로점', '서울시 구로구 6번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (7, '감자탕명가지점', '서울시 강남구 7번지');
+INSERT INTO location (location_id, location_name, address) VALUES (7, '부천점', '부천시 7번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (8, '해피푸드지점', '서울시 강남구 8번지');
+INSERT INTO location (location_id, location_name, address) VALUES (8, '양천점', '서울시 양천구 8번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (9, '바나나상회지점', '서울시 강남구 9번지');
+<<<<<<< HEAD
+INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점', '서울시 노원구 9번지');
+=======
+INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점';, '서울시 노원구 9번지');
+>>>>>>> 89fa044a1ecb63a52518351a550a7fb70da56789
 
-INSERT INTO location (location_id, location_name, address) VALUES (10, '딸기마켓지점', '서울시 강남구 10번지');
+INSERT INTO location (location_id, location_name, address) VALUES (10, '강서점', '서울시 강서구 10번지');
 
 INSERT INTO headquarters_user (headquarters_user_id, id, pw, email) VALUES (1, 'hquser1', 'pw1234', 'hquser1@example.com');
 
@@ -315,25 +321,48 @@ INSERT INTO storage_type (storage_type_id, type_code, type_name) VALUES (2, 'COL
 
 INSERT INTO storage_type (storage_type_id, type_code, type_name) VALUES (3, 'FROZEN', '냉동');
 
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (1, 'images/tomato.jpg', 'P001', '토마토', 2, 2, 4108);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (1, 'images/tomato.png', 'P001', '토마토', 1, 2, 4108);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (2, 'images/orange.png', 'P002', '오렌지', 1, 3, 5879);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (3, 'images/tuna.png', 'P003', '참치캔', 1, 4, 3200);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (4, 'images/chickenbreast.png', 'P004', '닭가슴살캔', 1, 5, 3500);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (5, 'images/potato.png', 'P005', '감자', 1, 6, 6010);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (6, 'images/onion.png', 'P006', '양파', 1, 7, 4546);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (7, 'images/napacabbage.png', 'P007', '배추', 1, 8, 7674);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (8, 'images/carrot.png', 'P008', '당근', 1, 9, 4426);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (9, 'images/ramen.png', 'P009', '라면', 1, 10, 15800);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (10, 'images/rice.png', 'P010', '쌀', 1, 1, 32000);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (11, 'images/canned_corn.png', 'P011', '옥수수캔', 1, 2, 2100);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (12, 'images/cereal.png', 'P012', '시리얼', 1, 3, 4900);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (13, 'images/soy_sauce.png', 'P013', '간장', 1, 4, 5200);
 
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (2, 'images/orange.jpg', 'P002', '오렌지', 3, 3, 5879);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (14, 'images/spinach.png', 'P014', '시금치', 2, 6, 2500);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (15, 'images/strawberry.png', 'P015', '딸기', 2, 7, 5200);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (16, 'images/lettuce.png', 'P016', '상추', 2, 8, 2100);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (17, 'images/yogurt.png', 'P017', '요거트', 2, 9, 3800);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (18, 'images/ham.png', 'P018', '햄', 2, 10, 4300);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (19, 'images/cheese.png', 'P019', '치즈', 2, 1, 4900);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (20, 'images/chilled_chickenbreast.png', 'P020', '닭가슴살', 2, 2, 7500);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (21, 'images/bellpepper.png', 'P021', '파프리카', 2, 3, 3300);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (22, 'images/bokchoy.png', 'P022', '청경채', 2, 4, 2900);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (23, 'images/cucumber.png', 'P023', '오이', 2, 5, 2600);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (24, 'images/kale.png', 'P024', '케일', 2, 6, 3100);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (25, 'images/pear.png', 'P025', '배', 2, 7, 4700);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (26, 'images/blueberry.png', 'P026', '블루베리', 2, 8, 5800);
 
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (3, 'images/tuna.jpg', 'P003', '참치', 1, 4, 8039);
 
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (4, 'images/chickenbreast.jpg', 'P004', '닭가슴살', 2, 5, 7377);
-
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (5, 'images/potato.jpg', 'P005', '감자', 3, 6, 6010);
-
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (6, 'images/onion.jpg', 'P006', '양파', 1, 7, 4546);
-
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (7, 'images/napacabbage.jpg', 'P007', '배추', 2, 8, 7674);
-
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (8, 'images/carrot.jpg', 'P008', '당근', 3, 9, 4426);
-
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (9, 'images/salmon.jpg', 'P009', '연어', 1, 10, 3588);
-
-INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (10, 'images/beef.jpg', 'P010', '소고기', 2, 1, 6928);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (27, 'images/frozen_dumplings.png', 'P027', '냉동만두', 3, 2, 6800);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (28, 'images/frozen_pizza.png', 'P028', '냉동피자', 3, 3, 8900);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (29, 'images/icecream.png', 'P029', '아이스크림', 3, 4, 1200);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (30, 'images/frozen_chicken.png', 'P030', '냉동닭다리', 3, 5, 9700);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (31, 'images/frozen_porkbelly.png', 'P031', '냉동삼겹살', 3, 6, 15500);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (32, 'images/frozen_seafoodmix.png', 'P032', '냉동해물믹스', 3, 7, 7200);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (33, 'images/frozen_blueberry.png', 'P033', '냉동블루베리', 3, 8, 5600);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (34, 'images/frozen_friedrice.png', 'P034', '냉동볶음밥', 3, 9, 4500);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (35, 'images/frozen_frenchfries.png', 'P035', '냉동감자튀김', 3, 10, 3900);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (36, 'images/frozen_tteokbokki.png', 'P036', '냉동떡볶이', 3, 1, 4200);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (37, 'images/frozen_udon.png', 'P037', '냉동우동', 3, 2, 3100);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (38, 'images/frozen_squid.png', 'P038', '냉동오징어', 3, 3, 6300);
+INSERT INTO product (product_id, product_img, product_code, product_name, storage_type_id, supplier_id, price) VALUES (39, 'images/frozen_croissant.png', 'P039', '냉동크로와상', 3, 4, 5700);
 
 INSERT INTO product (product_id, product_code, product_name, storage_type_id, supplier_id, price) VALUES (11, 'P011', '사과', 1, 3, 8252);
 

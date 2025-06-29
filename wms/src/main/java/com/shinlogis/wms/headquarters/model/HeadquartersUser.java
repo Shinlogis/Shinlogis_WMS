@@ -6,9 +6,15 @@ public class HeadquartersUser {
 	private String pw;
 	private String email;
 	private String status;
+	private boolean isChecked;
 	
 	
-	
+	public boolean isChecked() {
+		return isChecked;
+	}
+	public void setChecked(boolean isChecked) {
+		this.isChecked = isChecked;
+	}
 	public String getStatus() {
 		return status;
 	}

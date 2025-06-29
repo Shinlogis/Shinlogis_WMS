@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
@@ -25,6 +26,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
 import com.shinlogis.wms.AppMain;
@@ -248,10 +250,12 @@ public class HeadquatersMyPage extends Page {
 	//탈퇴 
 	public void deleteMyInfo() {
 		try {
+			Window window =  SwingUtilities.getWindowAncestor(this); //회원탈퇴 시 마이페이지 포함 앱메인 닫기
 			headquartersDAO.delete(headquartersUser);
 			JOptionPane.showMessageDialog(this, "회원 탈퇴 완료");
-			
 			headquartersUser = null;
+			
+			window.dispose();
 			new MemberLogin();
 		} catch (Exception e) {
 			e.printStackTrace();
