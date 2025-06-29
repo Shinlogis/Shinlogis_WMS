@@ -53,6 +53,7 @@ public class InventoryDAO {
 		}
 		return list;
 	}
+
 	// TODO 입고처리된 새로운 상품을 재고에 저장
 	public int addToInventory() {
 		Connection conn = null;
@@ -75,7 +76,6 @@ public class InventoryDAO {
 
 		return 0;
 	}
-
 
 	// 조회: 중복 항목 병합 (inventory_id 제외)
 	public List<InventoryDTO> selectInventoryDetails(InventoryDTO inventoryDTO) {
@@ -192,7 +192,6 @@ public class InventoryDAO {
 			int deleted = deletePstmt.executeUpdate();
 			System.out.println("삭제된 행 수: " + deleted);
 
-
 			// 2. 새 병합 행 삽입
 			insertPstmt = conn.prepareStatement(insertSql);
 			insertPstmt.setString(1, warehouseCode);
@@ -300,7 +299,7 @@ public class InventoryDAO {
 			dbManager.release(pstmt, null);
 		}
 	}
-	
+
 	/**
 	 * 입고처리할 때 이미 동일한 상품이 재고로 추가되는 경우 수량을 업데이트하고, 없으면 새로 삽입
 	 * @auther 김예진
@@ -376,5 +375,45 @@ public class InventoryDAO {
 	        }
 	    }
 	}
+	        
+	public int getQuantity(String productCode, String warehouseName) {
+	    String sql =
+	            "SELECT i.quantity " +
+	            "FROM inventory i " +
+	            "JOIN product p ON i.product_id = p.product_id " +
+	            "JOIN warehouse w ON i.warehouse_id = w.warehouse_id " +
+	            "WHERE p.product_code = ? AND w.warehouse_name = ?";
+            try (Connection conn = dbManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, productCode);
+                pstmt.setString(2, warehouseName);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) return rs.getInt("quantity");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return 0;
+        }
 
-}
+        public boolean decreaseQuantity(String productCode, String warehouseName, int amount) {
+            String sql =
+                    "UPDATE inventory i " +
+                    "JOIN product p ON i.product_id = p.product_id " +
+                    "JOIN warehouse w ON i.warehouse_id = w.warehouse_id " +
+                    "SET i.quantity = i.quantity - ? " +
+                    "WHERE p.product_code = ? AND w.warehouse_name = ? AND i.quantity >= ?";
+
+            try (Connection conn = dbManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, amount);
+                pstmt.setString(2, productCode);
+                pstmt.setString(3, warehouseName);
+                pstmt.setInt(4, amount);
+                int updated = pstmt.executeUpdate();
+                return updated > 0;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
