@@ -138,7 +138,7 @@ public class MemberLogin extends JFrame{
 		headquarters_join.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new HeadquartersJoin();
+				new HeadquartersJoin(MemberLogin.this);
 			}
 		});
 		
@@ -146,7 +146,7 @@ public class MemberLogin extends JFrame{
 		location_join.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new LocationJoin();
+				new LocationJoin(MemberLogin.this);
 			}
 		});
 		
@@ -264,7 +264,6 @@ public class MemberLogin extends JFrame{
 			return;
 		}
 	}
-	
 	
 	public static void main(String[] args) {
 		new MemberLogin();

@@ -1,5 +1,4 @@
-
-package com.shinlogis.wms.supplier.view;
+package com.shinlogis.wms.headquarters.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -8,8 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -28,10 +25,10 @@ import com.shinlogis.wms.common.config.ButtonEditor;
 import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
-import com.shinlogis.wms.supplier.model.Supplier;
-import com.shinlogis.wms.supplier.repository.SupplierDAO;
+import com.shinlogis.wms.headquarters.model.HeadquartersUser;
+import com.shinlogis.wms.headquarters.repository.HeadquartersDAO;
 
-public class SupplierPage extends Page {
+public class MemberManagement extends Page {
 
 	// 페이지 명
 	private JPanel pPageName;
@@ -47,23 +44,22 @@ public class SupplierPage extends Page {
 	private JLabel laPlanCount; // 공급사 몇개 나올지
 	private JTable table;
 	private JScrollPane scroll;
-	private SupplierModel model;
+	private HeadquaterModel model;
 	private JPanel p_tableNorth;
 	private JPanel p_btNorth;
-	private JButton bt_add;
 	private JButton bt_delete;
+	
+	private HeadquartersDAO headquartersDAO;
 
-	private SupplierDAO supplierDAO;
-
-	public SupplierPage(AppMain appMain) {
+	public MemberManagement(AppMain appMain) {
 		super(appMain);
-
-		supplierDAO = new SupplierDAO();
+		
+		headquartersDAO = new HeadquartersDAO();
 
 		/* ==== 페이지 명 영역 ==== */
 		pPageName = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
-		laPageName = new JLabel("공급사 관리 > 공급사 관리");
+		laPageName = new JLabel("회원관리");
 		pPageName.add(laPageName);
 
 		/* ==== 검색 영역 ==== */
@@ -78,9 +74,9 @@ public class SupplierPage extends Page {
 		gbc.fill = GridBagConstraints.HORIZONTAL; // 셀 안에서 공간을 채우는 방식 설정. HORIZONTAL: 가로방향으로 셀을 꽉 채우기 (JtextField의 너비가
 													// 셀만큼 쭉 늘어남)
 
-		// 상품명
+		// 검색이름
 		gbc.gridx = 8;
-		p_search.add(new JLabel("공급사명"), gbc);
+		p_search.add(new JLabel("회원ID"), gbc);
 		t_name = new JTextField(10);
 		gbc.gridx = 9;
 		p_search.add(t_name, gbc);
@@ -93,11 +89,11 @@ public class SupplierPage extends Page {
 		/* ==== 검색 결과 카운트 영역 ==== */
 		p_tableNorth = new JPanel(new FlowLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-		laPlanCount = new JLabel("총 n개의 공급사 검색");
+		laPlanCount = new JLabel("총 n개의 회원 검색");
 		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
 		p_tableNorth.add(laPlanCount);
 
-		model = new SupplierModel();
+		model = new HeadquaterModel();
 
 		table = new JTable(model);
 		table.setRowHeight(45);
@@ -125,9 +121,8 @@ public class SupplierPage extends Page {
 		// 수정 버튼
 		table.getColumn("수정").setCellRenderer(new ButtonRenderer());
 		table.getColumn("수정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-			Supplier supplier = model.getSupplierAt(row);
-			new EditSupplierDialog(appMain, supplier, model);
-			// dialog.setVisible(true);
+			HeadquartersUser headquartersUser = model.getHeaquaterAt(row);
+			new EditHeadquaterDialog(appMain, headquartersUser, model);
 		}));
 
 		scroll = new JScrollPane(table);
@@ -136,9 +131,7 @@ public class SupplierPage extends Page {
 		scroll.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 20, 495));
 
 		p_btNorth = new JPanel();
-		bt_add = new JButton("추가");
 		bt_delete = new JButton("삭제");
-		p_btNorth.add(bt_add);
 		p_btNorth.add(bt_delete);
 		p_btNorth.setOpaque(false);
 
@@ -148,7 +141,7 @@ public class SupplierPage extends Page {
 		p_table.add(p_tableNorth); // 40
 		p_table.add(p_btNorth, BorderLayout.NORTH);
 		p_table.add(scroll); // 660
-		// pTable.add(pPaging); // 40
+		
 
 		// 스타일
 		setBackground(Color.LIGHT_GRAY);
@@ -158,47 +151,50 @@ public class SupplierPage extends Page {
 		add(pPageName);
 		add(p_search);
 		add(p_table);
-
-		// 이벤트
-		// 공급사 추가
-		bt_add.addActionListener(e -> {
-			new AddSupplierDialog(appMain, model);
-			count();
-		});
-
-		bt_delete.addActionListener(e -> {
-			model.deleteSupplier();
-		});
-
-		bt_search.addActionListener(e-> {
-				searchSupplier();
-		});
-		count();
 		
+		
+		//이벤트
+		bt_delete.addActionListener(e->{
+			delete();
+		});
+		
+		bt_search.addActionListener(e -> {
+			search();
+		});
+
+		count();
+
 	}
-
-	// 검색
-	public void searchSupplier() {
-
-		Supplier supplier = new Supplier();
-		supplier.setName(t_name.getText().trim());
-
-		List<Supplier> result = supplierDAO.searchSupplier(supplier);
-		//System.out.println("searchSupplier" + result.size());
-
-		if (result.size() <1) {
-			JOptionPane.showMessageDialog(this, "공급사명이 존재하지 않습니다.");
-		} else {
-			model.list = result;
+	
+	
+	public void delete() {
+		model.deleteHeaquater();
+	}
+	
+	public void search() {
+		
+		HeadquartersUser headquartersUser = new HeadquartersUser();
+		headquartersUser.setId(t_name.getText().trim());
+		
+		List<HeadquartersUser> user = headquartersDAO.searchHeadquater(headquartersUser);
+		
+		if(user.size() < 1) {
+			JOptionPane.showMessageDialog(this, "회원명이 존재하지 않습니다.");
+		}else {
+			model.list = user;
 			table.updateUI();
-			laPlanCount.setText("총 " + result.size() + "개의 공급사 검색");
+			laPlanCount.setText("총 " + user.size() + " 명의 회원 검색");
 		}
 	}
 	
-	//공급사 개수 카운트
+	//회원 수 카운트
 	public void count() {
-		List<Supplier> count = supplierDAO.showSuppliers();
-		laPlanCount.setText("총 " + count.size() + " 개의 공급사 검색");
+		List<HeadquartersUser> count = headquartersDAO.headquaterList();
+		laPlanCount.setText("총 " + count.size() + " 명의 회원 검색");
 	}
-
+			
+			
+			
+			
+			
 }

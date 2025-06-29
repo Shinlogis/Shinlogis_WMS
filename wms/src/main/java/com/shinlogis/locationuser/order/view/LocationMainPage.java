@@ -46,14 +46,14 @@ public class LocationMainPage extends Page{
 		this.appMain=appMain;
 		setLayout(new BorderLayout());
 		
-		image1 = imageUtil.getImage("images/carrot.jpg",Config.CONTENT_WIDTH/3, 300);
-		image2 = imageUtil.getImage("images/carrot.jpg",Config.CONTENT_WIDTH/3, 300);
-		image3 = imageUtil.getImage("images/carrot.jpg",300, 250);
+		image1 = imageUtil.getImage("images/cloud.png",Config.CONTENT_WIDTH/3, 300);
+		image2 = imageUtil.getImage("images/fridge.png",Config.CONTENT_WIDTH/3, 300);
+		image3 = imageUtil.getImage("images/ice.png",Config.CONTENT_WIDTH/3, 300);
 		
 		p_visual = new JPanel();
 		la_title=new JLabel("WMS 창고관리 시스템",JLabel.CENTER);
 		la_title.setFont(new Font("맑은 고딕", Font.BOLD, 30));
-		la_title.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 50)); // 높이 지정
+		la_title.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 80)); // 높이 지정
 		
 		JPanel p_images = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
 		p_images.setOpaque(false); // 배경 투명하게
@@ -61,30 +61,30 @@ public class LocationMainPage extends Page{
 		img1= new JPanel() {
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);// update() 에 지워진 배경을 스스로 복구
-				g.drawImage(image1, 0, 0, Config.CONTENT_WIDTH/3, 350, p_visual);
+				g.drawImage(image1, 0, 0, getWidth(), getHeight(), p_visual);
 			}
 		};
 		img2= new JPanel() {
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);// update() 에 지워진 배경을 스스로 복구
-				g.drawImage(image2, 0, 0, Config.CONTENT_WIDTH/3, 350, p_visual);
+				g.drawImage(image2, 0, 0, getWidth(), getHeight(), p_visual);
 			}
 		};
 		img3= new JPanel() {
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);// update() 에 지워진 배경을 스스로 복구
-				g.drawImage(image3, 0, 0, Config.CONTENT_WIDTH/3, 350, p_visual);
+				g.drawImage(image3, 0, 0, getWidth(), getHeight(), p_visual);
 			}
 		};
 		
-		Dimension imgSize = new Dimension(250, 250);
+		Dimension imgSize = new Dimension(Config.CONTENT_WIDTH/3, 300);
 		img1.setPreferredSize(imgSize);
 		img2.setPreferredSize(imgSize);
 		img3.setPreferredSize(imgSize);
 		
 		p_content = new JPanel(new FlowLayout(FlowLayout.LEFT, 45, 20)); //마진 주기 
 		//스타일
-		p_visual.setPreferredSize(new Dimension( Config.CONTENT_WIDTH, 350));
+		p_visual.setPreferredSize(new Dimension( Config.CONTENT_WIDTH, 430));
 		p_content.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, 340));
 		
 		p_visual.setBackground(Color.WHITE);
@@ -100,6 +100,7 @@ public class LocationMainPage extends Page{
 		         p_content.repaint();
 			}
 		});
+		img1.setOpaque(false);
 		
 		//냉장 
 		img2.addMouseListener(new MouseAdapter() {
@@ -111,6 +112,7 @@ public class LocationMainPage extends Page{
 				p_content.repaint();
 			}
 		});
+		img2.setOpaque(false); 
 		
 		//냉동 
 		img3.addMouseListener(new MouseAdapter() {
@@ -122,6 +124,7 @@ public class LocationMainPage extends Page{
 				p_content.repaint();
 			}
 		});
+		img3.setOpaque(false); 
 		
 		//조립
 		p_visual.add(la_title, BorderLayout.NORTH);
@@ -138,8 +141,8 @@ public class LocationMainPage extends Page{
 	//최신상품 패널 원하는 p_content 에 출력
 	public void createRecentList(int storeTypeId) {
 		List<Product> productList=productDAO.selectthumbnail(storeTypeId);
-		
-		for(int i=0;i<productList.size();i++) {
+		System.out.println("1:"+productList.size());
+		for(int i=0;i<12;i++) {
 			Product product=productList.get(i); //리스트에서 상품을 하나씩 꺼내자 
 			
 			ProductItem productItem=new ProductItem(this,product); //상품을 하나를 표현하는 카드 
