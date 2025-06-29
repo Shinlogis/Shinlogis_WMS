@@ -103,7 +103,7 @@ public class EditDetailDialog extends JDialog {
         gbc.gridwidth = 1;
 
         // 상태
-        cbStatus = new JComboBox<>(new String[]{"예정", "진행 중", "완료", "보류"});
+        cbStatus = new JComboBox<>(new String[]{"예정", "진행 중", "보류"});
         cbStatus.setSelectedItem(detail.getStatus());
         beforeStatus = detail.getStatus();
         gbc.gridx = 0; gbc.gridy = 4;

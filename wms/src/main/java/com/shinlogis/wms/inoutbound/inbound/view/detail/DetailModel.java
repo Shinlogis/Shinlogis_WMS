@@ -1,5 +1,6 @@
 package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -11,65 +12,96 @@ import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.snapshot.model.Snapshot;
 
-
 /**
- * InboundPlanItemModel 테이블모델 입니다.
+ * DetailModel 테이블모델입니다. 체크박스 및 페이징 기능 포함.
  * @author 김예진
  */
 public class DetailModel extends AbstractTableModel {
-	DetailDAO ioDetailDAO = new DetailDAO();
-	ReceiptDAO ioReceiptDAO = new ReceiptDAO();
-	Snapshot snapshot = new Snapshot();
-	
-	List<IODetail> inblundPlanItemList;
-	String[] column = { "입고예정ID", "입고예정상세ID", "상품코드", "상품명", "상태", "공급사명",
-			"수량", "입고예정일", "처리일", "입고", "수정"};
+	private DetailDAO ioDetailDAO = new DetailDAO();
+	private ReceiptDAO ioReceiptDAO = new ReceiptDAO();
+	private Snapshot snapshot = new Snapshot();
+
+	private List<IODetail> fullList = new ArrayList<>();     // 전체 리스트
+	private List<IODetail> pageList = new ArrayList<>();     // 현재 페이지에 보여줄 리스트
+	private List<Boolean> selected = new ArrayList<>();      // 체크박스 상태 리스트
+
+	private String[] column = {
+		"선택", "입고예정ID", "입고예정상세ID", "상품코드", "상품명", "상태", "공급사명",
+		"수량", "입고예정일", "처리일", "입고", "수정"
+	};
 
 	public DetailModel() {
-		// 전체 목록 로드
-		this.inblundPlanItemList = ioDetailDAO.selectIODetails(Collections.emptyMap());
+		setData(Collections.emptyMap());
 	}
 
-	/**
-	 * rowIndex의 io_detail 데이터를 가져오는 메서드입니다
-	 * @author 김예진
-	 * @since 2025-06-22
-	 * @param rowIndex
-	 * @return
-	 */
+	/** 특정 행의 IODetail 객체 반환 */
 	public IODetail getIODetailAt(int rowIndex) {
-		if (rowIndex >= 0 && rowIndex < inblundPlanItemList.size()) {
-			return inblundPlanItemList.get(rowIndex);
+		if (rowIndex >= 0 && rowIndex < pageList.size()) {
+			return pageList.get(rowIndex);
 		} else {
 			return null;
 		}
 	}
 
-	/**
-	 * 값을 새로 설정하는 메서드
-	 * @author 김예진
-	 * @since 2025-06-23
-	 * @param filters
-	 */
-	public void setData(Map<String,Object> filters) {
-		this.inblundPlanItemList = ioDetailDAO.selectIODetails(filters);
+	/** 검색 필터에 따라 전체 데이터 새로 불러오기 */
+	public void setData(Map<String, Object> filters) {
+		this.fullList = ioDetailDAO.selectIODetails(filters);
+		this.pageList = new ArrayList<>(fullList);
+		initSelected();
 		fireTableDataChanged();
+	}
+
+	public void setFullData(Map<String, Object> filters) {
+		this.fullList = ioDetailDAO.selectIODetails(filters);
+	}
+
+	public List<IODetail> getFullData() {
+		return this.fullList;
+	}
+
+	public void setCurrentPageData(List<IODetail> pageData) {
+		this.pageList = pageData;
+		initSelected();
+		fireTableDataChanged();
+	}
+
+	/** 선택 초기화 */
+	private void initSelected() {
+		this.selected = new ArrayList<>(pageList.size());
+		for (int i = 0; i < pageList.size(); i++) selected.add(false);
+	}
+
+	/** 현재 페이지에서 선택된 상세 리스트 반환 */
+	public List<IODetail> getSelectedDetails() {
+		List<IODetail> result = new ArrayList<>();
+		for (int i = 0; i < selected.size(); i++) {
+			if (selected.get(i)) result.add(pageList.get(i));
+		}
+		return result;
+	}
+
+	/** 현재 페이지에서 선택된 io_detail_id 리스트 반환 */
+	public List<Integer> getSelectedDetailIds() {
+		List<Integer> result = new ArrayList<>();
+		for (int i = 0; i < selected.size(); i++) {
+			if (selected.get(i)) result.add(pageList.get(i).getIoDetailId());
+		}
+		return result;
 	}
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 9) { // "입고처리" 버튼 컬럼으로 변경
-			IODetail detail = inblundPlanItemList.get(row);
+		if (column == 0) return true; // 체크박스
+		if (column == 10) { // 입고처리 버튼
+			IODetail detail = getIODetailAt(row);
 			return detail != null && detail.isProcessable();
 		}
-		return column == 10; // 수정 컬럼
+		return column == 11; // 수정 버튼
 	}
-
-
 
 	@Override
 	public int getRowCount() {
-		return inblundPlanItemList.size();
+		return pageList.size();
 	}
 
 	@Override
@@ -83,40 +115,37 @@ public class DetailModel extends AbstractTableModel {
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		String value = null;
-		IODetail ioDetail = inblundPlanItemList.get(rowIndex); // 레코드 값 불러오기		
-		switch (columnIndex) {
-			case 0:
-				return ioDetail.getIoReceipt().getIoReceiptId();
-			case 1:
-				return ioDetail.getIoDetailId();
-			case 2:
-				return ioDetail.getProductSnapshot().getProductCode();
-			case 3:
-				return ioDetail.getProductSnapshot().getProductName();
-			case 4:
-				return ioDetail.getStatus();
-			case 5:
-				return ioDetail.getProductSnapshot().getSupplierName();
-			case 6:
-				return ioDetail.getPlannedQuantity();
-			case 7:
-				return ioDetail.getIoReceipt().getScheduledDate();
-			case 8:
-				return ioDetail.getProccessedDate(); 
-			case 9:
-				if (ioDetail != null && ioDetail.isProcessable()) {
-					return "검수";
-				} else {
-					return "완료"; // 버튼 아닌 텍스트로 표시
-				}
-			case 10:
-				return "수정";
+	public Class<?> getColumnClass(int columnIndex) {
+		if (columnIndex == 0) return Boolean.class;
+		if (columnIndex == 7) return Integer.class;
+		return String.class;
+	}
 
-		default:
-			return "";
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		IODetail ioDetail = pageList.get(rowIndex);
+		switch (columnIndex) {
+			case 0: return selected.get(rowIndex);
+			case 1: return ioDetail.getIoReceipt().getIoReceiptId();
+			case 2: return ioDetail.getIoDetailId();
+			case 3: return ioDetail.getProductSnapshot().getProductCode();
+			case 4: return ioDetail.getProductSnapshot().getProductName();
+			case 5: return ioDetail.getStatus();
+			case 6: return ioDetail.getProductSnapshot().getSupplierName();
+			case 7: return ioDetail.getPlannedQuantity();
+			case 8: return ioDetail.getIoReceipt().getScheduledDate();
+			case 9: return ioDetail.getProccessedDate();
+			case 10: return ioDetail.isProcessable() ? "검수" : "완료";
+			case 11: return "수정";
+			default: return "";
 		}
 	}
 
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		if (columnIndex == 0 && rowIndex < selected.size()) {
+			selected.set(rowIndex, (Boolean) aValue);
+			fireTableCellUpdated(rowIndex, columnIndex);
+		}
+	}
 }

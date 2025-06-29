@@ -50,8 +50,10 @@ public class HeadquartersJoin extends JFrame {
 	DBManager dbManager = DBManager.getInstance();
 	HeadquartersDAO headquartersDAO;
 	boolean idCheck = false;
+	MemberLogin memberLogin;
 
-	public HeadquartersJoin() {
+	public HeadquartersJoin(MemberLogin memberLogin) {
+		this.memberLogin = memberLogin;
 		p_center = new JPanel();
 
 		getContentPane().setBackground(Color.WHITE);
@@ -219,6 +221,9 @@ public class HeadquartersJoin extends JFrame {
 				regist();
 				JOptionPane.showMessageDialog(this, "회원가입이 완료되었습니다.");
 				this.dispose();
+				if(memberLogin != null) {
+					memberLogin.dispose();
+				}
 				new MemberLogin();
 			} catch (HeadquartersException e) {
 				e.printStackTrace();

@@ -20,6 +20,16 @@ public class IOReceipt {
 	private String status;
 	private Location location;
 	private String supplierName;
+	private boolean active;
+	
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
 
 	private String firstProductName;
 	private int itemCount;

@@ -82,15 +82,14 @@ public class DetailDAO {
 				.append("dc.damage_code_id, dc.code AS damage_code, ")
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email, ")
 				.append("w.warehouse_id, w.warehouse_name, w.address, w.storage_type_id, w.warehouse_code, ")
-				.append("s.storage_type_code ")
-				.append("FROM io_detail ip ")
+				.append("s.storage_type_code ").append("FROM io_detail ip ")
 				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("LEFT JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
 				.append("LEFT JOIN damaged_code dc  ON ip.damage_code_id = dc.damage_code_id ")
 				.append("LEFT JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 				.append("LEFT JOIN warehouse w ON ip.warehouse_id = w.warehouse_id ")
 				.append("LEFT JOIN storage_type st ON st.storage_type_id = w.storage_type_id ")
-				.append("WHERE ir.io_type = 'IN'");
+				.append("WHERE ir.io_type = 'IN' AND ip.active = true ");
 //		System.out.println(sql);
 		// 검색 필터 추가
 		List<Object> params = new ArrayList<>();
@@ -114,9 +113,13 @@ public class DetailDAO {
 			sql.append("AND s.supplier_name = ? ");
 			params.add(filters.get("supplier_name"));
 		}
-		if (filters.get("status") != "전체" && filters.get("status") != null) {
-			sql.append("AND ip.status = ? ");
-			params.add(filters.get("status"));
+		Object statusObj = filters.get("status");
+		if (filters.get("status") != null) {
+		    String status = statusObj.toString();
+		    if (!status.equals("전체") && !status.isEmpty()) {
+		        sql.append("AND ip.status = ? ");
+		        params.add(status);
+		    }
 		}
 		if (filters.get("scheduled_date") != null) {
 			sql.append("AND DATE(ir.scheduled_date) = ? ");
@@ -280,15 +283,14 @@ public class DetailDAO {
 				.append("dc.damage_code_id, dc.code AS damage_code, dc.name AS damage_code_name,")
 				.append("hu.headquarters_user_id, hu.id AS hq_user_id, hu.email AS hq_user_email, ")
 				.append("w.warehouse_id, w.warehouse_name, w.address, w.storage_type_id, w.warehouse_code, ")
-				.append("s.storage_type_code ")
-				.append("FROM io_detail ip ")
+				.append("s.storage_type_code ").append("FROM io_detail ip ")
 				.append("JOIN io_receipt ir  ON ip.io_receipt_id = ir.io_receipt_id ")
 				.append("LEFT JOIN snapshot s ON ip.snapshot_id = s.snapshot_id ")
 				.append("LEFT JOIN damaged_code dc  ON ip.damage_code_id = dc.damage_code_id ")
 				.append("LEFT JOIN headquarters_user hu ON ir.user_id = hu.headquarters_user_id ")
 				.append("LEFT JOIN warehouse w ON ip.warehouse_id = w.warehouse_id ")
 				.append("LEFT JOIN storage_type st ON st.storage_type_id = w.storage_type_id ")
-				.append("WHERE ir.io_type = 'IN' AND ip.processed_date IS NOT NULL ");
+				.append("WHERE ir.io_type = 'IN' AND ip.processed_date IS NOT NULL and ip.active = true ");
 //		System.out.println(sql);
 		// 검색 필터 추가
 		List<Object> params = new ArrayList<>();
@@ -313,8 +315,8 @@ public class DetailDAO {
 			params.add(filters.get("supplier_name"));
 		}
 		if (filters.get("damage_code_name") != null && !"전체".equals(filters.get("damage_code_name"))) {
-		    sql.append("AND dc.name = ? ");
-		    params.add(filters.get("damage_code_name"));
+			sql.append("AND dc.name = ? ");
+			params.add(filters.get("damage_code_name"));
 		}
 		if (filters.get("processed_date") != null) {
 			sql.append("AND DATE(ir.processed_date) = ? ");
@@ -412,7 +414,7 @@ public class DetailDAO {
 
 		StringBuffer sql = new StringBuffer();
 		sql.append(
-				"update io_detail set damage_code_id = ?, damage_quantity = ?, warehouse_id = ?, processed_date = NOW(), actual_quantity = ? where io_detail_id = ?");
+				"update io_detail set damage_code_id = ?, damage_quantity = ?, warehouse_id = ?, processed_date = NOW(), actual_quantity = ?, status = \"완료\" where io_detail_id = ?");
 
 		try {
 			conn = dbManager.getConnection();
@@ -427,8 +429,112 @@ public class DetailDAO {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			dbManager.release(ps);
 		}
 		return 0;
 	}
+
+	/**
+	 * 입고상세의 active를 비활성화
+	 * 
+	 * @author 김예진
+	 * @param ioDetailId
+	 * @return
+	 */
+	public int deactivateIoDetail(int ioDetailId) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		int result = 0;
+
+		String sql = "UPDATE io_detail SET active = false WHERE io_detail_id = ?";
+
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, ioDetailId);
+			result = ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps);
+		}
+		return result;
+	}
+
+
+	/**
+	 * 특정 입고상세 ID에 해당하는 입고예정 ID를 반환
+	 * @auther 김예진
+	 * @since 2025-06-28
+	 * @param detailId 입고상세 ID
+	 * @return 상위 입고예정 ID
+	 */
+	public int findReceiptIdByDetailId(int detailId) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int receiptId = -1;
+
+		String sql = "SELECT io_receipt_id FROM io_detail WHERE io_detail_id = ?";
+
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, detailId);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				receiptId = rs.getInt("io_receipt_id");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps, rs);
+		}
+
+		return receiptId;
+	}
+
+	/**
+	 * 특정 입고예정 ID의 모든 입고상세가 비활성화되었는지 여부를 반환
+	 * @auther 김예진
+	 * @since 2025-06-28
+	 * @param receiptId 입고예정 ID
+	 * @return true: 모두 비활성화됨, false: 하나라도 활성화됨
+	 */
+	public boolean areAllDetailsInactiveByReceiptId(int receiptId) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean result = false;
+
+		String sql = "SELECT COUNT(CASE WHEN active = true THEN 1 END) AS active FROM io_detail WHERE io_receipt_id = ?";
+
+		try {
+			conn = dbManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, receiptId);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				int activeCount = rs.getInt("active");
+				if (activeCount == 0) {
+					result = true;  // 모두 비활성화됨
+				} else {
+					result = false; // 하나라도 활성화됨
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(ps, rs);
+		}
+
+		return result;
+	}
+
+
+
 
 }
