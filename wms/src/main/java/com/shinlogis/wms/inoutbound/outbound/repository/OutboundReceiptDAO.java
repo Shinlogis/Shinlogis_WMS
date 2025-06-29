@@ -14,8 +14,8 @@ import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
-import com.shinlogis.wms.inoutbound.outbound.model.Order;
 import com.shinlogis.wms.location.model.Location;
+import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 
 /**
  * <h2>출고예정 전표DAO
@@ -97,73 +97,15 @@ public class OutboundReceiptDAO {
 	 * 
 	 * @author 이세형
 	 */
-//	public int insertOutboundDetail(IODetail detail) throws SQLException {
-//	    Connection con = null;
-//	    PreparedStatement pstmt = null;
-//	    con = dbManager.getConnection();
-//	    
-//	    String sql = "INSERT INTO io_detail (io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, warehouse_id, status) " +
-//	                 "VALUES (?, ?, ?, 0, 0, 0, ?, '예정')";
-//	    pstmt = con.prepareStatement(sql);
-//	    
-//	    pstmt.setInt(1, detail.getIoReceipt().getIoReceiptId());
-//	    pstmt.setInt(2, detail.getPlannedQuantity());
-//	    pstmt.setInt(3, detail.getProductSnapshot().getSnapshotId());
-//	    pstmt.setInt(4, detail.getWarehouse().getWarehouseId());
-//
-//	    int affectedRows = pstmt.executeUpdate();
-//	    if (affectedRows == 0) {
-//	        throw new SQLException("출고 상세 생성 실패");
-//	    }
-//
-//	    dbManager.release(pstmt);
-//	    return affectedRows;
-//	}
-//	public int insertAllOutbounds(AppMain appMain,IOReceipt receipt, IODetail detail, Date scheduledDate) throws SQLException {
-//		this.appMain = appMain;
-//		Connection con = null;
-//		PreparedStatement pstmt = null;
-//		con = dbManager.getConnection();
-//		StringBuffer sql = new StringBuffer();
-//		sql.append("INSERT INTO io_receipt (io_type, user_id, scheduled_date, status, location_id, active) ");
-//		sql.append("VALUES ('out', ?, ?, '예정', ?, 1)");
-//
-//		pstmt = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
-//		pstmt.setInt(1, appMain.headquartersUser.getHeadquartersUserId());
-//		pstmt.setDate(2, (java.sql.Date) scheduledDate);
-//
-//		if (receipt.getLocation() != null) {
-//			pstmt.setInt(3, appMain.locationUser.getLocationUserId());
-//		} else {
-//			pstmt.setNull(3, java.sql.Types.INTEGER);
-//		}
-//
-//		int affectedRows = pstmt.executeUpdate();
-//		if (affectedRows == 0) {
-//			throw new SQLException("입출고 전표 생성 실패.");
-//		}
-//
-//		// 마지막 아래에서 생성된 key 1번 받아오기.(detail에 io_receipt_id를 넣어주기 위해서 사용 됨)
-//		try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-//			if (generatedKeys.next()) {
-//				int id = generatedKeys.getInt(1);
-//				receipt.setIoReceiptId(id);
-//				return id;
-//			} else {
-//				throw new SQLException("입출고 전표 생성 실패: ID를 얻지 못함.");
-//			}
-//
-//		}
-//
-//	}
+
 	public int insertAllOutbounds(AppMain appMain, IOReceipt receipt, IODetail detail, Date scheduledDate,
-			int plannedQuantity, String locationName) throws SQLException {
+			int plannedQuantity, String locationName, String productName) throws SQLException {
 		this.appMain = appMain;
 		Connection con = null;
 		PreparedStatement pstmtReceipt = null;
 		PreparedStatement pstmtDetail = null;
-
 		con = dbManager.getConnection();
+
 		int locationId = this.findLocationIdByLocationName(locationName);
 		
 		// 1. io_receipt insert
@@ -195,7 +137,7 @@ public class OutboundReceiptDAO {
 		StringBuffer sqlDetail = new StringBuffer();
 		sqlDetail.append("INSERT INTO io_detail (io_receipt_id, planned_quantity, snapshot_id, damage_code_id, ");
 		sqlDetail.append("damage_quantity, actual_quantity, warehouse_id, status, headquarters_user_id) ");
-		sqlDetail.append("VALUES (?, ?, 1, 1, 0, 0, 1, '예정', ?)");
+		sqlDetail.append("VALUES (?, ?, 2, 1, 0, 0, 1, '예정', ?)");
 
 		pstmtDetail = con.prepareStatement(sqlDetail.toString());
 		pstmtDetail.setInt(1, ioReceiptId);
