@@ -1,18 +1,26 @@
 package com.shinlogis.wms.location.model;
 
 public class LocationUser {
-	private int headquartersUserId;
+	private int locationUserId;
     private String id;
     private String pw;
     private String email;
+    private String status;
     private Location location;
     
+    
 	
-	public int getHeadquartersUserId() {
-		return headquartersUserId;
+	public String getStatus() {
+		return status;
 	}
-	public void setHeadquartersUserId(int headquartersUserId) {
-		this.headquartersUserId = headquartersUserId;
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public int getLocationUserId() {
+		return locationUserId;
+	}
+	public void setLocationUserId(int locationUserId) {
+		this.locationUserId = locationUserId;
 	}
 	public String getId() {
 		return id;

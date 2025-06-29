@@ -1,11 +1,13 @@
 package com.shinlogis.wms.inoutbound.inbound.view.detail;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
+import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,11 +22,13 @@ import javax.swing.JTextField;
 import com.shinlogis.wms.common.util.NumericTextFieldUtil;
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.DetailDAO;
+import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.inventory.repository.InventoryDAO;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.shinlogis.wms.snapshot.model.Snapshot;
-import com.shinlogis.wms.snapshot.repository.SnapshotDAO;
 import com.shinlogis.wms.warehouse.model.Warehouse;
 import com.shinlogis.wms.warehouse.repository.WarehouseDAO;
 import com.toedter.calendar.JDateChooser;
@@ -33,23 +37,22 @@ public class CheckDetailDialog extends JDialog {
 	private DamagedCodeDAO damagedCodeDAO = new DamagedCodeDAO();
 	private WarehouseDAO warehouseDAO = new WarehouseDAO();
 	private DetailDAO detailDAO = new DetailDAO();
+	private InventoryDAO inventoryDAO = new InventoryDAO();
+	private ReceiptDAO receiptDAO = new ReceiptDAO();
 
 	private JLabel laIOReceipt;
 	private JLabel laIODetail;
 	private JLabel laProductCode;
 	private JLabel laProductName;
-	private JLabel laProductType;
+	private JLabel laProductStorageType;
 	private JLabel laSupplierName;
 	private JLabel laPlannedQuantity;
 	private JComboBox<String> cbDamagedTypeCode;
-	private JTextField tfDamagedTypeCode;
 	private JTextField tfDamagedQuantity;
-	private JLabel laActualQuantity;
 	private JTextField tfWarehouseCode;
 	private JLabel laWarehouseName;
 	private JLabel laWarehouseType;
 
-	private JLabel laWarehouseCode;
 	private JDateChooser chooser; // 유통기한 선택 달력
 
 	private JButton btnSearch;
@@ -66,11 +69,10 @@ public class CheckDetailDialog extends JDialog {
 		laIODetail = new JLabel(String.valueOf(detail.getIoDetailId()));
 		laProductCode = new JLabel(detail.getProductSnapshot().getProductCode());
 		laProductName = new JLabel(detail.getProductSnapshot().getProductName());
-		laProductType = new JLabel(detail.getProductSnapshot().getStorageType().getTypeName());
+		laProductStorageType = new JLabel(detail.getProductSnapshot().getStorageType().getTypeCode());
 		laSupplierName = new JLabel(detail.getProductSnapshot().getSupplierName());
 		laPlannedQuantity = new JLabel(String.valueOf(detail.getPlannedQuantity()));
 		tfDamagedQuantity = new JTextField(10); 
-		tfDamagedTypeCode = new JTextField(10);
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -97,7 +99,7 @@ public class CheckDetailDialog extends JDialog {
 		gbc.gridx = 2;
 		add(laProductName, gbc);
 		gbc.gridx = 3;
-		add(laProductType, gbc);
+		add(laProductStorageType, gbc);
 
 		gbc.gridy = 3;
 		gbc.gridx = 0;
@@ -171,7 +173,7 @@ public class CheckDetailDialog extends JDialog {
 					laWarehouseName.setText(warehouse.getWarehouseName());
 					laWarehouseType.setText(warehouse.getStorageType().getTypeName());
 				} else {
-					JOptionPane.showMessageDialog(this, snapshot.getStorageType().getTypeName()+" 상품은 "+warehouse.getStorageType().getTypeName()+" 창고에 보관할 수 없습니다.");
+					JOptionPane.showMessageDialog(this, snapshot.getStorageType().getTypeCode()+" 상품은 "+warehouse.getStorageType().getTypeCode()+" 창고에 보관할 수 없습니다.");
 				}
 			} else {
 				JOptionPane.showMessageDialog(this, "존재하지 않는 창고입니다.");
@@ -185,6 +187,15 @@ public class CheckDetailDialog extends JDialog {
 		gbc.gridx = 2;
 		laWarehouseType = new JLabel();
 		add(laWarehouseType, gbc);
+		
+		gbc.gridy = 8;
+		gbc.gridx = 0;
+		add(new JLabel("유통기한"), gbc);
+		gbc.gridx = 1;
+		chooser = new JDateChooser();
+		chooser.setDateFormatString("yyyy-MM-dd");
+		chooser.setPreferredSize(new Dimension(150, chooser.getPreferredSize().height));
+		add(chooser, gbc);
 
 		// 버튼
 		btnSave = new JButton("저장");
@@ -193,26 +204,60 @@ public class CheckDetailDialog extends JDialog {
 		pButtons.add(btnSave);
 		pButtons.add(btnCancel);
 
+		gbc.gridy = 9;
 		gbc.gridx = 0;
-		gbc.gridy = 8;
 		gbc.gridwidth = 4;
 		add(pButtons, gbc);
 
 		// 저장 버튼
 		btnSave.addActionListener(e -> {
-			int result = detailDAO.processInboundDetail(detail.getIoDetailId(), cbDamagedTypeCode.getSelectedIndex()+1, Integer.parseInt(tfDamagedQuantity.getText().trim()), Integer.parseInt(laPlannedQuantity.getText().toString()), warehouse.getWarehouseId());
-			if (result > 0) {
-				JOptionPane.showMessageDialog(this, "검수 완료");				
-			} else {
-				JOptionPane.showMessageDialog(this, "오류가 발생했습니다.");
-			}
-			dispose();
-			model.setData(Collections.emptyMap());
+		    int result = detailDAO.processInboundDetail(
+		        detail.getIoDetailId(),
+		        cbDamagedTypeCode.getSelectedIndex() + 1,
+		        Integer.parseInt(tfDamagedQuantity.getText().trim()),
+		        Integer.parseInt(laPlannedQuantity.getText().trim()),
+		        warehouse.getWarehouseId()
+		    );
+
+		    if (result > 0) {
+		        ProductDAO productDAO = new ProductDAO();
+		        java.sql.Date sqlDate = new java.sql.Date(chooser.getDate().getTime());
+		        Product product = productDAO.selectByCode(detail.getProductSnapshot().getProductCode());
+
+		        boolean result2 = inventoryDAO.addOrUpdateInventory(
+		            warehouse.getWarehouseId(),
+		            product.getProductId(),
+		            sqlDate,
+		            detail.getPlannedQuantity()
+		        );
+
+		        // 상세 상태는 이 시점에서 '완료'로 변경됨
+		        detailDAO.updateStatus(detail.getIoDetailId(), "완료");
+
+		        // 전표 ID 가져오기
+		        int receiptId = detail.getIoReceipt().getIoReceiptId();
+
+		        // 전표 상태 판단 & 갱신
+		        String newStatus = receiptDAO.determineReceiptStatus(receiptId);
+		        receiptDAO.updateReceiptStatus(receiptId, newStatus);
+
+		        if (result2) {
+		            JOptionPane.showMessageDialog(this, "검수 완료");
+		        } else {
+		            JOptionPane.showMessageDialog(this, "검수 실패");
+		        }
+		    } else {
+		        JOptionPane.showMessageDialog(this, "오류가 발생했습니다.");
+		    }
+
+		    dispose();
+		    model.setData(Collections.emptyMap());
 		});
+
 
 		btnCancel.addActionListener(e -> dispose());
 
-		setSize(530, 420);
+		setSize(530, 460);
 		setLocationRelativeTo(owner);
 	}
 	

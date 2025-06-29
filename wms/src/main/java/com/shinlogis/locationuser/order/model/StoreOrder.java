@@ -6,9 +6,10 @@ import java.util.List;
 public class StoreOrder {
 	private int storeOrderId;
 	private int locationId;
-	private LocalDateTime orderDate;
+	private String orderDate;
 	private int totalPrice;
 	private List<StoreOrderItem> items;
+	private int cnt;
 	
 	public int getStoreOrderId() {
 		return storeOrderId;
@@ -22,10 +23,10 @@ public class StoreOrder {
 	public void setLocationId(int locationId) {
 		this.locationId = locationId;
 	}
-	public LocalDateTime getOrderDate() {
+	public String getOrderDate() {
 		return orderDate;
 	}
-	public void setOrderDate(LocalDateTime orderDate) {
+	public void setOrderDate(String orderDate) {
 		this.orderDate = orderDate;
 	}
 	public int getTotalPrice() {
@@ -40,6 +41,12 @@ public class StoreOrder {
 	public void setItems(List<StoreOrderItem> items) {
 		this.items = items;
 	}
-	
+	public int getCnt() {
+		return cnt;
+	}
+	public void setCnt(int cnt) {
+		this.cnt = cnt;
+	}
+
 	
 }

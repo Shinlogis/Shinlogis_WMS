@@ -6,20 +6,25 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.TextField;
+import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 
 import com.shinlogis.wms.AppMain;
+import com.shinlogis.wms.common.config.ButtonEditor;
+import com.shinlogis.wms.common.config.ButtonRenderer;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.outbound.repository.OutboundDetailDAO;
 import com.toedter.calendar.JDateChooser;
 
 public class OutboundDetailPage extends Page {
@@ -37,7 +42,7 @@ public class OutboundDetailPage extends Page {
 	private JDateChooser ch_reservatedDate; // 출고예정일
 	private JTextField tf_targetStore;// 상품코드
 	private JTextField tf_container; // 보관창고
-	private JDateChooser ch_registeredDate; // 출고등록일
+	private JDateChooser ch_processedDate; // 출고등록일
 	private JComboBox<String> cb_status; // 상태 (전체/예정/처리 중/완료/보류)
 	private JButton bt_search; // 검색 버튼
 
@@ -47,11 +52,15 @@ public class OutboundDetailPage extends Page {
 
 	private JLabel la_counter;
 	private JTable tb_plan; // 출고예정 목록 테이블
-//	private JScrollPane sc_table;
-//	private DefaultTableModel model;
-
+	private JScrollPane sc_table;
+	private AbstractTableModel model;
+	private int count;
+	
+	OutboundDetailDAO outboundDetailDAO;
+	
 	public OutboundDetailPage(AppMain app) {
 		super(app);
+		outboundDetailDAO = new OutboundDetailDAO();
 		// 제목영역
 		p_pageTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		la_pageTitle = new JLabel("출고관리 > 출고상세");
@@ -143,25 +152,65 @@ public class OutboundDetailPage extends Page {
 		gbc.gridx = 4;// (4,1)
 		p_search.add(new JLabel("상태"), gbc);
 
-		cb_status = new JComboBox<>(new String[] { "전체", "예정", "처리 중", "완료", "보류" });
+		cb_status = new JComboBox<>(new String[] { "전체", "예정", "진행 중", "완료", "보류" });
 		gbc.gridx = 5;// (5,1)
 		p_search.add(cb_status, gbc);
 
 		// 출고일
 		gbc.gridx = 6;// (6,1)
-		p_search.add(new JLabel("등록일"), gbc);
+		p_search.add(new JLabel("출고일"), gbc);
 
-		ch_registeredDate = new JDateChooser();
-		ch_registeredDate.setDateFormatString("yyyy-MM-dd");
-		ch_registeredDate.setPreferredSize(new Dimension(150, ch_registeredDate.getPreferredSize().height));
+		ch_processedDate = new JDateChooser();
+		ch_processedDate.setDateFormatString("yyyy-MM-dd");
+		ch_processedDate.setPreferredSize(new Dimension(150, ch_processedDate.getPreferredSize().height));
 		gbc.gridx = 7;// (7,1)
-		p_search.add(ch_registeredDate, gbc);
+		p_search.add(ch_processedDate, gbc);
 
 		// 검색버튼
 		bt_search = new JButton("검색");
 		bt_search.addActionListener(e -> {
-			System.out.println("출고상세페이지 검색버튼을 눌렀습니다. 상세를 검색하는 쿼리문이 실행될 것입니다.");
+		    // 1. 검색 조건 수집
+		    String planId = tf_outBoundPlanId.getText();
+		    String detailId = tf_outboundDetailId.getText();
+		    String code = tf_productCode.getText();
+		    String supplier = tf_productSupplier.getText();
+		    String store = tf_targetStore.getText();
+		    String warehouse = tf_container.getText();
+		    String status = cb_status.getSelectedItem().toString();
+
+		    java.sql.Date reservedDate = null;
+		    if (ch_reservatedDate.getDate() != null) {
+		        reservedDate = new java.sql.Date(ch_reservatedDate.getDate().getTime());
+		    }
+
+		    java.sql.Date processedDate = null;
+		    if (ch_processedDate.getDate() != null) {
+		        processedDate = new java.sql.Date(ch_processedDate.getDate().getTime());
+		    }
+
+		    // 2. 검색 실행
+		    List<IODetail> result = outboundDetailDAO.selectByCondition(
+		        planId, detailId, code, supplier, reservedDate, store, warehouse, status, processedDate
+		    );
+
+		    // 3. 테이블 모델 교체
+		    tb_plan.setModel(new OutboundDetailModel(result));
+
+		    tb_plan.getColumn("수정").setCellRenderer(new ButtonRenderer());
+		    tb_plan.getColumn("수정").setCellEditor(
+		        new ButtonEditor(new JCheckBox(), (table, row, col) -> {
+		        	//클릭시 동작도 다시 재 정의 해주기
+		            int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
+		            new OrderDialog();
+		        })
+		    );
+
+		    // 5. 카운터 갱신
+		    la_counter.setText("총 " + result.size() + "개의 출고상세 검색");
 		});
+
+
+
 		gbc.gridx = 8;// (8,1)
 		p_search.add(bt_search, gbc);
 
@@ -170,8 +219,25 @@ public class OutboundDetailPage extends Page {
 		GridBagConstraints gbcTableNorth = new GridBagConstraints();
 		p_tableNorth = new JPanel(new GridBagLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-
-		la_counter = new JLabel("총 0개의 출고예정 검색");
+		
+		
+		tb_plan = new JTable(model = new OutboundDetailModel());
+		tb_plan.setRowHeight(45);
+		
+		tb_plan.getColumn("수정").setCellRenderer(new ButtonRenderer());
+		tb_plan.getColumn("수정").setCellEditor(
+		    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+		        // 상세보기 클릭 시 동작 정의
+		        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
+		        new OrderDialog();
+		    })
+		); 
+		
+		sc_table= new JScrollPane(tb_plan);
+		sc_table.setPreferredSize(new Dimension(1150,660));
+		
+		count = outboundDetailDAO.countTotal();
+		la_counter = new JLabel("총 "+ count + "개의 출고상세 검색");
 		gbcTableNorth.gridx = 0;
 		gbcTableNorth.gridy = 0;
 		gbcTableNorth.weightx = 1.0; // 남는 공간 차지
@@ -179,20 +245,19 @@ public class OutboundDetailPage extends Page {
 		gbcTableNorth.insets = new Insets(0, 10, 0, 10); // 좌우 여백
 		p_tableNorth.add(la_counter, gbcTableNorth);
 		
-
-		// 테이블(컨텐트영역) 디자인
-
-		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-		p_table.add(p_tableNorth);
-		p_table.add(tb_plan);
-		p_table.setBackground(Color.GRAY);
-
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);
 		add(p_search);
-		add(p_table);
+		add(p_tableNorth);
+		add(sc_table);
 
+	}
+	
+	//출고예정에서 넘어오면 강제로 값을 입력받아서 출력해주기 위한 메서드
+	public void searchByPlanId(String planId) {
+	    tf_outBoundPlanId.setText(planId); // 텍스트 필드 설정
+	    bt_search.doClick(); // 검색 버튼 강제 클릭 (이벤트 실행됨)
 	}
 
 }

@@ -2,7 +2,6 @@ package com.shinlogis.wms.product.model;
 
 import com.shinlogis.wms.storageType.model.StorageType;
 import com.shinlogis.wms.supplier.model.Supplier;
-import com.shinlogis.wms.warehouse.model.Warehouse;
 
 public class Product {
 	private int productId;
@@ -12,7 +11,14 @@ public class Product {
 	private Supplier supplier;
 	private int price;
 	private boolean isChecked;
-	
+	private String thumbnailPath;
+
+	public String getThumbnailPath() {
+	    return thumbnailPath;
+	}
+	public void setThumbnailPath(String thumbnailPath) {
+	    this.thumbnailPath = thumbnailPath;
+	}
 	public boolean isChecked() {
 		return isChecked;
 	}
@@ -38,6 +44,7 @@ public class Product {
 		this.productName = productName;
 	}
 
+	
 	public Supplier getSupplier() {
 		return supplier;
 	}
@@ -65,6 +72,4 @@ public class Product {
 	public void setQuantity(int quantity) {
 	    this.quantity = quantity;
 	}
-
-
 }
