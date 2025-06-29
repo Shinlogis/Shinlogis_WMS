@@ -34,6 +34,7 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.headquarters.view.HeadquatersMyPage;
+import com.shinlogis.wms.headquarters.view.MemberManagement;
 import com.shinlogis.wms.inoutbound.inbound.view.detail.DetailPage;
 import com.shinlogis.wms.inoutbound.inbound.view.process.ProcessPage;
 import com.shinlogis.wms.inoutbound.inbound.view.receipt.ReceiptPage;
@@ -55,7 +56,7 @@ public class AppMain extends JFrame {
 	JLabel la_outboundPlan, la_outboundDetail, la_outboundRegister;
 	JLabel la_inventory, la_warehouse, la_branch, la_supplier, la_chat, la_order, la_orderList, la_product, la_location_chat,la_home,la_main;
 
-	JLabel la_user, la_logout, la_locationName;
+	JLabel la_user, la_logout, la_locationName, la_memberManagement;
 	public Page[] pages;
 
 	HeadquartersJoin memberJoin;
@@ -101,7 +102,7 @@ public class AppMain extends JFrame {
 
 		// 상단 바 설정
 		p_north.setPreferredSize(new Dimension(Config.ADMINMAIN_WIDTH - Config.SIDE_WIDTH, Config.HEADER_HEIGHT));
-		p_north.setBackground(Color.YELLOW);
+		p_north.setBackground(Color.WHITE);
 		createMyPage();
 
 		// 사이드 바 설정
@@ -185,6 +186,10 @@ public class AppMain extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					showPage(Config.INBOUND_PLAN_PAGE);
+					ReceiptPage receiptPage = (ReceiptPage) pages[Config.INBOUND_PLAN_PAGE];
+					if (receiptPage != null) {
+						receiptPage.refresh();
+					}
 				}
 			});
 
@@ -192,6 +197,10 @@ public class AppMain extends JFrame {
 			la_inboundDetail.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					DetailPage detailPage = (DetailPage) pages[Config.INBOUND_ITEM_PAGE];
+					if (detailPage != null) {
+						detailPage.refreshDetailModel();
+					}
 					showPage(Config.INBOUND_ITEM_PAGE);
 				}
 			});
@@ -326,6 +335,9 @@ public class AppMain extends JFrame {
 
 		if (headquartersUser != null) {
 			la_user.setText(headquartersUser.getId());
+			if(headquartersUser.getId().equals("yujin")) {
+				la_locationName.setText("회원관리"); //아이디 yujin만 회원관리 보이게
+			}
 		} else if (locationUser != null) {
 			la_user.setText(locationUser.getId());
 			la_locationName.setText(locationUser.getLocation().getLocationName());
@@ -364,6 +376,16 @@ public class AppMain extends JFrame {
 					showPage(Config.HEADQUATERS_MY_PAGE);
 				} else if (locationUser != null) {
 					showPage(Config.LOCATION_MY_PAGE);
+				}
+			}
+		});
+		
+		//회원 관리 페이지
+		la_locationName.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(headquartersUser != null) {
+					showPage(Config.MEMBERMENAGERMENT_PAGE);
 				}
 			}
 		});
@@ -450,11 +472,12 @@ public class AppMain extends JFrame {
 	public void createPage() {
 
 		if ("headquartersUser".equals(role)) {
-			pages = new Page[14];
+			pages = new Page[15];
 
 			pages[0] = new MainPage(this);
-			pages[1] = new ReceiptPage(this);
-			pages[2] = new DetailPage(this);
+			DetailPage detailPage = new DetailPage(this);
+			pages[2] = detailPage;
+			pages[1] = new ReceiptPage(this, detailPage);
 			pages[3] = new ProcessPage(this);
 			pages[4] = new OutboundReceiptPage(this);
 			pages[5] = new OutboundDetailPage(this);
@@ -466,6 +489,7 @@ public class AppMain extends JFrame {
 			pages[11] = new ChattingPage(this);
 			pages[12] = new HeadquatersMyPage(this,headquartersUser.getHeadquartersUserId());
 			pages[13] = new OutboundRegisterPage(this);
+			pages[14] = new MemberManagement(this);
 
 		} else if ("locationUser".equals(role)) {
 			pages = new Page[5];

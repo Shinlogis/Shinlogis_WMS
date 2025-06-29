@@ -4,10 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.headquarters.model.HeadquartersUser;
 import com.shinlogis.wms.inoutbound.model.IODetail;
@@ -22,8 +24,9 @@ import com.shinlogis.wms.location.model.Location;
  */
 public class OutboundReceiptDAO {
 	DBManager dbManager = DBManager.getInstance();
-	//iodetail먹어서 안에 컬럼을 가져다가 인서트 할 무언가가 생기나,,?
+	// iodetail먹어서 안에 컬럼을 가져다가 인서트 할 무언가가 생기나,,?
 	IODetail outboundDetail;
+	AppMain appMain;
 	
 //	public OutBoundReceiptDAO(){}
 
@@ -48,8 +51,7 @@ public class OutboundReceiptDAO {
 					+ " where id.io_receipt_id = ir.io_receipt_id" + " order by id.io_detail_id"
 					+ " limit 1) as first_product_name," + " (select count(*)" + " from io_detail id2"
 					+ " where id2.io_receipt_id = ir.io_receipt_id) as item_count" + " from io_receipt ir"
-					+ " inner join location l on ir.location_id = l.location_id"
-					+ " where ir.io_type =  'out' "
+					+ " inner join location l on ir.location_id = l.location_id" + " where ir.io_type =  'out' "
 					+ " order by ir.io_receipt_id desc");
 			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
@@ -94,8 +96,42 @@ public class OutboundReceiptDAO {
 	 * 
 	 * @author 이세형
 	 */
-	public void insertOutbound() {
-		
+	public int insertAllOutbounds(AppMain appMain,IOReceipt receipt, IODetail detail, Date scheduledDate) throws SQLException {
+		this.appMain = appMain;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("INSERT INTO io_receipt (io_type, user_id, scheduled_date, status, location_id, active) ");
+		sql.append("VALUES ('out', ?, ?, '예정', ?, 1)");
+
+		pstmt = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+		pstmt.setInt(1, appMain.headquartersUser.getHeadquartersUserId());
+		pstmt.setDate(2, (java.sql.Date) scheduledDate);
+
+		if (receipt.getLocation() != null) {
+			pstmt.setInt(3, appMain.locationUser.getLocationUserId());
+		} else {
+			pstmt.setNull(3, java.sql.Types.INTEGER);
+		}
+
+		int affectedRows = pstmt.executeUpdate();
+		if (affectedRows == 0) {
+			throw new SQLException("입출고 전표 생성 실패.");
+		}
+
+		// 마지막 아래에서 생성된 key 1번 받아오기.(detail에 io_receipt_id를 넣어주기 위해서 사용 됨)
+		try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+			if (generatedKeys.next()) {
+				int id = generatedKeys.getInt(1);
+				receipt.setIoReceiptId(id);
+				return id;
+			} else {
+				throw new SQLException("입출고 전표 생성 실패: ID를 얻지 못함.");
+			}
+
+		}
+
 	}
 
 	/**
@@ -113,8 +149,7 @@ public class OutboundReceiptDAO {
 			con = dbManager.getConnection();
 			// total로서 sql문을 받아온다.
 			StringBuffer sql = new StringBuffer();
-			sql.append("SELECT COUNT(*) AS total FROM io_receipt ir"
-					+ " where ir.io_type = 'out' ");
+			sql.append("SELECT COUNT(*) AS total FROM io_receipt ir" + " where ir.io_type = 'out' ");
 			pstmt = con.prepareStatement(sql.toString());
 			rs = pstmt.executeQuery();
 
@@ -175,7 +210,7 @@ public class OutboundReceiptDAO {
 			}
 			if (scheduledDate != null) {
 				sql.append("AND DATE(ir.scheduled_date) = ? ");
-				params.add(new java.sql.Date(scheduledDate.getTime())); 
+				params.add(new java.sql.Date(scheduledDate.getTime()));
 			}
 			if (createdAt != null) {
 				sql.append("AND DATE(ir.created_at) = ? ");
@@ -226,11 +261,11 @@ public class OutboundReceiptDAO {
 	}
 
 	/**
-	 * <h2> 검색기반 카운트 구현
+	 * <h2>검색기반 카운트 구현
 	 * 
 	 * @author 이세형
-	 * */
-	
+	 */
+
 	public int countByCondition(String ioReceiptId, String productName, String locationName, Date scheduledDate,
 			Date createdAt, String status) {
 		int totalCount = 0;

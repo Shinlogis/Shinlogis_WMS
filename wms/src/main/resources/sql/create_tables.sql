@@ -68,7 +68,7 @@ CREATE TABLE storage_type (
 -- [상품 정보 테이블]
 CREATE TABLE product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
-   product_img VARCHAR(100),
+    product_img VARCHAR(100),
     product_code VARCHAR(100) NOT NULL UNIQUE,
     product_name VARCHAR(100) NOT NULL,
     storage_type_id INT NOT NULL,
@@ -207,7 +207,11 @@ INSERT INTO location (location_id, location_name, address) VALUES (7, '부천점
 
 INSERT INTO location (location_id, location_name, address) VALUES (8, '양천점', '서울시 양천구 8번지');
 
+<<<<<<< HEAD
 INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점', '서울시 노원구 9번지');
+=======
+INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점';, '서울시 노원구 9번지');
+>>>>>>> 89fa044a1ecb63a52518351a550a7fb70da56789
 
 INSERT INTO location (location_id, location_name, address) VALUES (10, '강서점', '서울시 강서구 10번지');
 

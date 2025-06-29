@@ -31,7 +31,7 @@ public class EditSupplierDialog extends JDialog {
 	Supplier supplier;
 
 	public EditSupplierDialog(AppMain appMain,Supplier supplier, SupplierModel supplierModel) {
-		super(appMain, "공급사 추가", true);
+		super(appMain, "공급사 수정", true);
 
 		this.supplierModel = supplierModel;
 		this.supplier = supplier;
@@ -45,12 +45,12 @@ public class EditSupplierDialog extends JDialog {
 		t_name = new JTextField(supplier.getName());
 		la_address = new JLabel("주소");
 		t_address = new JTextField(supplier.getAddress());
-		bt = new JButton("추가");
+		bt = new JButton("수정");
 
 
 		// 스타일
 		panel.setBackground(Color.WHITE);
-		bt.setPreferredSize(new Dimension(80, 60));
+		bt.setPreferredSize(new Dimension(60, 40));
 
 		// 조립
 		panel.add(createLine(la_name, t_name));
@@ -62,7 +62,7 @@ public class EditSupplierDialog extends JDialog {
 			editSupplier();
 		});
 
-		this.setBounds(550, 350, 700, 300);
+		this.setBounds(550, 350, 700, 200);
 		this.setVisible(true);
 	}
 
@@ -70,8 +70,8 @@ public class EditSupplierDialog extends JDialog {
 	public JPanel createLine(JLabel label, JTextField field) {
 		JPanel panel = new JPanel();
 		panel.setOpaque(false);
-		label.setPreferredSize(new Dimension(150, 50)); // 라벨 고정 폭
-		field.setPreferredSize(new Dimension(500, 50)); // 필드 고정 폭
+		label.setPreferredSize(new Dimension(150, 30)); // 라벨 고정 폭
+		field.setPreferredSize(new Dimension(500, 30)); // 필드 고정 폭
 		panel.add(label);
 		panel.add(field);
 		return panel;
@@ -95,9 +95,6 @@ public class EditSupplierDialog extends JDialog {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
-		
-		
-		
 		
 	}
 	

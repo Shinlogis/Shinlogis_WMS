@@ -329,4 +329,43 @@ public class OutboundDetailDAO {
 
 		return outboundDetail;
 	}
+	public int insertOutboundDetail(IODetail detail) throws SQLException {
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    con = dbManager.getConnection();
+	    
+	    String sql = "INSERT INTO io_detail (io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, warehouse_id, status) " +
+	                 "VALUES (?, ?, ?, 0, 0, 0, ?, '예정')";
+	    pstmt = con.prepareStatement(sql);
+	    
+	    pstmt.setInt(1, detail.getIoReceipt().getIoReceiptId());
+	    pstmt.setInt(2, detail.getPlannedQuantity());
+	    pstmt.setInt(3, detail.getProductSnapshot().getSnapshotId());
+	    pstmt.setInt(4, detail.getWarehouse().getWarehouseId());
+
+	    int affectedRows = pstmt.executeUpdate();
+	    if (affectedRows == 0) {
+	        throw new SQLException("출고 상세 생성 실패");
+	    }
+
+	    dbManager.release(pstmt);
+	    return affectedRows;
+	}
+	
+	//상태 업데이트 및 날짜 업데이트
+	public boolean updateStatusAndProcessedDate(int ioDetailId, String status, java.sql.Date processedDate) {
+	    String sql = "UPDATE io_detail SET status = ?, processed_date = ? WHERE io_detail_id = ?";
+	    try (Connection con = dbManager.getConnection();
+	         PreparedStatement pstmt = con.prepareStatement(sql)) {
+	        pstmt.setString(1, status);
+	        pstmt.setDate(2, processedDate);
+	        pstmt.setInt(3, ioDetailId);
+	        int updated = pstmt.executeUpdate();
+	        return updated > 0;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+
 }

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.HeadlessException;
+import java.awt.Window;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -17,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.Member.view.MemberLogin;
@@ -198,7 +200,7 @@ public class LocatoinMyPage extends Page {
 		locationUser = locationUserDAO.selectById(pk);
 		String[] email = locationUser.getEmail().split("@");
 
-		System.out.println("pk 값은 : " + pk);
+		//System.out.println("pk 값은 : " + pk);
 		show_id.setText(locationUser.getId());
 		t_email.setText(email[0]);
 	}
@@ -242,10 +244,12 @@ public class LocatoinMyPage extends Page {
 	//탈퇴
 	public void deleteMyInfo() {
 		try {
+			Window window =  SwingUtilities.getWindowAncestor(this); //회원탈퇴 시 마이페이지 포함 앱메인 닫기
 			locationUserDAO.delete(locationUser);
 			JOptionPane.showMessageDialog(this, "회원 탈퇴 완료");
-			
 			locationUser = null;
+			
+			window.dispose();
 			new MemberLogin();
 		} catch (HeadlessException e) {
 			e.printStackTrace();

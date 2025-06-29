@@ -25,6 +25,16 @@ public class IODetail {
 	private Date proccessedDate;
 	private String status;
 	private HeadquartersUser user;
+	private boolean active;
+	
+	
+	
+	public boolean isActive() {
+		return active;
+	}
+	public void setActive(boolean active) {
+		this.active = active;
+	}
 	public int getIoDetailId() {
 		return ioDetailId;
 	}

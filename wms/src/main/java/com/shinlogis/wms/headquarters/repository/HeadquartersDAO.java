@@ -170,7 +170,7 @@ public class HeadquartersDAO {
 	}
 	
 	
-	//이메일을 통해 아이디 찾기
+	//아이디 찾기
 	public String findIdByEmail(String email) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -199,7 +199,7 @@ public class HeadquartersDAO {
 		
 	}
 	
-	//비밀번호 찾기
+	//이메일 통해 비밀번호 찾기
 	public String findPwd(String id, String email)throws HeadquartersException{
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -327,7 +327,7 @@ public class HeadquartersDAO {
 	
 	
 	
-	//수정하기
+	//수정하기 (비밀번호 적지 않으면 변경하지 않고 적을 시에만 변경되게, id는 수정x)
 	public void edit(HeadquartersUser headquartersUser) throws HeadquartersException{
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -352,11 +352,11 @@ public class HeadquartersDAO {
 			int result = pstmt.executeUpdate();
 			
 			if(result <1) {
-				throw new HeadquartersException("비밀번호 변경에 실패하였습니다.");
+				throw new HeadquartersException("수정에 실패하였습니다.");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new HeadquartersException("비밀번호 변경 시 문제 발생", e); 
+			throw new HeadquartersException("수정시 문제 발생", e); 
 		} finally {
 			dbManager.release(pstmt);
 		}
@@ -395,5 +395,108 @@ public class HeadquartersDAO {
 	}
 	
 	
+	//회원 전체 리스트 조회
+	public List headquaterList() {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<HeadquartersUser> list = new ArrayList<>();
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select headquarters_user_id, id, email");
+		sql.append(" from headquarters_user where status = '활성' order by headquarters_user_id desc");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				HeadquartersUser headquartersUser = new HeadquartersUser();
+				String[] email = rs.getString("email").split("@");
+				headquartersUser.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
+				headquartersUser.setId(rs.getString("id"));
+				headquartersUser.setEmail(email[0], email[1]);
+				
+				list.add(headquartersUser);
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			dbManager.release(pstmt, rs);
+		}
+		
+		
+		return list;
+	}
+	
+	
+	//아이디로 검색
+	public List searchHeadquater(HeadquartersUser headquartersUser) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<HeadquartersUser> list = new ArrayList<>();
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select headquarters_user_id, id, email");
+		sql.append(" from headquarters_user where id like ? and status = '활성' order by headquarters_user_id desc");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, "%" + headquartersUser.getId() + "%");
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				HeadquartersUser user = new HeadquartersUser();
+				String[] email = rs.getString("email").split("@");
+				
+				user.setHeadquartersUserId(rs.getInt("headquarters_user_id"));
+				user.setId(rs.getString("id"));
+				user.setEmail(email[0], email[1]);
+				
+				list.add(user);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			dbManager.release(pstmt, rs);
+		}
+		
+		return list;
+	}
+	
+	
+	
+	//비밀번호만 수정
+	public void updatePwd(HeadquartersUser headquartersUser) throws HeadquartersException{
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		con = dbManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("update headquarters_user set pw = ? where headquarters_user_id =?");
+		
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, headquartersUser.getPw());
+			pstmt.setInt(2, headquartersUser.getHeadquartersUserId());
+			
+			int result = pstmt.executeUpdate();
+			
+			if(result <1) {
+				throw new HeadquartersException("수정에 실패하였습니다.");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new HeadquartersException("수정 시 문제 발생", e);
+		}finally {
+			dbManager.release(pstmt);
+		}
+	}
 
 }
