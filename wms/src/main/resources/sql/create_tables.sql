@@ -189,25 +189,25 @@ CREATE TABLE store_order_item (
     CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
 
-INSERT INTO location (location_id, location_name, address) VALUES (1, '스시맛집지점', '서울시 강남구 1번지');
+INSERT INTO location (location_id, location_name, address) VALUES (1, '강남점', '서울시 강남구 1번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (2, '토마토마트지점', '서울시 강남구 2번지');
+INSERT INTO location (location_id, location_name, address) VALUES (2, '마포점', '서울시 마포구 2번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (3, '맛나제과지점', '서울시 강남구 3번지');
+INSERT INTO location (location_id, location_name, address) VALUES (3, '김포점', '김포시 3번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (4, '오렌지카페지점', '서울시 강남구 4번지');
+INSERT INTO location (location_id, location_name, address) VALUES (4, '시흥점', '시흥시 4번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (5, '치킨천국지점', '서울시 강남구 5번지');
+INSERT INTO location (location_id, location_name, address) VALUES (5, '부평점', '부평시 5번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (6, '초밥도감지점', '서울시 강남구 6번지');
+INSERT INTO location (location_id, location_name, address) VALUES (6, '구로점', '서울시 구로구 6번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (7, '감자탕명가지점', '서울시 강남구 7번지');
+INSERT INTO location (location_id, location_name, address) VALUES (7, '부천점', '부천시 7번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (8, '해피푸드지점', '서울시 강남구 8번지');
+INSERT INTO location (location_id, location_name, address) VALUES (8, '양천점', '서울시 양천구 8번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (9, '바나나상회지점', '서울시 강남구 9번지');
+INSERT INTO location (location_id, location_name, address) VALUES (9, '노원점';, '서울시 노원구 9번지');
 
-INSERT INTO location (location_id, location_name, address) VALUES (10, '딸기마켓지점', '서울시 강남구 10번지');
+INSERT INTO location (location_id, location_name, address) VALUES (10, '강서점', '서울시 강서구 10번지');
 
 INSERT INTO headquarters_user (headquarters_user_id, id, pw, email) VALUES (1, 'hquser1', 'pw1234', 'hquser1@example.com');
 
