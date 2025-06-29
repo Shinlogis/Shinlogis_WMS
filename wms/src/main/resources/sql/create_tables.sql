@@ -66,7 +66,7 @@ CREATE TABLE storage_type (
 -- [상품 정보 테이블]
 CREATE TABLE product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
-	product_img VARCHAR(100),
+    product_img VARCHAR(100),
     product_code VARCHAR(100) NOT NULL UNIQUE,
     product_name VARCHAR(100) NOT NULL,
     storage_type_id INT NOT NULL,
