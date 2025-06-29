@@ -15,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -26,7 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.inoutbound.model.IODetail;
 import com.shinlogis.wms.inoutbound.model.IOReceipt;
-import com.shinlogis.wms.inoutbound.outbound.repository.OutboundDetailDAO;
+import com.shinlogis.wms.inoutbound.outbound.model.Order;
 import com.shinlogis.wms.inoutbound.outbound.repository.OutboundReceiptDAO;
 import com.shinlogis.wms.location.model.Location;
 import com.shinlogis.wms.location.repository.LocationDAO;
@@ -127,9 +126,7 @@ public class OutboundRegisterDialog extends JDialog {
         
         loadLocations();
 
-
         // ===== 테이블
-        setupProductTable();
 
         // ===== 버튼
         p_bttn = new JPanel();
@@ -143,20 +140,19 @@ public class OutboundRegisterDialog extends JDialog {
                 // 1. 출고 전표 insert
                 OutboundReceiptDAO receiptDAO = new OutboundReceiptDAO();
                 IOReceipt receipt = new IOReceipt();
-                //선택한 날짜를 담아 줄 테이트 추저..
+                IODetail detail = new IODetail();
+                //선택한 날짜를 담아 줄 테이트 추적..
                 ScheduledDate = new Date(ch_reservatedDate.getDate().getTime());
-
+                int plannedQuantity = Integer.parseInt(tf_quantity.getText());
                 // UI에서 입력받은 값들 세팅
-                
+                Location selectedLocation = (Location) cb_location.getSelectedItem();
+                String locationName = selectedLocation.getLocationName();
 
-				int	ioReceiptId = receiptDAO.insertAllOutbounds(appMain, receipt, null, ScheduledDate);
+
+				int	ioReceiptId = receiptDAO.insertAllOutbounds(appMain, receipt, detail, ScheduledDate, plannedQuantity, locationName);
 
                 // 2. 출고 상세 insert
-                OutboundDetailDAO detailDAO = new OutboundDetailDAO();
-                for (IODetail detail : outboundDetailList) { // 리스트에서 꺼내
-                    detail.getIoReceipt().setIoReceiptId(ioReceiptId); // FK 세팅
-                    detailDAO.insertOutboundDetail(detail);
-                }
+                
 
                 System.out.println("출고 등록 완료!");
                 this.dispose(); // 닫기
@@ -187,20 +183,4 @@ public class OutboundRegisterDialog extends JDialog {
             cb_location.addItem(loc);
         }
     }
-
-    private void setupProductTable() {
-        String[] columns = {"상품코드", "상품명", "계획수량"};
-        model = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                return col == 2; // 계획수량만 수정 가능
-            }
-        };
-        tb_products = new JTable(model);
-
-        // 임시 데이터
-        model.addRow(new Object[] {"P001", "테스트상품1", 10});
-        model.addRow(new Object[] {"P002", "테스트상품2", 20});
-    }
-
 }
