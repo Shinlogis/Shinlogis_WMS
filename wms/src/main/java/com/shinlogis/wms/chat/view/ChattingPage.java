@@ -37,7 +37,7 @@ public class ChattingPage extends Page{
 	List<Location> locations;
 	
 	
-	String ip = "192.168.60.18";
+	String ip = "192.168.219.50";
 	int port = 9999;
 	Location dummy = null;
 	Vector<HeadClientThread> vector = new Vector<>(); 
