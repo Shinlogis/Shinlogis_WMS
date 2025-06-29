@@ -23,7 +23,7 @@ public class OrderModel extends AbstractTableModel {
 	Order order;
 	ProductDAO productDAO;
 	public List<Order> list;
-
+	
 	String[] column = { "주문ID", "주문 품목", "주문 일시", "주문 지점", "주문 상세", "출고 등록" };
 
 	public OrderModel() {
@@ -45,7 +45,7 @@ public class OrderModel extends AbstractTableModel {
 		return list.size();
 
 	}
-
+	
 	// 행열에 값 넣기
 	@Override
 	public Object getValueAt(int row, int col) {

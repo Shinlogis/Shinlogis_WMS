@@ -57,7 +57,7 @@ public class ProcessPage extends Page {
 	private JButton btnPrevPage, btnNextPage;
 	private JLabel laPageInfo;
 	private int currentPage = 1;
-	private final int rowsPerPage = 14;
+	private final int rowsPerPage = 10;
 	private List<IODetail> fullList;
 
 	public ProcessPage(AppMain appMain) {
