@@ -163,13 +163,13 @@ public class FindPwd extends JFrame {
 
 		} catch (HeadquartersException e) {
 			e.printStackTrace();
-			JOptionPane.showInternalMessageDialog(this, e.getMessage());
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		} catch (EmailException e) {
 			e.printStackTrace();
-			JOptionPane.showInternalMessageDialog(this, e.getMessage());
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		} catch (LocationException e) {
 			e.printStackTrace();
-			JOptionPane.showInternalMessageDialog(this, e.getMessage());
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
 
 	}

@@ -24,7 +24,7 @@ public class LocationDAO {
 		
 		con = dbManager.getConnection();
 		StringBuffer sql = new StringBuffer();
-		sql.append("select * from location");
+		sql.append("select * from location where status = '활성'");
 		
 		try {
 			pstmt = con.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);

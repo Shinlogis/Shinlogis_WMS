@@ -25,6 +25,7 @@ public class Config {
 	public static final int CHATTING_PAGE = 11;
 	public static final int HEADQUATERS_MY_PAGE = 12;
 	public static final int OUTBOUND_REGISTER_PAGE = 13;
+	public static final int MEMBERMENAGERMENT_PAGE = 14;
 	
 	
 	/*-------------------------------------

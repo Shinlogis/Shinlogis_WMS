@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -55,9 +56,10 @@ public class OutboundDetailPage extends Page {
 	private JScrollPane sc_table;
 	private AbstractTableModel model;
 	private int count;
-	
+	private List<IODetail> outboundDetailList;
+
 	OutboundDetailDAO outboundDetailDAO;
-	
+
 	public OutboundDetailPage(AppMain app) {
 		super(app);
 		outboundDetailDAO = new OutboundDetailDAO();
@@ -166,50 +168,65 @@ public class OutboundDetailPage extends Page {
 		gbc.gridx = 7;// (7,1)
 		p_search.add(ch_processedDate, gbc);
 
+		// 해당 날짜를 받아오기 위한 Lis설정 및 new Model
+		outboundDetailList = outboundDetailDAO.selectAllOutboundDetail();
+		tb_plan.setModel(new OutboundDetailModel(outboundDetailList));
+
 		// 검색버튼
 		bt_search = new JButton("검색");
 		bt_search.addActionListener(e -> {
-		    // 1. 검색 조건 수집
-		    String planId = tf_outBoundPlanId.getText();
-		    String detailId = tf_outboundDetailId.getText();
-		    String code = tf_productCode.getText();
-		    String supplier = tf_productSupplier.getText();
-		    String store = tf_targetStore.getText();
-		    String warehouse = tf_container.getText();
-		    String status = cb_status.getSelectedItem().toString();
+			// 1. 검색 조건 수집
+			String planId = tf_outBoundPlanId.getText();
+			String detailId = tf_outboundDetailId.getText();
+			String code = tf_productCode.getText();
+			String supplier = tf_productSupplier.getText();
+			String store = tf_targetStore.getText();
+			String warehouse = tf_container.getText();
+			String status = cb_status.getSelectedItem().toString();
 
-		    java.sql.Date reservedDate = null;
-		    if (ch_reservatedDate.getDate() != null) {
-		        reservedDate = new java.sql.Date(ch_reservatedDate.getDate().getTime());
-		    }
+			java.sql.Date reservedDate = null;
+			if (ch_reservatedDate.getDate() != null) {
+				reservedDate = new java.sql.Date(ch_reservatedDate.getDate().getTime());
+			}
 
-		    java.sql.Date processedDate = null;
-		    if (ch_processedDate.getDate() != null) {
-		        processedDate = new java.sql.Date(ch_processedDate.getDate().getTime());
-		    }
+			java.sql.Date processedDate = null;
+			if (ch_processedDate.getDate() != null) {
+				processedDate = new java.sql.Date(ch_processedDate.getDate().getTime());
+			}
 
-		    // 2. 검색 실행
-		    List<IODetail> result = outboundDetailDAO.selectByCondition(
-		        planId, detailId, code, supplier, reservedDate, store, warehouse, status, processedDate
-		    );
+			// 2. 검색 실행
+			List<IODetail> result = outboundDetailDAO.selectByCondition(planId, detailId, code, supplier, reservedDate,
+					store, warehouse, status, processedDate);
 
-		    // 3. 테이블 모델 교체
-		    tb_plan.setModel(new OutboundDetailModel(result));
+			// 3. 테이블 모델 교체
+			tb_plan.setModel(new OutboundDetailModel(result));
 
-		    tb_plan.getColumn("수정").setCellRenderer(new ButtonRenderer());
-		    tb_plan.getColumn("수정").setCellEditor(
-		        new ButtonEditor(new JCheckBox(), (table, row, col) -> {
-		        	//클릭시 동작도 다시 재 정의 해주기
-		            int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		            new OrderDialog();
-		        })
-		    );
+			tb_plan.getColumn("출고확정").setCellRenderer(new ButtonRenderer());
+			tb_plan.getColumn("출고확정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+				OutboundDetailModel model = (OutboundDetailModel) table.getModel();
+				IODetail detail = model.getIODetailAt(row);
 
-		    // 5. 카운터 갱신
-		    la_counter.setText("총 " + result.size() + "개의 출고상세 검색");
+				if ("완료".equals(detail.getStatus())) {
+					new JOptionPane().showMessageDialog(null, "이미 출고 완료된 내역입니다.");
+					return;
+				}
+
+				int ioDetailId = detail.getIoDetailId();
+				java.sql.Date now = new java.sql.Date(System.currentTimeMillis());
+				boolean success = outboundDetailDAO.updateStatusAndProcessedDate(ioDetailId, "완료", now);
+
+				if (success) {
+					detail.setStatus("완료");
+					detail.setProccessedDate(now);
+					model.fireTableRowsUpdated(row, row);
+					new JOptionPane().showMessageDialog(null, "출고등록이 완료되었습니다.");
+				}
+				bt_search.doClick();
+			}));
+
+			// 5. 카운터 갱신
+			la_counter.setText("총 " + result.size() + "개의 출고상세 검색");
 		});
-
-
 
 		gbc.gridx = 8;// (8,1)
 		p_search.add(bt_search, gbc);
@@ -219,32 +236,45 @@ public class OutboundDetailPage extends Page {
 		GridBagConstraints gbcTableNorth = new GridBagConstraints();
 		p_tableNorth = new JPanel(new GridBagLayout());
 		p_tableNorth.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_NORTH_HEIGHT));
-		
-		
+
 		tb_plan = new JTable(model = new OutboundDetailModel());
 		tb_plan.setRowHeight(45);
-		
-		tb_plan.getColumn("수정").setCellRenderer(new ButtonRenderer());
-		tb_plan.getColumn("수정").setCellEditor(
-		    new ButtonEditor(new JCheckBox(), (table, row, column) -> {
-		        // 상세보기 클릭 시 동작 정의
-		        int ioReceiptId = Integer.parseInt(table.getValueAt(row, 0).toString());
-		        new OrderDialog();
-		    })
-		); 
-		
-		sc_table= new JScrollPane(tb_plan);
-		sc_table.setPreferredSize(new Dimension(1150,660));
-		
+
+		tb_plan.getColumn("출고확정").setCellRenderer(new ButtonRenderer());
+		tb_plan.getColumn("출고확정").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
+			OutboundDetailModel model = (OutboundDetailModel) table.getModel();
+			IODetail detail = model.getIODetailAt(row);
+
+			if ("완료".equals(detail.getStatus())) {
+				new JOptionPane().showMessageDialog(null, "이미 출고 완료된 내역입니다.");
+				return;
+			}
+
+			int ioDetailId = detail.getIoDetailId();
+			java.sql.Date now = new java.sql.Date(System.currentTimeMillis());
+			boolean success = outboundDetailDAO.updateStatusAndProcessedDate(ioDetailId, "완료", now);
+
+			if (success) {
+				detail.setStatus("완료");
+				detail.setProccessedDate(now);
+				model.fireTableRowsUpdated(row, row);
+				new JOptionPane().showMessageDialog(null, "출고등록이 완료되었습니다.");
+			}
+			bt_search.doClick();
+		}));
+
+		sc_table = new JScrollPane(tb_plan);
+		sc_table.setPreferredSize(new Dimension(1150, 660));
+
 		count = outboundDetailDAO.countTotal();
-		la_counter = new JLabel("총 "+ count + "개의 출고상세 검색");
+		la_counter = new JLabel("총 " + count + "개의 출고상세 검색");
 		gbcTableNorth.gridx = 0;
 		gbcTableNorth.gridy = 0;
 		gbcTableNorth.weightx = 1.0; // 남는 공간 차지
 		gbcTableNorth.anchor = GridBagConstraints.WEST;
 		gbcTableNorth.insets = new Insets(0, 10, 0, 10); // 좌우 여백
 		p_tableNorth.add(la_counter, gbcTableNorth);
-		
+
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);
@@ -253,11 +283,11 @@ public class OutboundDetailPage extends Page {
 		add(sc_table);
 
 	}
-	
-	//출고예정에서 넘어오면 강제로 값을 입력받아서 출력해주기 위한 메서드
+
+	// 출고예정에서 넘어오면 강제로 값을 입력받아서 출력해주기 위한 메서드
 	public void searchByPlanId(String planId) {
-	    tf_outBoundPlanId.setText(planId); // 텍스트 필드 설정
-	    bt_search.doClick(); // 검색 버튼 강제 클릭 (이벤트 실행됨)
+		tf_outBoundPlanId.setText(planId); // 텍스트 필드 설정
+		bt_search.doClick(); // 검색 버튼 강제 클릭 (이벤트 실행됨)
 	}
 
 }
