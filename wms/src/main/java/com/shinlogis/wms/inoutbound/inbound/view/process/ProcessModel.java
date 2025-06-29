@@ -66,6 +66,15 @@ public class ProcessModel extends AbstractTableModel {
     }
 
     /**
+     * 데이터 로드
+     * @return
+     */
+    public List<IODetail> getFullDataList() {
+        return fullDataList;
+    }
+
+
+    /**
      * 페이징 데이터 설정
      * @author 김예진
      * @since 2025-06-27
