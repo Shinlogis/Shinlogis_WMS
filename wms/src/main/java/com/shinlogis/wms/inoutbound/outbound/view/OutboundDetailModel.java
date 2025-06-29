@@ -12,7 +12,7 @@ public class OutboundDetailModel extends AbstractTableModel {
 	List<IODetail> outboundDetailList;
 
 	String[] column = { "출고예정ID", "출고상세ID", "상품코드", "상품명", "출고예정수량", "출고예정일", "출고지점", "보관창고", "상태", "실제출고수량", "출고일",
-			"수정" };
+			"출고확정" };
 
 	public OutboundDetailModel() {
 		IOReceipt outboundReceipt = new IOReceipt();
@@ -77,9 +77,13 @@ public class OutboundDetailModel extends AbstractTableModel {
 			value = outboundDetail.getStatus();
 			break;
 		case 9:
-			//출고수량 변환하는 기능 구현해야함 다시 와서 봐야 할지도 모름****************
-			value = Integer.toString(outboundDetail.getActualQuantity());
-			break;
+			if ("완료".equals(outboundDetail.getStatus())) {
+				value = Integer.toString(outboundDetail.getPlannedQuantity());
+				break;
+			} else {
+				value = "0";
+				break;
+			}
 		case 10:
 			if (outboundDetail.getProccessedDate() != null) {
 				value = outboundDetail.getProccessedDate().toString();
@@ -89,13 +93,24 @@ public class OutboundDetailModel extends AbstractTableModel {
 				break;
 			}
 		case 11:
-			value = "수정";
-			break;
+			if (!"완료".equals(outboundDetail.getStatus())) {
+				value = "출고확정";
+				break;
+			} else {
+				value = "완료";
+				break;
+			}
 		default:
 			return null;
 		}
 
 		return value;
 	}
+	
+	//상세 검색을 통해 해당 row에 해당하는 id값을 받아오기 위해 따로 정의한 메서드
+	public IODetail getIODetailAt(int row) {
+	    return outboundDetailList.get(row);
+	}
 
+	
 }
