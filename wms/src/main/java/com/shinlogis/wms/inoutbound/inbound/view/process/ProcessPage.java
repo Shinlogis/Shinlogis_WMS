@@ -232,7 +232,7 @@ public class ProcessPage extends Page {
 		add(pTable);
 		add(pPaging);
 
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(new Color(0xF1F1F1));
 
 		// 초기 데이터 로드
 		loadData(new HashMap<>());

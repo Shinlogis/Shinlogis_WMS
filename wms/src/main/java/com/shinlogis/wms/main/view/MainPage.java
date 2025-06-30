@@ -193,6 +193,16 @@ public class MainPage extends Page {
         int amount = 123456789;
         return String.format("%,d", amount);
     }
+    
+    public void refreshData() {
+        pt1Value.setText(Integer.toString(statisticDAO.getTotalInboundToday()));
+        pt2Value.setText(Integer.toString(statisticDAO.getTotalInboundCompleted()));
+        pt3Value.setText(Integer.toString(statisticDAO.getTotalOutboundToday()));
+
+
+        // AreaChart 및 BarChart 데이터 갱신 필요 시 재호출하거나 차트에 refresh() 메서드 구현 후 호출
+    }
+
 
     
 }

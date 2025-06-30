@@ -431,7 +431,7 @@ INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code
 
 INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date) VALUES (5, 'P005', '양파', 'FROZEN', '건강푸드', 4920, '2025-12-18 00:00:00');
 
-INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date) VALUES (6, 'P006', '배추', 'ROOM', '농장직송', 8596, '2025-12-28 00:00:00');
+INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date) VALUES (6, 'P006', '양파', 'ROOM', '농장직송', 8596, '2025-12-28 00:00:00');
 
 INSERT INTO snapshot (snapshot_id, product_code, product_name, storage_type_code, supplier_name, price, expiry_date) VALUES (7, 'P007', '당근', 'COLD', '웰빙식품', 5915, '2025-12-10 00:00:00');
 
