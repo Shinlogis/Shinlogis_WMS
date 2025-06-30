@@ -150,9 +150,9 @@ public class OutboundRegisterDialog extends JDialog {
                 // UI에서 입력받은 값들 세팅
                 Location selectedLocation = (Location) cb_location.getSelectedItem();
                 String locationName = selectedLocation.getLocationName();
+                String productName = tf_productName.getText();
 
-
-				int	ioReceiptId = receiptDAO.insertAllOutbounds(appMain, receipt, detail, ScheduledDate, plannedQuantity, locationName);
+				int	ioReceiptId = receiptDAO.insertAllOutbounds(appMain, receipt, detail, ScheduledDate, plannedQuantity, locationName, productName);
 
                 // 2. 출고 상세 insert
                 

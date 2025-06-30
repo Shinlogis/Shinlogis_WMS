@@ -6,21 +6,17 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.common.util.excel.ExcelExporter;
 import com.shinlogis.wms.damagedCode.repository.DamagedCodeDAO;
 import com.shinlogis.wms.inoutbound.inbound.repository.ReceiptDAO;
 import com.shinlogis.wms.inoutbound.model.IODetail;
@@ -50,14 +46,14 @@ public class ProcessPage extends Page {
 	private ProcessModel iModel;
 
 	private JPanel pTableNorth;
-	private JButton btnRegister; 
+	private JButton btnExcelExport;
 
 	/* ────────── 페이징 영역 구성 요소 ────────── */
 	private JPanel pPaging;
 	private JButton btnPrevPage, btnNextPage;
 	private JLabel laPageInfo;
 	private int currentPage = 1;
-	private final int rowsPerPage = 14;
+	private final int rowsPerPage = 10;
 	private List<IODetail> fullList;
 
 	public ProcessPage(AppMain appMain) {
@@ -141,6 +137,49 @@ public class ProcessPage extends Page {
 		laPlanCount = new JLabel("총 0개의 입고처리 검색");
 		laPlanCount.setPreferredSize(new Dimension(Config.CONTENT_WIDTH - 150, 30));
 		pTableNorth.add(laPlanCount);
+		btnExcelExport = new JButton("엑셀파일 저장");
+		btnExcelExport.addActionListener(e -> {
+			// 현재 시간 포맷
+			SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss");
+			String timestamp = sdf.format(new java.util.Date());
+
+			// 파일 이름에 현재 날짜/시간 포함
+			String defaultFileName = "입고처리목록_" + timestamp + ".xlsx";
+
+			// 파일 선택 창 생성
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("엑셀 파일로 저장");
+
+			// 기본 파일 이름 설정
+			fileChooser.setSelectedFile(new java.io.File(defaultFileName));
+
+			// 저장 다이얼로그 표시 후, 사용자 선택 결과 받기
+			int userSelection = fileChooser.showSaveDialog(this); // this는 JPanel 기준
+
+			// 저장을 선택한 경우
+			if (userSelection == JFileChooser.APPROVE_OPTION) {
+				// 선택한 파일 객체 얻기
+				java.io.File fileToSave = fileChooser.getSelectedFile();
+
+				// 현재 검색 조건에 따라 필터링된 전체 데이터 목록을 가져옴
+				List<IODetail> dataToExport = fullList;
+
+				// 데이터를 엑셀로 저장
+				boolean success = ExcelExporter.exportIODetailListToExcel(dataToExport, fileToSave.getAbsolutePath());
+				if (success) {
+					JOptionPane.showMessageDialog(this, "엑셀 파일이 저장되었습니다.");
+				} else {
+					JOptionPane.showMessageDialog(this, "엑셀 저장 중 오류가 발생했습니다.");
+				}
+			}
+		});
+
+
+
+
+
+		pTableNorth.add(btnExcelExport);
+
 
 		// 테이블 영역
 		pTable = new JPanel(new FlowLayout());

@@ -100,9 +100,10 @@ public class OrderModel extends AbstractTableModel{
 
 	//체크박스 선택된 물건 가져오기 
 	public List<Product> getSelectedProducts() {
-		return list.stream()
-				.filter(p -> p.isChecked() && p.getQuantity() > 0)
-				.toList();
+//		return list.stream()
+//				.filter(p -> p.isChecked() && p.getQuantity() > 0)
+//				.toList();
+		return null;
 	}
 	
 	//주문서 얻기 
