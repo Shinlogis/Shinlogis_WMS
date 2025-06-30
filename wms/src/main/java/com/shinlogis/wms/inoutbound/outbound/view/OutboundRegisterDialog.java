@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -78,50 +79,52 @@ public class OutboundRegisterDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL; // 가로로 늘리기
         gbc.weightx = 0.3; // 라벨 너비 비율
 
-        // 1행 - 출고예정일
+        p_form = new JPanel(new GridBagLayout());
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // ===== 1번째 라인 (출고예정일, 주문지점) =====
+        gbc.gridy = 1;
+
+        // 출고예정일
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.weightx = 0.1;
         p_form.add(new JLabel("출고예정일"), gbc);
 
         gbc.gridx = 1;
-        gbc.weightx = 0.7;
+        gbc.weightx = 0.4;
         p_form.add(ch_reservatedDate, gbc);
 
-        // 2행 - 주문지점
+        // 주문지점
         gbc.gridx = 2;
-        gbc.weightx = 0.3;
+        gbc.weightx = 0.1;
         p_form.add(new JLabel("주문지점"), gbc);
 
         gbc.gridx = 3;
-        gbc.weightx = 0.7;
+        gbc.weightx = 0.4;
         p_form.add(cb_location, gbc);
 
-     // y=1 위치를 빈 공간으로 유지하기 위해
-        gbc.gridx = 0;
-        gbc.gridy = 1; // 전체 칼럼 폭을 차지하게
-        gbc.weighty = 0.1; // 조금 아래로 밀리게
-        p_form.add(new JLabel(""), gbc);
+        // ===== 2번째 라인 (상품명, 주문수량) =====
+        gbc.gridy = 3;
 
-        
-        
-        // 3행 - 상품명
+        // 상품명
         gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0.3;
-        p_form.add(new JLabel("상품명"), gbc);
+        gbc.weightx = 0.1;
+        p_form.add(new JLabel("상품코드"), gbc);
 
         gbc.gridx = 1;
-        gbc.weightx = 0.7;
+        gbc.weightx = 0.4;
         p_form.add(tf_productName, gbc);
 
-        // 4행 - 주문수량
+        // 주문수량
         gbc.gridx = 2;
-        gbc.weightx = 0.3;
+        gbc.weightx = 0.1;
         p_form.add(new JLabel("주문수량"), gbc);
 
         gbc.gridx = 3;
-        gbc.weightx = 0.7;
+        gbc.weightx = 0.4;
         p_form.add(tf_quantity, gbc);
+
 
         
         loadLocations();
@@ -154,9 +157,8 @@ public class OutboundRegisterDialog extends JDialog {
                 // 2. 출고 상세 insert
                 
 
-                System.out.println("출고 등록 완료!");
                 this.dispose(); // 닫기
-
+                JOptionPane.showMessageDialog(null, "출고등록이 완료되었습니다.");
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
