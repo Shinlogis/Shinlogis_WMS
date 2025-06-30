@@ -190,7 +190,7 @@ public class ReceiptPage extends Page {
 		add(pPageName);
 		add(pSearch);
 		add(pTable);
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(new Color(0xF1F1F1));
 
 		loadReceiptData(Collections.emptyMap());
 	}

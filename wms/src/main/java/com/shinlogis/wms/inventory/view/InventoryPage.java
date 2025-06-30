@@ -179,7 +179,7 @@ public class InventoryPage extends Page {
         add(pPageName);
         add(pSearch);
         add(pTable);
-        setBackground(Color.LIGHT_GRAY);
+        setBackground(new Color(0xF1F1F1));
 
         // 버튼 렌더러 및 에디터 설정
         int editColumnIndex = getColumnIndex("수정");

@@ -311,7 +311,7 @@ public class OutboundDetailPage extends Page {
 
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(new Color(0xF1F1F1));
 		add(p_pageTitle);
 		add(p_search);
 		add(p_tableNorth);

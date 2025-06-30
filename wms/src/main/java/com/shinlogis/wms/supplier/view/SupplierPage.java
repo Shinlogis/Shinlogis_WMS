@@ -65,6 +65,7 @@ public class SupplierPage extends Page {
 		pPageName.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
 		laPageName = new JLabel("공급사 관리 > 공급사 관리");
 		pPageName.add(laPageName);
+		pPageName.setBackground(new Color(0xF1F1F1));
 
 		/* ==== 검색 영역 ==== */
 		p_search = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
@@ -151,7 +152,7 @@ public class SupplierPage extends Page {
 		// pTable.add(pPaging); // 40
 
 		// 스타일
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(new Color(0xF1F1F1));
 
 		// 조립
 		setLayout(new FlowLayout());
