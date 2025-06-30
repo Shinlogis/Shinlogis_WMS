@@ -590,19 +590,17 @@ INSERT INTO io_detail ( io_receipt_id, planned_quantity, snapshot_id, damage_cod
 
 INSERT INTO io_detail ( io_receipt_id, planned_quantity, snapshot_id, damage_code_id, damage_quantity, actual_quantity, headquarters_user_id, processed_date, status) VALUES ( 18, 13, 1, 1, 0, 24, 9, NULL, '진행 중');
 
-
 INSERT INTO store_order (order_date, location_id, total_price, status) VALUES
-(NOW() - INTERVAL 10 DAY, 1, 18000, '대기'),
-(NOW() - INTERVAL 9 DAY, 2, 24000, '완료'),
-(NOW() - INTERVAL 8 DAY, 3, 15000, '대기'),
-(NOW() - INTERVAL 7 DAY, 4, 33000, '완료'),
-(NOW() - INTERVAL 6 DAY, 5, 21000, '대기'),
-(NOW() - INTERVAL 5 DAY, 6, 11000, '완료'),
-(NOW() - INTERVAL 4 DAY, 7, 17000, '대기'),
-(NOW() - INTERVAL 3 DAY, 8, 25000, '완료'),
-(NOW() - INTERVAL 2 DAY, 9, 31000, '대기'),
-(NOW() - INTERVAL 1 DAY, 10, 28000, '완료');
-
+(NOW(), 1, 50000, '대기'),
+(NOW(), 2, 75000, '완료'),
+(NOW(), 3, 25000, '대기'),
+(NOW(), 1, 120000, '완료'),
+(NOW(), 4, 95000, '대기'),
+(NOW(), 2, 31000, '완료'),
+(NOW(), 5, 42000, '대기'),
+(NOW(), 3, 67000, '완료'),
+(NOW(), 4, 88000, '대기'),
+(NOW(), 1, 55000, '완료');
 
 INSERT INTO store_order_item (store_order_id, product_id, status, quantity) VALUES
 (1, 1, '대기', 2),
@@ -615,8 +613,6 @@ INSERT INTO store_order_item (store_order_id, product_id, status, quantity) VALU
 (7, 3, '대기', 2),
 (8, 9, '완료', 3),
 (9, 6, '대기', 2);
-
-
 
 
 
