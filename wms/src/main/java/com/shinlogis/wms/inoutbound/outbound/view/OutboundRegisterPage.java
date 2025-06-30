@@ -71,7 +71,6 @@ public class OutboundRegisterPage extends Page {
 
 		// 제목영역 디자인
 		p_pageTitle.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
-		p_pageTitle.setBackground(Color.YELLOW);
 		p_pageTitle.add(la_pageTitle);
 
 		/* ===================검색 영역================= */
@@ -192,13 +191,7 @@ public class OutboundRegisterPage extends Page {
 		tb_order.getColumn("출고 등록").setCellEditor(new ButtonEditor(new JCheckBox(), (table, row, column) -> {
 		    int selectedOrderId = Integer.parseInt(table.getValueAt(row, 0).toString());
 		    OutboundRegisterDialog ourboundRegisterDialog = new OutboundRegisterDialog(appMain);
-//==============등록 다이얼로그 띄워서 insert 쿼리랑 연결할거임
-		    // DAO로부터 새로운 상세 리스트 가져오기
-//		    OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
-//		    List<OrderDetail> newList = orderDetailDAO.select(selectedOrderId);
-//
-//		    // 모델에 갱신된 리스트 주입 → 테이블 자동 리프레시
-//		    ((OrderDetailModel) orderDetailModel).setList(newList);
+
 		}));
 		
 		tb_detail = new JTable(orderDetailModel = new OrderDetailModel(storeOrderId));
@@ -223,13 +216,7 @@ public class OutboundRegisterPage extends Page {
 
 		sc_detailTable = new JScrollPane(tb_detail);
 		sc_detailTable.setPreferredSize(new Dimension(1150, 300));
-		// 테이블(컨텐트영역) 디자인
-
-//		p_table.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.TABLE_HEIGHT));
-//		p_table.setBackground(Color.GRAY);
-//		p_table.add(p_tableSouth);
-//		p_table.add(sc_table);
-
+		
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
 		add(p_pageTitle);

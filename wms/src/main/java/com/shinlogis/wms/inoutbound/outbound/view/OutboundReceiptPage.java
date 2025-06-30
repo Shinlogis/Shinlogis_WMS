@@ -54,7 +54,6 @@ public class OutboundReceiptPage extends Page {
 	private JTable tb_plan; // 출고예정 목록 테이블
 	private JScrollPane sc_table;
 	private AbstractTableModel model;
-//	private InboundPlanItemModel inboundPlanItemModel;
 	private int count;
 	OutboundReceiptDAO outboundReceiptDAO;
 
@@ -68,7 +67,6 @@ public class OutboundReceiptPage extends Page {
 
 		// 제목영역 디자인
 		p_pageTitle.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
-		p_pageTitle.setBackground(Color.YELLOW);
 		p_pageTitle.add(la_pageTitle);
 
 		/* ===================검색 영역================= */
@@ -214,6 +212,7 @@ public class OutboundReceiptPage extends Page {
 
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
+		setBackground(Color.LIGHT_GRAY);
 		add(p_pageTitle);
 		add(p_search);
 		add(p_tableNorth);
