@@ -69,6 +69,7 @@ public class AppMain extends JFrame {
 	private String role; // 내부적으로 사용할 역할(관리자,지점)
 	
 	OrderListPage orderListPage;
+	MainPage mainPage;
 
 	public AppMain(HeadquartersUser headquartersUser, LocationUser locationUser) {
 		this.headquartersUser = headquartersUser;
@@ -86,6 +87,7 @@ public class AppMain extends JFrame {
 		// 로그인한 사용자가 누구인지 판단하기
 		if (headquartersUser != null) {
 			role = "headquartersUser";
+			mainPage=new MainPage(this);
 		} else if (locationUser != null) {
 			role = "locationUser";
 			orderListPage= new OrderListPage(this);
@@ -154,6 +156,7 @@ public class AppMain extends JFrame {
 			la_main.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					mainPage.refreshData();
 					showPage(Config.MAIN_PAGE);
 				}
 			});
@@ -474,7 +477,8 @@ public class AppMain extends JFrame {
 		if ("headquartersUser".equals(role)) {
 			pages = new Page[15];
 
-			pages[0] = new MainPage(this);
+			//pages[0] = new MainPage(this);
+			pages[0]=mainPage;
 			DetailPage detailPage = new DetailPage(this);
 			pages[2] = detailPage;
 			pages[1] = new ReceiptPage(this, detailPage);
