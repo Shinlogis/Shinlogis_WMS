@@ -71,7 +71,7 @@ public class OutboundDetailPage extends Page {
 
 		// 제목영역 디자인
 		p_pageTitle.setPreferredSize(new Dimension(Config.CONTENT_WIDTH, Config.PAGE_NAME_HEIGHT));
-		p_pageTitle.setBackground(Color.LIGHT_GRAY);
+		p_pageTitle.setBackground(Color.WHITE);
 		p_pageTitle.add(la_pageTitle);
 
 		// 검색 영역
@@ -311,6 +311,7 @@ public class OutboundDetailPage extends Page {
 
 		// page에 만든 파츠들 부착.
 		setLayout(new FlowLayout());
+		setBackground(Color.LIGHT_GRAY);
 		add(p_pageTitle);
 		add(p_search);
 		add(p_tableNorth);
