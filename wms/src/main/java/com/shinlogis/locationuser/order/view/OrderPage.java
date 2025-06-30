@@ -23,19 +23,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-<<<<<<< HEAD
-import src.main.java.com.shinlogis.locationuser.order.model.OrderModel;
-import src.main.java.com.shinlogis.locationuser.order.model.StoreOrder;
-import src.main.java.com.shinlogis.locationuser.order.repository.StoreOrderDAO;
-import src.main.java.com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
-import src.main.java.com.shinlogis.wms.AppMain;
-import src.main.java.com.shinlogis.wms.common.Exception.OrderInsertException;
-import src.main.java.com.shinlogis.wms.common.config.Config;
-import src.main.java.com.shinlogis.wms.common.config.Page;
-import src.main.java.com.shinlogis.wms.common.util.DBManager;
-import src.main.java.com.shinlogis.wms.product.model.Product;
-import src.main.java.com.shinlogis.wms.product.repository.ProductDAO;
-=======
+
 import com.shinlogis.locationuser.order.model.OrderModel;
 import com.shinlogis.locationuser.order.model.StoreOrder;
 import com.shinlogis.locationuser.order.model.StoreOrderItem;
@@ -49,7 +37,6 @@ import com.shinlogis.wms.common.config.Page;
 import com.shinlogis.wms.common.util.DBManager;
 import com.shinlogis.wms.product.model.Product;
 import com.shinlogis.wms.product.repository.ProductDAO;
->>>>>>> 05d278e43b0ad701c938523e28fbc8b185bf855d
 
 public class OrderPage extends Page{
 
@@ -212,7 +199,7 @@ public class OrderPage extends Page{
 				dialog.setVisible(true);
 			    return;
 			}
-		
+
 			if(isConfirmed()) {
 				Connection con=dbManager.getConnection();
 				try {
@@ -220,30 +207,30 @@ public class OrderPage extends Page{
 					StoreOrder storeOrder =new StoreOrder();
 					StoreOrderDAO storeOrderDao = new StoreOrderDAO();
 					StoreOrderItemDAO storeItemDao= new StoreOrderItemDAO();
-					
+
 					storeOrder=model.getStoreOrder(appMain.locationUser.getLocation().getLocationId());
-					
+
 					try {
 						storeOrderDao.insert(storeOrder);
 						int pk=storeOrderDao.getRecentId();
 						storeOrder.setStoreOrderId(pk);
-						
+
 						for (StoreOrderItem item : storeOrder.getItems()) {
-						    item.setStoreOrderId(pk);  
+						    item.setStoreOrderId(pk);
 						    storeItemDao.insert(item);
-						    item.setStoreOrderId(pk); 
+						    item.setStoreOrderId(pk);
 						}
 						model.tableChanged();
-						
+
 						con.commit();
 						JOptionPane.showMessageDialog(null, "주문이 완료되었습니다");
-						
-						
+
+
 					} catch (OrderInsertException e1) {
 						e1.printStackTrace();
 						con.rollback();
 						JOptionPane.showMessageDialog(this, e1.getMessage());
-					} 
+					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -262,8 +249,8 @@ public class OrderPage extends Page{
 					}//start
 				}
 			}
-		
-			pTable.updateUI();    
+
+			pTable.updateUI();
 			tfProduct.setText("");
 		});			
 	}

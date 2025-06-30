@@ -203,7 +203,7 @@ public class HeadquatersMyPage extends Page {
 	// 마이페이지 보여주기
 	public void showMyInfo() {
 		headquartersUser = headquartersDAO.selectById(pk);
-		show_id.setText(headquartersUser.getId());
+		show_id.setText("a");
 		t_pwd.setText("");
 		t_pwdCheck.setText("");
 

@@ -103,6 +103,7 @@ public class OrderModel extends AbstractTableModel{
 		return list.stream()
 				.filter(p -> p.isChecked() && p.getQuantity() > 0)
 				.toList();
+		//return null;
 	}
 	
 	//주문서 얻기 

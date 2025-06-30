@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.shinlogis.wms.common.util.DBManager;
+import com.shinlogis.wms.inoutbound.model.IODetail;
+import com.shinlogis.wms.inoutbound.model.IOReceipt;
+import com.shinlogis.wms.snapshot.model.Snapshot;
 
 public class StatisticDAO {
 	DBManager dbManager = DBManager.getInstance();
@@ -206,7 +209,47 @@ public class StatisticDAO {
 		
 		return total; 
 	}
-	
+
+	/**
+	 * 오늘 출고한 상품의 총 금액을 반환
+	 * @return
+	 */
+	public int getTotalOutboundCompletedPrice() {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int totalAmount = 0;
+
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT IFNULL(SUM(s.price * id.actual_quantity), 0) AS total_price ");
+		sql.append("FROM io_detail id ");
+		sql.append("JOIN io_receipt ir ON id.io_receipt_id = ir.io_receipt_id ");
+		sql.append("JOIN snapshot s ON id.snapshot_id = s.snapshot_id ");
+		sql.append("WHERE ir.io_type = 'OUT' ");
+		sql.append("AND DATE(ir.processed_date) = CURRENT_DATE() ");
+		sql.append("AND id.status = '완료' ");
+		sql.append("AND id.active = TRUE ");
+		sql.append("AND ir.active = TRUE");
+
+		try {
+			conn = dbManager.getConnection();
+			pstmt = conn.prepareStatement(sql.toString());
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				totalAmount = rs.getInt("total_price");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(pstmt, rs);
+		}
+
+		return totalAmount;
+	}
+
+
+
 	/**
 	 * 최근 7일 간 일자별 입고 수량
 	 * @author 김예진
@@ -333,5 +376,111 @@ public class StatisticDAO {
 	    // LinkedHashMap 값을 리스트로 변환
 	    return new ArrayList<>(merged.values());
 	}
+
+	/**
+	 * 최근 완료된 입고
+	 * @return
+	 */
+	public List<IODetail> getRecentCompletedInboundDetails() {
+		List<IODetail> list = new ArrayList<>();
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT id.io_receipt_id, id.io_detail_id, s.product_name, id.actual_quantity, id.processed_date ");
+		sql.append("FROM io_detail id ");
+		sql.append("JOIN io_receipt ir ON id.io_receipt_id = ir.io_receipt_id ");
+		sql.append("JOIN snapshot s ON id.snapshot_id = s.snapshot_id ");
+		sql.append("WHERE ir.io_type = 'IN' ");
+		sql.append("AND id.status = '완료' ");
+		sql.append("AND id.active = TRUE ");
+		sql.append("AND ir.active = TRUE ");
+		sql.append("ORDER BY id.processed_date DESC ");
+		sql.append("LIMIT 5");
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			conn = dbManager.getConnection();
+			pstmt = conn.prepareStatement(sql.toString());
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				IODetail detail = new IODetail();
+				IOReceipt receipt = new IOReceipt();
+				Snapshot snapshot = new Snapshot();
+
+				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));
+				detail.setIoReceipt(receipt);
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
+				snapshot.setProductName(rs.getString("product_name"));
+				detail.setProductSnapshot(snapshot);
+				detail.setActualQuantity(rs.getInt("actual_quantity"));
+				detail.setProccessedDate(rs.getDate("processed_date"));
+
+				list.add(detail);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(pstmt, rs);
+		}
+
+		return list;
+	}
+
+
+	/**
+	 * 최근 출고 완료
+	 * @return
+	 */
+	public List<IODetail> getRecentCompletedOutboundDetails() {
+		List<IODetail> list = new ArrayList<>();
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT id.io_receipt_id, id.io_detail_id, s.product_name, id.actual_quantity, id.processed_date ");
+		sql.append("FROM io_detail id ");
+		sql.append("JOIN io_receipt ir ON id.io_receipt_id = ir.io_receipt_id ");
+		sql.append("JOIN snapshot s ON id.snapshot_id = s.snapshot_id ");
+		sql.append("WHERE ir.io_type = 'OUT' ");
+		sql.append("AND id.status = '완료' ");
+		sql.append("AND id.active = TRUE ");
+		sql.append("AND ir.active = TRUE ");
+		sql.append("ORDER BY id.processed_date DESC ");
+		sql.append("LIMIT 5");
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			conn = dbManager.getConnection();
+			pstmt = conn.prepareStatement(sql.toString());
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				IODetail detail = new IODetail();
+				IOReceipt receipt = new IOReceipt();
+				Snapshot snapshot = new Snapshot();
+
+				receipt.setIoReceiptId(rs.getInt("io_receipt_id"));
+				detail.setIoReceipt(receipt);
+				detail.setIoDetailId(rs.getInt("io_detail_id"));
+				snapshot.setProductName(rs.getString("product_name"));
+				detail.setProductSnapshot(snapshot);
+				detail.setActualQuantity(rs.getInt("actual_quantity"));
+				detail.setProccessedDate(rs.getDate("processed_date"));
+
+				list.add(detail);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			dbManager.release(pstmt, rs);
+		}
+
+		return list;
+	}
+
 
 }

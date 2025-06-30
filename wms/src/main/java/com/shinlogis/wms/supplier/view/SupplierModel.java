@@ -102,6 +102,7 @@ public class SupplierModel extends AbstractTableModel {
 	public void deleteSupplier() {
 
 		boolean hasChecked = false;
+		int deleteCount = 0;
 		
 		for (Supplier supplier : list) {
 			if (supplier.isChecked()) {
@@ -109,6 +110,7 @@ public class SupplierModel extends AbstractTableModel {
 				supplier.setStatus("비활성");
 				try {
 					supplierDAO.deleteSupplier(supplier);
+					deleteCount++;
 				} catch (SupplierException e) {
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(null, e.getMessage());
@@ -121,7 +123,7 @@ public class SupplierModel extends AbstractTableModel {
 			return;
 		}
 		
-		JOptionPane.showMessageDialog(null, "삭제에 성공하였습니다.");
+		JOptionPane.showMessageDialog(null, "공급사" + deleteCount + " 개가 삭제되었습니다.");
 		list = supplierDAO.showSuppliers();
 		fireTableDataChanged();
 	}
