@@ -63,7 +63,7 @@ public class LocationChat extends JFrame{
         scrollPane = new JScrollPane(chatPane);
 		
 		p_north = new JPanel();
-		t_ip = new JTextField("172.30.1.46");
+		t_ip = new JTextField("192.168.123.101");
 		t_port = new JTextField("9999");
 		bt = new JButton("접속하기");
 		

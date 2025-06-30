@@ -74,12 +74,7 @@ public class ServerThread extends Thread{
 					server.locationList.add(this); //location.getLocationId()를 받는 이유가 본점에서
 					
 				}
-				/*
-				for(ServerThread st : server.headList) {
-					System.out.println("맵에 들어있는 지점의 pk "+st.message.getTarget().getLocationId());
-				}
-				System.out.println("현재까지 " + server.headList.size());
-				*/
+				
 				for(ServerThread st : server.locationList) {
 					System.out.println("맵에 들어있는 지점의 pk "+st.message.getTarget().getLocationId()+",현재까지 " + server.locationList.size());
 				}
