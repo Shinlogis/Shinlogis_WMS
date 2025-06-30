@@ -139,6 +139,8 @@ public class ReceiptDAO {
 			sql.append("AND r.status = ? ");
 			params.add(filters.get("status"));
 		}
+		
+		sql.append(" order by r.io_receipt_id desc ");
 
 		try {
 			conn = dbManager.getConnection();

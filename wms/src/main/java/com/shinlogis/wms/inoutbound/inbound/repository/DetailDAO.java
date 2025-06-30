@@ -125,6 +125,7 @@ public class DetailDAO {
 			sql.append("AND DATE(ir.scheduled_date) = ? ");
 			params.add(filters.get("scheduled_date"));
 		}
+		sql.append(" order by ip.io_detail_id desc ");
 
 //		System.out.println(sql.toString());
 
@@ -322,6 +323,7 @@ public class DetailDAO {
 			sql.append("AND DATE(ir.processed_date) = ? ");
 			params.add(filters.get("processed_date"));
 		}
+		sql.append(" order by ip.io_detail_id desc ");
 
 //		System.out.println(sql.toString());
 

@@ -6,8 +6,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -36,6 +38,7 @@ import com.shinlogis.locationuser.order.repository.StoreOrderItemDAO;
 import com.shinlogis.wms.AppMain;
 import com.shinlogis.wms.common.config.Config;
 import com.shinlogis.wms.common.config.Page;
+import com.shinlogis.wms.common.util.ImageUtil;
 import com.shinlogis.wms.location.model.LocationModel;
 import com.shinlogis.wms.product.repository.ProductDAO;
 import com.toedter.calendar.JDateChooser;
@@ -67,10 +70,21 @@ public class LocationPage extends Page{
     private JPanel pTable_Content_title2; //content 제목 영역 
     private JLabel laContentTitle2; 
     
+    ImageUtil imageUtil=new ImageUtil();
+    Image image1;
+    JPanel img1;
     
 	public LocationPage(AppMain appMain) {
 		super(appMain);
-			
+		image1 = imageUtil.getImage("images/map.png",Config.CONTENT_WIDTH/2, 580);
+		img1= new JPanel() {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);// update() 에 지워진 배경을 스스로 복구
+				g.drawImage(image1, 0, 0, getWidth(), getHeight(),this);
+			}
+		};
+		img1.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, 580));
+		
 		/* ==== 검색 영역 ==== */
 		pSearch = new JPanel(new GridBagLayout()); // GridBagLayout: 칸(그리드)를 바탕으로 컴포넌트를 배치
 		pSearch.setPreferredSize(new Dimension(Config.CONTENT_WIDTH/2, Config.SEARCH_BAR_HEIGHT));
@@ -94,12 +108,13 @@ public class LocationPage extends Page{
         pSearch.add(tf, gbc);
         
         gbc.gridx = 2;
-        pSearch2.add(new JLabel("지점검색"), gbc);
+        pSearch2.add(new JLabel("지점 위치 검색"), gbc);
         tf2 = new JTextField();
         tf2.setPreferredSize(new Dimension(150, tf2.getPreferredSize().height));
         tf2.setBackground(Color.WHITE);
         gbc.gridx = 3;
         pSearch2.add(tf2, gbc);
+        
         
         // 검색 버튼
         btnSearch = new JButton("검색");
@@ -139,9 +154,10 @@ public class LocationPage extends Page{
         pTable_Content_title2.setPreferredSize(new Dimension(800/2, Config.TABLE_NORTH_HEIGHT-10));
         laContentTitle2.setPreferredSize(new Dimension(800/2, 20));
         pTable_Content_title2.setBackground(Color.white);
-        pTable_Content2.setBackground(Color.WHITE);
-        pTable.setBackground(new Color(0xF1F1F1));
-  
+        pTable_Content2.setBackground(Color.red);
+        pTable2.setBackground(new Color(0xF1F1F1));
+        //pTable2.setBackground(Color.red);
+        pTable2.add(img1);
         
         //정렬 적용
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
