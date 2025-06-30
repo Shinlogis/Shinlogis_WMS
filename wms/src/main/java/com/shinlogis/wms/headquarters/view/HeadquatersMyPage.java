@@ -207,8 +207,8 @@ public class HeadquatersMyPage extends Page {
 		t_pwd.setText("");
 		t_pwdCheck.setText("");
 
-//		String[] email = headquartersUser.getEmail().split("@");
-//		t_email.setText(email[0]);
+		String[] email = headquartersUser.getEmail().split("@");
+		t_email.setText(email[0]);
 
 	}
 
